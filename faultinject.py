@@ -4,21 +4,25 @@ import subprocess
 import time
 import random
 import pexpect
+import configure
 
-toolbase = "/home/bo/pb_interceptor"
-pinbase = "/home/bo/pin-2.11-49306-gcc.3.4.6-ia32_intel64-linux/pin"
+
 randinst_lib = "obj-intel64/randomInst.so"
 randinst_config = "-randinst"
 
 iterationinst = "obj-intel64/determineInst.so"
 iterationinst_config1 = "-pc"
-iterationinst_config2 = "-randomInt"
+iterationinst_config2 = "-randinst"
+
+nextinst = "obj-intel64/findnextpc.so"
+nextinst_config1 = "-pc"
 
 binary = ""
 timeout = 500
 
 instructionfile = "instruction"
 iterationfile = "iteration"
+nextpcfile = "nextpc"
 
 
 class FaultInjector:
@@ -27,14 +31,14 @@ class FaultInjector:
         self.totalInst = totalInst
         self.binary = binary
 
-    def getBreakpoint(self,total):
+    def getBreakpoint(self):
         ## get
         """
 
         :rtype: strings
         """
-        randomnum = random.randint(0,total)
-        execlist = [pinbase,"-t",os.path.join(toolbase,randinst_lib),randinst_config,str(randomnum),"--",self.binary]
+        randomnum = random.randint(0,self.totalInst)
+        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,randinst_lib),randinst_config,str(randomnum),"--",self.binary]
         self.execute(execlist)
         # check if the file is generated
         if os.path.isfile(instructionfile) != True:
@@ -44,7 +48,6 @@ class FaultInjector:
         reg = ""
         pc = ""
         iteration = ""
-        next = ""
         with open(instructionfile,"r") as f:
             lines = f.readlines()
             for line in lines:
@@ -58,15 +61,15 @@ class FaultInjector:
                     reg = line.split(":")[1]
                 if "pc:" in line:
                     pc = line.split(":")[1]
-                if "next:" in line:
-                    next = line.split(":")[1]
+                #if "next:" in line:
+                #    next = line.split(":")[1]
         if reg == "" and regmem == "":
             print "No reg, Exit"
             exit()
-        execlist = [pinbase,"-t",os.path.join(toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,randomnum,"--",self.binary]
+        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,randomnum,"--",self.binary]
         self.execute(execlist)
 
-        if os.path.isfile(iterationfile):
+        if os.path.isfile(iterationfile) != True:
             print "No iteration file generated! Exit"
             exit()
 
@@ -76,7 +79,7 @@ class FaultInjector:
                 line = line.rstrip("\n")
                 iteration = line
 
-        return [regmem,reg,pc, iteration,next]
+        return [regmem,reg,pc, iteration]
 
 
     def execute(self,execlist):
@@ -104,3 +107,21 @@ class FaultInjector:
         mask = (1 << pos)
         print "New value is "+str(int(ori_value,16)^mask)+" Old value is "+ori_value
         return str(int(ori_value)^mask)
+
+    def getNextPC(self,pc):
+        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,instructionfile),nextinst_config1,str(pc),"--",self.binary]
+        p = self.execute(execlist)
+        if os.path.isfile(nextpcfile) != True:
+            print "No nextpc file is generated! Exit"
+            exit()
+        nextpc = ""
+        regw = []
+        with open(nextpcfile,"r") as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.rstrip("\n")
+                if "nextpc:" in line:
+                    nextpc = line.split(":")[1]
+                if "regw" in line:
+                    regw.append(line.split(":")[1])
+        return [nextpc,regw]

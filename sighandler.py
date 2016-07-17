@@ -5,23 +5,22 @@ import pexpect
 
 import objdump
 import faultinject
+import configure
 
-benchmark = ""
 GDB_PROMOPT = "(gdb)"
-GDB_ARG = "" # need a space in the beginning
-GDB_RUN = "run"+GDB_ARG
-GDB_LAUNCH = "gdb "+benchmark
+GDB_RUN = "run "+configure.args
+GDB_LAUNCH = "gdb "+configure.benchmark
 GDB_HANDLE_BUS = "handle SIGBUS nopass"
 GDB_HANDLE_SEGV = "handle SIGSEGV nopass"
 GDB_PRINT_PC = "x/i $pc"
 GDB_CONTINUE = "c"
 GDB_NEXT = "stepi"
 GDB_PRINT_REG = "print"
+GDB_FAKE = "0"
 
 GDB_ERROR_SEGV = "Program received signal SIGSEGV"
 GDB_ERROR_BUS = "Program received signal SIGBUS"
 
-totalinst = ''
 
 class SigHandler:
 
@@ -30,7 +29,7 @@ class SigHandler:
         self.insts = insts
 
     def executeProgram(self):
-        global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT,GDB_CONTINUE
+        global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT,GDB_CONTINUE,GDB_FAKE
         process = pexpect.spawn(GDB_LAUNCH)
         i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
         if i == 0:
@@ -50,10 +49,10 @@ class SigHandler:
         ##
         # Set a breakpoint: need pc and iteration number
         ##
-        fi = faultinject(totalinst,benchmark)
-        args = fi.getBreakpoint(totalinst) # [regmm, reg, pc, iteration]
+        fi = faultinject(self.executable,self.insts)
+        args = fi.getBreakpoint(self.insts) # [regmm, reg, pc, iteration]
 
-        if len(args) != 5:
+        if len(args) != 4:
             print "Wrong return values! Exit!"
             exit()
 
@@ -61,7 +60,7 @@ class SigHandler:
         reg = args[1]
         pc = args[2]
         iteration = int(args[3])
-        next = hex(int(args[4]))
+        #next = hex(int(args[4]))
 
         hexpc = hex(int(pc))
         print hexpc
@@ -183,7 +182,60 @@ class SigHandler:
 
                     output = process.before
                     if GDB_ERROR_SEGV in output or GDB_ERROR_BUS in output:
-                        process.sendline(GDB_PRINT_REG+" $pc="+str(next))
+                        ##
+                        # Need to pass the current pc to pin, and get all the info
+                        ##
+                        process.sendline(GDB_PRINT_PC+" $pc")
+                        i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                        if i == 1:
+                            # parse the pc value by regex 0x
+                            # send the pc to pin, and get all info we need
+                            match = re.findall('^(0[xX])?[A-Fa-f0-9]+$',process.before)
+                            if len(match) == 0:
+                                print "Error while getting no PC!"
+                                sys.exit(1)
+                            decpc = int(match[0],0)
+                            args = fi.getNextPC(decpc)
+                            if len(args) != 2:
+                                print "Error while returning incorrect length"
+                                sys.exit(1)
+
+                            nextpc = args[0]
+                            regwlist = args[1]
+                            process.sendline(GDB_PRINT_REG+" $pc="+str(nextpc))
+                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                            if i == 0:
+                                print "ERROR when setting the pc value"
+                                print process.before, process.after
+                                print str(process)
+                                sys.exit(1)
+
+                            if i == 1:
+                            #####
+                            # We can have multiple options here. For now, we feed the value (0) to the supposed-to-write register
+                            #####
+                                for reg in regwlist:
+                                    process.sendline(GDB_PRINT_REG+" "+reg+"="+GDB_FAKE)
+                                    i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                    if i == 0:
+                                         print "ERROR when setting the reg value"
+                                         print process.before, process.after
+                                         print str(process)
+                                         sys.exit(1)
+
+
+
+                                process.snedline(GDB_CONTINUE)
+                                i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                if i == 0:
+                                    print "ERROR when continue after feeding the regsters"
+                                    print process.before, process.after
+                                    print str(process)
+                                    sys.exit(1)
+
+                                if i == 1:
+                                    print "Program finishes!"
+                                    print process.before
 
 
 
