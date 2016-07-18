@@ -51,7 +51,7 @@ with open(configure.instcount,"r") as f:
     if len(lines) > 1:
         print "Error while loading inst count."
         sys.exit(1)
-    totalcount = lines[0]
+    totalcount = lines[0].rstrip("\n")
 
 
 for i in range(0,configure.numFI):
