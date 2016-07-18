@@ -41,7 +41,7 @@ class FaultInjector:
         execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,randinst_lib),randinst_config,str(randomnum),"--",self.binary]
         self.execute(execlist)
         # check if the file is generated
-        if os.path.isfile(instructionfile) != True:
+        if not os.path.isfile(instructionfile):
             print "No File generated!"
             exit()
         regmem = ""
@@ -69,7 +69,7 @@ class FaultInjector:
         execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,randomnum,"--",self.binary]
         self.execute(execlist)
 
-        if os.path.isfile(iterationfile) != True:
+        if not os.path.isfile(iterationfile):
             print "No iteration file generated! Exit"
             exit()
 
@@ -111,7 +111,7 @@ class FaultInjector:
     def getNextPC(self,pc):
         execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,instructionfile),nextinst_config1,str(pc),"--",self.binary]
         p = self.execute(execlist)
-        if os.path.isfile(nextpcfile) != True:
+        if not os.path.isfile(nextpcfile):
             print "No nextpc file is generated! Exit"
             exit()
         nextpc = ""
