@@ -25,7 +25,7 @@ GDB_ERROR_BUS = "Program received signal SIGBUS"
 class SigHandler:
 
     def __init__(self, insts,trial):
-        self.insts = insts
+        self.insts = int(insts)
         self.trial = trial
 
     def executeProgram(self):
