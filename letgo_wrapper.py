@@ -34,7 +34,7 @@ def execute(execlist,out,err):
 
 instcount = configure.pin_base+"/source/tools/ManualExamples/obj-intel64/inscount0.so"
 
-execlist = [configure.pin_home,"-t",instcount,"--",configure.benchmark]
+execlist = [configure.pin_home,"-t",instcount,"--",configure.benchmark,configure.args]
 
 out = "sampleout"
 err = "sampleerr"

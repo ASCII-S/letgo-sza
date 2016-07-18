@@ -24,8 +24,7 @@ GDB_ERROR_BUS = "Program received signal SIGBUS"
 
 class SigHandler:
 
-    def __init__(self, executable, insts):
-        self.executable = executable
+    def __init__(self, insts):
         self.insts = insts
 
     def executeProgram(self):
@@ -49,7 +48,7 @@ class SigHandler:
         ##
         # Set a breakpoint: need pc and iteration number
         ##
-        fi = faultinject(self.executable,self.insts)
+        fi = faultinject(self.insts)
         args = fi.getBreakpoint(self.insts) # [regmm, reg, pc, iteration]
 
         if len(args) != 4:

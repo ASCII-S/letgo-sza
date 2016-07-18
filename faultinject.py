@@ -27,9 +27,8 @@ nextpcfile = "nextpc"
 
 class FaultInjector:
 
-    def __init__(self, binary, totalInst):
+    def __init__(self,totalInst):
         self.totalInst = totalInst
-        self.binary = binary
 
     def getBreakpoint(self):
         ## get
@@ -38,7 +37,7 @@ class FaultInjector:
         :rtype: strings
         """
         randomnum = random.randint(0,self.totalInst)
-        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,randinst_lib),randinst_config,str(randomnum),"--",self.binary]
+        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,randinst_lib),randinst_config,str(randomnum),"--",configure.benchmark,configure.args]
         self.execute(execlist)
         # check if the file is generated
         if not os.path.isfile(instructionfile):
@@ -66,7 +65,7 @@ class FaultInjector:
         if reg == "" and regmem == "":
             print "No reg, Exit"
             exit()
-        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,randomnum,"--",self.binary]
+        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,randomnum,"--",configure.benchmark,configure.args]
         self.execute(execlist)
 
         if not os.path.isfile(iterationfile):
@@ -109,7 +108,7 @@ class FaultInjector:
         return str(int(ori_value)^mask)
 
     def getNextPC(self,pc):
-        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,instructionfile),nextinst_config1,str(pc),"--",self.binary]
+        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,instructionfile),nextinst_config1,str(pc),"--",configure.benchmark,configure.args]
         p = self.execute(execlist)
         if not os.path.isfile(nextpcfile):
             print "No nextpc file is generated! Exit"
