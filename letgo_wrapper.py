@@ -53,11 +53,13 @@ with open(configure.instcount,"r") as f:
         sys.exit(1)
     count = lines[0]
     count = count.rstrip("\n")
+    print count
     totalcount = count.strip(" ")[1]
 
 
 for i in range(0,configure.numFI):
     print "Test"
+    print totalcount
     sig = sighandler.SigHandler(totalcount,i)
 
 
