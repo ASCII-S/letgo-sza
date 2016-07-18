@@ -61,6 +61,7 @@ for i in range(0,configure.numFI):
     print "Test"
     print totalcount
     sig = sighandler.SigHandler(totalcount,i)
+    sig.executeProgram()
 
 
 
