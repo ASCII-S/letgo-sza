@@ -38,6 +38,7 @@ class SigHandler:
             print('ERROR! Could not run GDB')
             print(process.before, process.after)
             print(str(process))
+            log.close()
             sys.exit(1)
         if i == 1:
             print('Program starts!')
@@ -56,6 +57,7 @@ class SigHandler:
 
         if len(args) != 4:
             print "Wrong return values! Exit!"
+            log.close()
             sys.exit(1)
 
         regmm = args[0]
@@ -73,6 +75,7 @@ class SigHandler:
             print'ERROR! Could not set the breakpoint'
             print process.before, process.after
             print str(process)
+            log.close()
             sys.exit (1)
         if i == 1:
             print 'Successfully set the breakpoint'
@@ -84,6 +87,7 @@ class SigHandler:
             print 'ERROR! Could not run the program'
             print process.before, process.after
             print str(process)
+            log.close()
             sys.exit(1)
         if i == 1:
             output = process.before
@@ -97,6 +101,7 @@ class SigHandler:
                         print 'ERROR while conitinuing the program'
                         print process.before, process.after
                         print str(process)
+                        log.close()
                         sys.exit(1)
                     if i == 1:
                         iteration = iteration -1
@@ -109,6 +114,7 @@ class SigHandler:
                         print 'ERROR! Can not step in'
                         print process.before, process.after
                         print str(process)
+                        log.close()
                         sys.exit(1)
                     if i == 1:
                         process.sendline(GDB_PRINT_REG+"$"+reg)
@@ -117,6 +123,7 @@ class SigHandler:
                             print 'ERROR while analyzing the content of the register'
                             print process.before, process.after
                             print str(process)
+                            log.close()
                             sys.exit(1)
                         if i == 1:
                             output = process.before
@@ -136,6 +143,7 @@ class SigHandler:
                                     print 'ERROR while waiting for changing the value'
                                     print process.before, process.after
                                     print str(process)
+                                    log.close()
                                     sys.exit(1)
                                 if i == 1:
                                     output = process.before
@@ -148,6 +156,7 @@ class SigHandler:
                         print 'ERROR while analyzing the content of the register mem'
                         print process.before, process.after
                         print str(process)
+                        log.close()
                         sys.exit(1)
                     if i == 1:
                         output = process.before
@@ -167,6 +176,7 @@ class SigHandler:
                                 print 'ERROR while waiting for changing the value mem'
                                 print process.before, process.after
                                 print str(process)
+                                log.close()
                                 sys.exit(1)
                             if i == 1:
                                 output = process.before
@@ -178,6 +188,7 @@ class SigHandler:
                     print "ERROR when passing to signal handler"
                     print process.before, process.after
                     print str(process)
+                    log.close()
                     sys.exit(1)
 
                 if i == 1:
@@ -195,11 +206,13 @@ class SigHandler:
                             match = re.findall('^(0[xX])?[A-Fa-f0-9]+$',process.before)
                             if len(match) == 0:
                                 print "Error while getting no PC!"
+                                log.close()
                                 sys.exit(1)
                             decpc = int(match[0],0)
                             args = fi.getNextPC(decpc)
                             if len(args) != 2:
                                 print "Error while returning incorrect length"
+                                log.close()
                                 sys.exit(1)
 
                             nextpc = args[0]
@@ -210,6 +223,7 @@ class SigHandler:
                                 print "ERROR when setting the pc value"
                                 print process.before, process.after
                                 print str(process)
+                                log.close()
                                 sys.exit(1)
 
                             if i == 1:
@@ -223,6 +237,7 @@ class SigHandler:
                                          print "ERROR when setting the reg value"
                                          print process.before, process.after
                                          print str(process)
+                                         log.close()
                                          sys.exit(1)
 
 
@@ -233,6 +248,7 @@ class SigHandler:
                                     print "ERROR when continue after feeding the regsters"
                                     print process.before, process.after
                                     print str(process)
+                                    log.close()
                                     sys.exit(1)
 
                                 if i == 1:
