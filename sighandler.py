@@ -24,18 +24,21 @@ GDB_ERROR_BUS = "Program received signal SIGBUS"
 
 class SigHandler:
 
-    def __init__(self, insts):
+    def __init__(self, insts,trial):
         self.insts = insts
+        self.trial = trial
 
     def executeProgram(self):
         global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT,GDB_CONTINUE,GDB_FAKE
+        log = open(str(self.trial),"w")
+        sys.stdout = log
         process = pexpect.spawn(GDB_LAUNCH)
         i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
         if i == 0:
             print('ERROR! Could not run GDB')
             print(process.before, process.after)
             print(str(process))
-            sys.exit (1)
+            sys.exit(1)
         if i == 1:
             print('Program starts!')
             process.sendline(GDB_HANDLE_BUS)
@@ -53,7 +56,7 @@ class SigHandler:
 
         if len(args) != 4:
             print "Wrong return values! Exit!"
-            exit()
+            sys.exit(1)
 
         regmm = args[0]
         reg = args[1]
@@ -234,7 +237,9 @@ class SigHandler:
 
                                 if i == 1:
                                     print "Program finishes!"
-                                    print process.before
+                                    print process.before, process.after
+                                    log.close()
+                                    sys.stdout = sys.__stdout__
 
 
 

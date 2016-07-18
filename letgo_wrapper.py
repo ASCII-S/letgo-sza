@@ -53,7 +53,9 @@ with open(configure.instcount,"r") as f:
         sys.exit(1)
     totalcount = lines[0]
 
-print totalcount
+
+for i in range(0,configure.numFI):
+    sig = sighandler(totalcount,i)
 
 
 
