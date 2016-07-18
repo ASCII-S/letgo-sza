@@ -51,7 +51,7 @@ class SigHandler:
         ##
         # Set a breakpoint: need pc and iteration number
         ##
-        fi = faultinject(self.insts)
+        fi = faultinject.FaultInjector(self.insts)
         args = fi.getBreakpoint(self.insts) # [regmm, reg, pc, iteration]
 
         if len(args) != 4:

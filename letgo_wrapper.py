@@ -55,7 +55,7 @@ with open(configure.instcount,"r") as f:
 
 
 for i in range(0,configure.numFI):
-    sig = sighandler(totalcount,i)
+    sig = sighandler.SigHandler(totalcount,i)
 
 
 
