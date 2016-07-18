@@ -54,7 +54,7 @@ with open(configure.instcount,"r") as f:
     count = lines[0]
     count = count.rstrip("\n")
     print count
-    totalcount = count.strip(" ")[1]
+    totalcount = count.split(" ")[1]
 
 
 for i in range(0,configure.numFI):
