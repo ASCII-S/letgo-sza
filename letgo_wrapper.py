@@ -7,7 +7,7 @@ import subprocess
 import time
 
 timeout = 500
-instcount = "instcout.out"
+
 
 #obtain the total number of dynamic instructions
 
@@ -46,7 +46,7 @@ if not os.path.isfile(instcount):
     sys.exit(1)
 
 totalcount = ""
-with open(instcount,"r") as f:
+with open(configure.inscount,"r") as f:
     lines = f.readlines()
     if len(lines) > 1:
         print "Error while loading inst count."
