@@ -11,7 +11,7 @@ instcount = "instcout.out"
 
 #obtain the total number of dynamic instructions
 
-def execute(self,execlist,out,err):
+def execute(execlist,out,err):
 
         outFile = open(out,"w")
         errFile = open(err,"w")
