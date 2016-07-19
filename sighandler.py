@@ -120,7 +120,7 @@ class SigHandler:
                         log.close()
                         sys.exit(1)
                     if i == 1:
-                        process.sendline(GDB_PRINT_REG+"$"+reg)
+                        process.sendline(GDB_PRINT_REG+" $"+reg)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 0:
                             print 'ERROR while analyzing the content of the register'
@@ -153,7 +153,7 @@ class SigHandler:
                                     if "=" in output:
                                         print "Fault injection is done"
                 if reg == "": # it means that it is a memory instruction. Need to inject before it is executed.
-                    process.sendline(GDB_PRINT_REG+"$"+regmm)
+                    process.sendline(GDB_PRINT_REG+" $"+regmm)
                     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                     if i == 0:
                         print 'ERROR while analyzing the content of the register mem'
