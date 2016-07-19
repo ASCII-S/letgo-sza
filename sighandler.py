@@ -41,6 +41,7 @@ class SigHandler:
             log.close()
             sys.exit(1)
         if i == 1:
+            temp = process.before ## just to flush the before buffer
             print('Program starts!')
             process.sendline(GDB_HANDLE_BUS)
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])

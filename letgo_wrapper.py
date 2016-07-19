@@ -63,9 +63,9 @@ for i in range(0,configure.numFI):
     sig = sighandler.SigHandler(totalcount,i)
     sig.executeProgram()
     #clean up for next round
-    sys.path.remove(faultinject.instructionfile)
-    sys.path.remove(faultinject.iterationfile)
-    sys.path.remove(faultinject.nextpcfile)
+    os.remove(faultinject.instructionfile)
+    os.remove(faultinject.iterationfile)
+    os.remove(faultinject.nextpcfile)
 
 
 
