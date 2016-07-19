@@ -12,7 +12,7 @@ GDB_RUN = "run "+configure.args
 GDB_LAUNCH = "gdb "+configure.benchmark
 GDB_HANDLE_BUS = "handle SIGBUS nopass"
 GDB_HANDLE_SEGV = "handle SIGSEGV nopass"
-GDB_PRINT_PC = "x/i $pc"
+GDB_PRINT_PC = "print $pc"
 GDB_CONTINUE = "c"
 GDB_NEXT = "stepi"
 GDB_PRINT_REG = "print"
@@ -140,7 +140,7 @@ class SigHandler:
                                 items = output.split(" ")
                                 content = items[len(items)-1]
                                 content = fi.generateFaults(content)
-                                process.sendline(GDB_PRINT_PC+" "+reg+"="+content)
+                                process.sendline(GDB_PRINT_REG+" "+reg+"="+content)
                                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                 if i == 0:
                                     print 'ERROR while waiting for changing the value'
@@ -173,7 +173,7 @@ class SigHandler:
                             items = output.split(" ")
                             content = items[len(items)-1]
                             content = fi.generateFaults(content)
-                            process.sendline(GDB_PRINT_PC+" "+regmm+"="+content)
+                            process.sendline(GDB_PRINT_REG+" "+regmm+"="+content)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
                                 print 'ERROR while waiting for changing the value mem'
@@ -201,7 +201,7 @@ class SigHandler:
                         ##
                         # Need to pass the current pc to pin, and get all the info
                         ##
-                        process.sendline(GDB_PRINT_PC+" $pc")
+                        process.sendline(GDB_PRINT_PC)
                         i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                         if i == 1:
                             # parse the pc value by regex 0x
