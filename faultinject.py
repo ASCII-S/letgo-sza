@@ -42,7 +42,7 @@ class FaultInjector:
         # check if the file is generated
         if not os.path.isfile(instructionfile):
             print "No File generated!"
-            exit()
+            sys.exit(1)
         regmem = ""
         reg = ""
         pc = ""
@@ -53,7 +53,7 @@ class FaultInjector:
                 line = line.rstrip("")
                 if "REGNOTVALID" in line:
                     print "REG not valid! Exit"
-                    exit()
+                    sys.exit(1)
                 if "mem:" in line:
                     regmem = line.split(":")[1]
                 if "reg:" in line:
@@ -64,13 +64,13 @@ class FaultInjector:
                 #    next = line.split(":")[1]
         if reg == "" and regmem == "":
             print "No reg, Exit"
-            exit()
-        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,randomnum,"--",configure.benchmark,configure.args]
+            sys.exit(1)
+        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,str(randomnum),"--",configure.benchmark,configure.args]
         self.execute(execlist)
 
         if not os.path.isfile(iterationfile):
             print "No iteration file generated! Exit"
-            exit()
+            sys.exit(1)
 
         with open(iterationfile,"r") as f:
             lines = f.readlines()
@@ -112,7 +112,7 @@ class FaultInjector:
         p = self.execute(execlist)
         if not os.path.isfile(nextpcfile):
             print "No nextpc file is generated! Exit"
-            exit()
+            sys.exit(1)
         nextpc = ""
         regw = []
         with open(nextpcfile,"r") as f:
