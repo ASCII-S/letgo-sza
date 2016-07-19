@@ -44,10 +44,10 @@ class SigHandler:
             print('Program starts!')
             process.sendline(GDB_HANDLE_BUS)
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-            print('Signal handler SIGBUS changed!')
+            print(process.before)
             process.sendline(GDB_HANDLE_SEGV)
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-            print('Signal handler SIGSEGV changed!')
+            print(process.before)
 
         ##
         # Set a breakpoint: need pc and iteration number
@@ -78,6 +78,7 @@ class SigHandler:
             log.close()
             sys.exit (1)
         if i == 1:
+            print process.before
             print 'Successfully set the breakpoint'
 
 
@@ -105,6 +106,7 @@ class SigHandler:
                         sys.exit(1)
                     if i == 1:
                         iteration = iteration -1
+                        print process.before
                         print "Jumping to the next iteration"
 
                 if regmm == "": # it means that it is a normal instruction and we need to inject the fault to the dest reg
