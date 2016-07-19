@@ -61,10 +61,10 @@ class SigHandler:
             log.close()
             sys.exit(1)
 
-        regmm = args[0]
-        reg = args[1]
-        pc = args[2]
-        iteration = int(args[3])
+        regmm = args[0].rstrip("\n")
+        reg = args[1].rstrip("\n")
+        pc = args[2].rstrip("\n")
+        iteration = int(args[3].rstrip("\n"))
         #next = hex(int(args[4]))
 
         hexpc = hex(int(pc))

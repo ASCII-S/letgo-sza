@@ -102,6 +102,7 @@ class FaultInjector:
 
     def generateFaults(self,ori_value):
 
+        print ori_value
         pos = random.randint(0,31)
         mask = (1 << pos)
         print "New value is "+str(int(ori_value,16)^mask)+" Old value is "+ori_value
