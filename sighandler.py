@@ -7,7 +7,7 @@ import objdump
 import faultinject
 import configure
 
-GDB_PROMOPT = "(gdb)"
+GDB_PROMOPT = "\(gdb\)"
 GDB_RUN = "run "+configure.args
 GDB_LAUNCH = "gdb "+configure.benchmark
 GDB_HANDLE_BUS = "handle SIGBUS nopass"
