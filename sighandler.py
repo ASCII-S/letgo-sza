@@ -35,6 +35,7 @@ class SigHandler:
         global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT,GDB_CONTINUE,GDB_FAKE
         log = open(str(self.trial),"w")
         sys.stdout = log
+        ori_reg = 0
         process = pexpect.spawn(GDB_LAUNCH)
         i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
         if i == 0:
@@ -176,6 +177,7 @@ class SigHandler:
                         else:
                             items = output.split(" ")
                             content = items[len(items)-1]
+                        ori_reg = content.rstrip("\r\n")
                         content = fi.generateFaults(content)
                         process.sendline(GDB_SET_REG+" $"+regmm+"="+content)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -260,7 +262,21 @@ class SigHandler:
                                          sys.exit(1)
 
 
+                                # try to set the rbp and rsp to reasonable values
+                                if reg == "":
+                                    if "rbp" in regmm or "rsp" in regmm or "rip" in regmm:
+                                        process.sendline(GDB_SET_REG+" $"+regmm+"="+ori_reg)
+                                        process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                        if i == 0:
+                                            print "ERROR when continue after feeding the regsters"
+                                            print process.before, process.after
+                                            print str(process)
+                                            log.close()
+                                            sys.exit(1)
 
+                                        if i == 1:
+                                            print "Set memory base back!"
+                                            print process.before, process.after
                                 process.sendline(GDB_CONTINUE)
                                 i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                 if i == 0:
