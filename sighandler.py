@@ -18,7 +18,7 @@ GDB_CONTINUE = "c"
 GDB_NEXT = "stepi"
 GDB_PRINT_REG = "print"
 GDB_FAKE = "0"
-GDB_DELETE_BP = "delete breakpoints"
+GDB_DELETE_BP = "delete breakpoints 1"
 
 GDB_ERROR_SEGV = "Program received signal SIGSEGV"
 GDB_ERROR_BUS = "Program received signal SIGBUS"
