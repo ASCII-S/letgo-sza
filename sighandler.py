@@ -43,7 +43,8 @@ class SigHandler:
             print(process.before, process.after)
             print(str(process))
             log.close()
-            sys.exit(1)
+            process.close()
+            return
         if i == 1:
             temp = process.before ## just to flush the before buffer
             print('Program starts!')
@@ -63,7 +64,8 @@ class SigHandler:
         if len(args) != 4:
             print "Wrong return values! Exit!"
             log.close()
-            sys.exit(1)
+            process.close()
+            return
 
         regmm = args[0].rstrip("\n")
         reg = args[1].rstrip("\n")
@@ -81,7 +83,8 @@ class SigHandler:
             print process.before, process.after
             print str(process)
             log.close()
-            sys.exit (1)
+            process.close()
+            return
         if i == 1:
             print process.before
             print 'Successfully set the breakpoint'
@@ -94,7 +97,8 @@ class SigHandler:
             print process.before, process.after
             print str(process)
             log.close()
-            sys.exit(1)
+            process.close()
+            return
         if i == 1:
             output = process.before
             if "Breakpoint" in output:
@@ -111,7 +115,8 @@ class SigHandler:
                         print process.before, process.after
                         print str(process)
                         log.close()
-                        sys.exit(1)
+                        process.close()
+                        return
                     if i == 1:
                         iteration -= 1
 
@@ -123,7 +128,8 @@ class SigHandler:
                         print process.before, process.after
                         print str(process)
                         log.close()
-                        sys.exit(1)
+                        process.close()
+                        return
                     if i == 1:
                         process.sendline(GDB_PRINT_REG+" $"+reg)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -152,7 +158,8 @@ class SigHandler:
                                 print process.before, process.after
                                 print str(process)
                                 log.close()
-                                sys.exit(1)
+                                process.close()
+                                return
                             if i == 1:
                                 output = process.before
                                 if "=" in output:
@@ -165,7 +172,8 @@ class SigHandler:
                         print process.before, process.after
                         print str(process)
                         log.close()
-                        sys.exit(1)
+                        process.close()
+                        return
                     if i == 1:
                         output = process.before
                         content = ""
@@ -186,7 +194,8 @@ class SigHandler:
                             print process.before, process.after
                             print str(process)
                             log.close()
-                            sys.exit(1)
+                            process.close()
+                            return
                         if i == 1:
                             output = process.before
                             if "=" in output:
@@ -198,7 +207,8 @@ class SigHandler:
                     print process.before, process.after
                     print str(process)
                     log.close()
-                    sys.exit(1)
+                    process.close()
+                    return
                 if i == 1:
                     print "Delete all breakpoints"
                 process.sendline(GDB_CONTINUE)
@@ -208,7 +218,8 @@ class SigHandler:
                     print process.before, process.after
                     print str(process)
                     log.close()
-                    sys.exit(1)
+                    process.close()
+                    return
 
                 if i == 1:
 
@@ -228,13 +239,15 @@ class SigHandler:
                             if len(match) == 0:
                                 print "Error while getting no PC!"
                                 log.close()
-                                sys.exit(1)
+                                process.close()
+                                return
                             decpc = int(match[0],0)
                             args = fi.getNextPC(decpc)
                             if len(args) != 2:
                                 print "Error while returning incorrect length"
                                 log.close()
-                                sys.exit(1)
+                                process.close()
+                                return
                             print args
                             nextpc = args[0]
                             regwlist = args[1]
@@ -245,21 +258,23 @@ class SigHandler:
                                 print process.before, process.after
                                 print str(process)
                                 log.close()
-                                sys.exit(1)
+                                process.close()
+                                return
 
                             if i == 1:
                             #####
                             # We can have multiple options here. For now, we feed the value (0) to the supposed-to-write register
                             #####
-                                for reg in regwlist:
-                                    process.sendline(GDB_SET_REG+" $"+reg+"="+GDB_FAKE)
+                                for regw in regwlist:
+                                    process.sendline(GDB_SET_REG+" $"+regw+"="+GDB_FAKE)
                                     i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                     if i == 0:
                                          print "ERROR when setting the reg value"
                                          print process.before, process.after
                                          print str(process)
                                          log.close()
-                                         sys.exit(1)
+                                         process.close()
+                                         return
 
 
                                 # try to set the rbp and rsp to reasonable values
@@ -272,7 +287,8 @@ class SigHandler:
                                             print process.before, process.after
                                             print str(process)
                                             log.close()
-                                            sys.exit(1)
+                                            process.close()
+                                            return
 
                                         if i == 1:
                                             print "Set memory base back!"
@@ -284,7 +300,8 @@ class SigHandler:
                                     print process.before, process.after
                                     print str(process)
                                     log.close()
-                                    sys.exit(1)
+                                    process.close()
+                                    return
 
                                 if i == 1:
                                     print process.before, process.after
