@@ -55,11 +55,11 @@ class FaultInjector:
                     print "REG not valid! Exit"
                     sys.exit(1)
                 if "mem:" in line:
-                    regmem = line.split(":")[1]
+                    regmem = line.split(":")[1].rstrip("\n")
                 if "reg:" in line:
-                    reg = line.split(":")[1]
+                    reg = line.split(":")[1].rstrip("\n")
                 if "pc:" in line:
-                    pc = line.split(":")[1]
+                    pc = line.split(":")[1].rstrip("\n")
                 #if "next:" in line:
                 #    next = line.split(":")[1]
         if reg == "" and regmem == "":
