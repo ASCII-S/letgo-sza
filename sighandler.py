@@ -278,6 +278,7 @@ class SigHandler:
                                     process.close()
                                     sys.stdout = sys.__stdout__
                     else:
+                        print "No triggering crashes"
                         print process.before
 
 
