@@ -6,6 +6,7 @@ import pexpect
 import objdump
 import faultinject
 import configure
+import random
 
 GDB_PROMOPT = "\(gdb\)"
 GDB_RUN = "run "+configure.args
@@ -96,6 +97,9 @@ class SigHandler:
             if "Breakpoint" in output:
                 print "Pause at the breakpoint for the first time!"
                 # inject a fault
+                if iteration > 1024:
+                    iteration = random.randint(0,1024)
+                iteration = 1
                 while iteration > 0:
                     process.sendline(GDB_CONTINUE)
                     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
