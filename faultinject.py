@@ -14,7 +14,7 @@ iterationinst = "obj-intel64/determineInst.so"
 iterationinst_config1 = "-pc"
 iterationinst_config2 = "-randinst"
 
-nextinst = "obj-intel64/findnextpc.so"
+nextinst = "obj-intel64/findnextinst.so"
 nextinst_config1 = "-pc"
 
 binary = ""
