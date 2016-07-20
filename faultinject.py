@@ -110,7 +110,7 @@ class FaultInjector:
             decvalue = int(ori_value,16)
         else:
             decvalue = int(ori_value)
-        print "New value is "+str(decvalue^mask)+" Old value is "+decvalue
+        print "New value is "+str(decvalue^mask)+" Old value is "+str(decvalue)
         return str(decvalue^mask)
 
     def getNextPC(self,pc):
