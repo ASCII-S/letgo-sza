@@ -66,7 +66,7 @@ class SigHandler:
         pc = args[2].rstrip("\n")
         iteration = int(args[3].rstrip("\n"))
         #next = hex(int(args[4]))
-
+        print args
         hexpc = hex(int(pc))
         print hexpc
         GDB_BREAKPOINT = "break *"+str(hexpc)
@@ -100,13 +100,13 @@ class SigHandler:
                     process.sendline(GDB_CONTINUE)
                     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                     if i == 0:
-                        print 'ERROR while conitinuing the program'
+                        print 'ERROR while continuing the program'
                         print process.before, process.after
                         print str(process)
                         log.close()
                         sys.exit(1)
                     if i == 1:
-                        iteration = iteration -1
+                        iteration -= 1
                         print process.before
                         print "Jumping to the next iteration"
 
