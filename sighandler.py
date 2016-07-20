@@ -44,6 +44,7 @@ class SigHandler:
             print(str(process))
             log.close()
             process.close()
+            sys.stdout = sys.__stdout__
             return
         if i == 1:
             temp = process.before ## just to flush the before buffer
@@ -65,6 +66,7 @@ class SigHandler:
             print "Wrong return values! Exit!"
             log.close()
             process.close()
+            sys.stdout = sys.__stdout__
             return
 
         regmm = args[0].rstrip("\n")
@@ -84,6 +86,7 @@ class SigHandler:
             print str(process)
             log.close()
             process.close()
+            sys.stdout = sys.__stdout__
             return
         if i == 1:
             print process.before
@@ -98,6 +101,7 @@ class SigHandler:
             print str(process)
             log.close()
             process.close()
+            sys.stdout = sys.__stdout__
             return
         if i == 1:
             output = process.before
@@ -116,6 +120,7 @@ class SigHandler:
                         print str(process)
                         log.close()
                         process.close()
+                        sys.stdout = sys.__stdout__
                         return
                     if i == 1:
                         iteration -= 1
@@ -129,6 +134,7 @@ class SigHandler:
                         print str(process)
                         log.close()
                         process.close()
+                        sys.stdout = sys.__stdout__
                         return
                     if i == 1:
                         process.sendline(GDB_PRINT_REG+" $"+reg)
@@ -138,6 +144,7 @@ class SigHandler:
                             print process.before, process.after
                             print str(process)
                             log.close()
+                            sys.stdout = sys.__stdout__
                             sys.exit(1)
                         if i == 1:
                             output = process.before
@@ -159,6 +166,7 @@ class SigHandler:
                                 print str(process)
                                 log.close()
                                 process.close()
+                                sys.stdout = sys.__stdout__
                                 return
                             if i == 1:
                                 output = process.before
@@ -173,6 +181,7 @@ class SigHandler:
                         print str(process)
                         log.close()
                         process.close()
+                        sys.stdout = sys.__stdout__
                         return
                     if i == 1:
                         output = process.before
@@ -195,6 +204,7 @@ class SigHandler:
                             print str(process)
                             log.close()
                             process.close()
+                            sys.stdout = sys.__stdout__
                             return
                         if i == 1:
                             output = process.before
@@ -208,6 +218,7 @@ class SigHandler:
                     print str(process)
                     log.close()
                     process.close()
+                    sys.stdout = sys.__stdout__
                     return
                 if i == 1:
                     print "Delete all breakpoints"
@@ -219,6 +230,7 @@ class SigHandler:
                     print str(process)
                     log.close()
                     process.close()
+                    sys.stdout = sys.__stdout__
                     return
 
                 if i == 1:
@@ -240,6 +252,7 @@ class SigHandler:
                                 print "Error while getting no PC!"
                                 log.close()
                                 process.close()
+                                sys.stdout = sys.__stdout__
                                 return
                             decpc = int(match[0],0)
                             args = fi.getNextPC(decpc)
@@ -247,6 +260,7 @@ class SigHandler:
                                 print "Error while returning incorrect length"
                                 log.close()
                                 process.close()
+                                sys.stdout = sys.__stdout__
                                 return
                             print args
                             nextpc = args[0]
@@ -259,6 +273,7 @@ class SigHandler:
                                 print str(process)
                                 log.close()
                                 process.close()
+                                sys.stdout = sys.__stdout__
                                 return
 
                             if i == 1:
@@ -274,6 +289,7 @@ class SigHandler:
                                          print str(process)
                                          log.close()
                                          process.close()
+                                         sys.stdout = sys.__stdout__
                                          return
 
 
@@ -288,6 +304,7 @@ class SigHandler:
                                             print str(process)
                                             log.close()
                                             process.close()
+                                            sys.stdout = sys.__stdout__
                                             return
 
                                         if i == 1:
@@ -303,6 +320,7 @@ class SigHandler:
                                             print str(process)
                                             log.close()
                                             process.close()
+                                            sys.stdout = sys.__stdout__
                                             return
 
                                         if i == 1:
@@ -316,6 +334,7 @@ class SigHandler:
                                     print str(process)
                                     log.close()
                                     process.close()
+                                    sys.stdout = sys.__stdout__
                                     return
 
                                 if i == 1:
@@ -326,6 +345,7 @@ class SigHandler:
                     else:
                         print "No triggering crashes"
                         print process.before
+                        sys.stdout = sys.__stdout__
 
 
 
