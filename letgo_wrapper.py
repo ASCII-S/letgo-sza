@@ -67,6 +67,7 @@ with open(configure.instcount,"r") as f:
 
 
 for i in range(0,configure.numFI):
+    sys.stdout = sys.__stdout__
     print "Test "+str(i)
     sig = sighandler.SigHandler(totalcount,i)
     sig.executeProgram()
