@@ -263,7 +263,7 @@ class SigHandler:
 
 
 
-                                process.snedline(GDB_CONTINUE)
+                                process.sendline(GDB_CONTINUE)
                                 i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                 if i == 0:
                                     print "ERROR when continue after feeding the regsters"
@@ -273,9 +273,9 @@ class SigHandler:
                                     sys.exit(1)
 
                                 if i == 1:
-                                    print "Program finishes!"
                                     print process.before, process.after
                                     log.close()
+                                    process.close()
                                     sys.stdout = sys.__stdout__
                     else:
                         print process.before
