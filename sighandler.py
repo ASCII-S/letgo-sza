@@ -296,7 +296,7 @@ class SigHandler:
                                 # try to set the rbp and rsp to reasonable values
                                 if reg == "":
                                     if "rbp" in regmm or "rsp" in regmm:
-                                        process.sendline(GDB_SET_REG+" $"+regmm+"="+ori_reg)
+                                        process.sendline(GDB_SET_REG+" $"+regmm+"="+str(ori_reg))
                                         process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                         if i == 0:
                                             print "ERROR when resetting the rbp and rsp"
@@ -312,7 +312,7 @@ class SigHandler:
                                             print process.before, process.after
                                 if regmm == "":
                                     if "rsi" in reg or "rdi" in reg:
-                                        process.sendline(GDB_SET_REG+" $"+reg+"="+ori_reg)
+                                        process.sendline(GDB_SET_REG+" $"+reg+"="+str(ori_reg))
                                         process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                         if i == 0:
                                             print "ERROR when resetting the rsi and rdi"
