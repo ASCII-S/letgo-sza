@@ -139,19 +139,19 @@ class SigHandler:
                             else:
                                 items = output.split(" ")
                                 content = items[len(items)-1]
-                                content = fi.generateFaults(content)
-                                process.sendline(GDB_PRINT_REG+" "+reg+"="+content)
-                                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                                if i == 0:
-                                    print 'ERROR while waiting for changing the value'
-                                    print process.before, process.after
-                                    print str(process)
-                                    log.close()
-                                    sys.exit(1)
-                                if i == 1:
-                                    output = process.before
-                                    if "=" in output:
-                                        print "Fault injection is done"
+                            content = fi.generateFaults(content)
+                            process.sendline(GDB_PRINT_REG+" "+reg+"="+content)
+                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                            if i == 0:
+                                print 'ERROR while waiting for changing the value'
+                                print process.before, process.after
+                                print str(process)
+                                log.close()
+                                sys.exit(1)
+                            if i == 1:
+                                output = process.before
+                                if "=" in output:
+                                    print "Fault injection is done"
                 if reg == "": # it means that it is a memory instruction. Need to inject before it is executed.
                     process.sendline(GDB_PRINT_REG+" $"+regmm)
                     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -172,19 +172,19 @@ class SigHandler:
                         else:
                             items = output.split(" ")
                             content = items[len(items)-1]
-                            content = fi.generateFaults(content)
-                            process.sendline(GDB_PRINT_REG+" "+regmm+"="+content)
-                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                            if i == 0:
-                                print 'ERROR while waiting for changing the value mem'
-                                print process.before, process.after
-                                print str(process)
-                                log.close()
-                                sys.exit(1)
-                            if i == 1:
-                                output = process.before
-                                if "=" in output:
-                                    print "Fault injection is done mem"
+                        content = fi.generateFaults(content)
+                        process.sendline(GDB_PRINT_REG+" "+regmm+"="+content)
+                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                        if i == 0:
+                            print 'ERROR while waiting for changing the value mem'
+                            print process.before, process.after
+                            print str(process)
+                            log.close()
+                            sys.exit(1)
+                        if i == 1:
+                            output = process.before
+                            if "=" in output:
+                                print "Fault injection is done mem"
                 process.sendline(GDB_CONTINUE)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
@@ -259,7 +259,8 @@ class SigHandler:
                                     print process.before, process.after
                                     log.close()
                                     sys.stdout = sys.__stdout__
-
+                    else:
+                        print process.before
 
 
 
