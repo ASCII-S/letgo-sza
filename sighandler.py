@@ -224,7 +224,7 @@ class SigHandler:
                             # parse the pc value by regex 0x
                             # send the pc to pin, and get all info we need
                             print process.before
-                            match = re.findall('(0[xX])?[A-Fa-f0-9]+',process.before)
+                            match = re.findall('0[xX]?[A-Fa-f0-9]+',process.before)
                             if len(match) == 0:
                                 print "Error while getting no PC!"
                                 log.close()
