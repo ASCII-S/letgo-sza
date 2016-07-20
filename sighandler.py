@@ -17,6 +17,7 @@ GDB_PRINT_PC = "print $pc"
 GDB_CONTINUE = "c"
 GDB_NEXT = "stepi"
 GDB_PRINT_REG = "print"
+GDB_SET_REG = "set"
 GDB_FAKE = "0"
 GDB_DELETE_BP = "delete breakpoints 1"
 
@@ -145,7 +146,7 @@ class SigHandler:
                                 items = output.split(" ")
                                 content = items[len(items)-1]
                             content = fi.generateFaults(content)
-                            process.sendline(GDB_PRINT_REG+" "+reg+"="+content)
+                            process.sendline(GDB_SET_REG+" $"+reg+"="+content)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
                                 print 'ERROR while waiting for changing the value'
@@ -178,7 +179,7 @@ class SigHandler:
                             items = output.split(" ")
                             content = items[len(items)-1]
                         content = fi.generateFaults(content)
-                        process.sendline(GDB_PRINT_REG+" "+regmm+"="+content)
+                        process.sendline(GDB_SET_REG+" $"+regmm+"="+content)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 0:
                             print 'ERROR while waiting for changing the value mem'
@@ -212,6 +213,7 @@ class SigHandler:
                 if i == 1:
 
                     output = process.before
+                    print output
                     if GDB_ERROR_SEGV in output or GDB_ERROR_BUS in output:
                         ##
                         # Need to pass the current pc to pin, and get all the info
@@ -249,7 +251,7 @@ class SigHandler:
                             # We can have multiple options here. For now, we feed the value (0) to the supposed-to-write register
                             #####
                                 for reg in regwlist:
-                                    process.sendline(GDB_PRINT_REG+" "+reg+"="+GDB_FAKE)
+                                    process.sendline(GDB_SET_REG+" $"+reg+"="+GDB_FAKE)
                                     i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                     if i == 0:
                                          print "ERROR when setting the reg value"
