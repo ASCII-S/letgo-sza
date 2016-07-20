@@ -132,7 +132,7 @@ class FaultInjector:
         self.execute(execlist)
         if not os.path.isfile(nextpcfile):
             print "No nextpc file is generated! Exit"
-            sys.exit(1)
+            return []
         nextpc = ""
         regw = []
         with open(nextpcfile,"r") as f:
