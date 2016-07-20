@@ -18,6 +18,7 @@ GDB_CONTINUE = "c"
 GDB_NEXT = "stepi"
 GDB_PRINT_REG = "print"
 GDB_FAKE = "0"
+GDB_DELETE_BP = "delete breakpoints"
 
 GDB_ERROR_SEGV = "Program received signal SIGSEGV"
 GDB_ERROR_BUS = "Program received signal SIGBUS"
@@ -189,6 +190,16 @@ class SigHandler:
                             output = process.before
                             if "=" in output:
                                 print "Fault injection is done mem"
+                process.sendline(GDB_DELETE_BP)
+                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                if i == 0:
+                    print "ERROR when deleting breakpoints"
+                    print process.before, process.after
+                    print str(process)
+                    log.close()
+                    sys.exit(1)
+                if i == 1:
+                    print "Delete all breakpoints"
                 process.sendline(GDB_CONTINUE)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
