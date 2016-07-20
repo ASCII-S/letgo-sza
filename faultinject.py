@@ -102,11 +102,16 @@ class FaultInjector:
 
     def generateFaults(self,ori_value):
 
-        print ori_value
+        ori_value = ori_value.rstrip("\r\n")
         pos = random.randint(0,31)
         mask = (1 << pos)
-        print "New value is "+str(int(ori_value,16)^mask)+" Old value is "+ori_value
-        return str(int(ori_value)^mask)
+        decvalue = 0
+        if "0x" in ori_value:
+            decvalue = int(ori_value,16)
+        else:
+            decvalue = int(ori_value)
+        print "New value is "+str(decvalue^mask)+" Old value is "+decvalue
+        return str(decvalue^mask)
 
     def getNextPC(self,pc):
         execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,instructionfile),nextinst_config1,str(pc),"--",configure.benchmark,configure.args]
