@@ -279,11 +279,11 @@ class SigHandler:
 
                                 # try to set the rbp and rsp to reasonable values
                                 if reg == "":
-                                    if "rbp" in regmm or "rsp" in regmm or "rip" in regmm:
+                                    if "rbp" in regmm or "rsp" in regmm:
                                         process.sendline(GDB_SET_REG+" $"+regmm+"="+ori_reg)
                                         process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                         if i == 0:
-                                            print "ERROR when continue after feeding the regsters"
+                                            print "ERROR when resetting the rbp and rsp"
                                             print process.before, process.after
                                             print str(process)
                                             log.close()
@@ -292,6 +292,21 @@ class SigHandler:
 
                                         if i == 1:
                                             print "Set memory base back!"
+                                            print process.before, process.after
+                                if regmm == "":
+                                    if "rsi" in reg or "rdi" in reg:
+                                        process.sendline(GDB_SET_REG+" $"+reg+"="+ori_reg)
+                                        process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                        if i == 0:
+                                            print "ERROR when resetting the rsi and rdi"
+                                            print process.before, process.after
+                                            print str(process)
+                                            log.close()
+                                            process.close()
+                                            return
+
+                                        if i == 1:
+                                            print "Set index base back!"
                                             print process.before, process.after
                                 process.sendline(GDB_CONTINUE)
                                 i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
