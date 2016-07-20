@@ -101,7 +101,7 @@ class SigHandler:
                 # inject a fault
                 if iteration > 1024:
                     iteration = random.randint(0,1024)
-                iteration = 1
+                print iteration
                 while iteration > 0:
                     process.sendline(GDB_CONTINUE)
                     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -113,8 +113,6 @@ class SigHandler:
                         sys.exit(1)
                     if i == 1:
                         iteration -= 1
-                        print process.before
-                        print "Jumping to the next iteration"
 
                 if regmm == "": # it means that it is a normal instruction and we need to inject the fault to the dest reg
                     process.sendline(GDB_NEXT)
@@ -235,7 +233,7 @@ class SigHandler:
                                 print "Error while returning incorrect length"
                                 log.close()
                                 sys.exit(1)
-
+                            print args
                             nextpc = args[0]
                             regwlist = args[1]
                             process.sendline(GDB_PRINT_REG+" $pc="+str(nextpc))

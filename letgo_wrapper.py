@@ -1,5 +1,5 @@
 import sys
-import os
+import os, errno
 import sighandler
 import faultinject
 import configure
@@ -32,6 +32,15 @@ def execute(execlist,out,err):
         p.kill()
         return "timed-out"
 
+
+def silentremove(filename):
+    try:
+        os.remove(filename)
+    except OSError as e: # this would be "except OSError, e:" before Python 2.6
+        if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
+            raise # re-raise exception if a different error occured
+
+
 instcount = configure.pin_base+"/source/tools/ManualExamples/obj-intel64/inscount0.so"
 
 execlist = [configure.pin_home,"-t",instcount,"--",configure.benchmark,configure.args]
@@ -63,9 +72,9 @@ for i in range(0,configure.numFI):
     sig = sighandler.SigHandler(totalcount,i)
     sig.executeProgram()
     #clean up for next round
-    #os.remove(faultinject.instructionfile)
-    #os.remove(faultinject.iterationfile)
-    #os.remove(faultinject.nextpcfile)
+    silentremove(faultinject.instructionfile)
+    silentremove(faultinject.iterationfile)
+    silentremove(faultinject.nextpcfile)
 
 
 
