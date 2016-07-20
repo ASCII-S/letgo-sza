@@ -87,6 +87,10 @@ class FaultInjector:
 
     def execute(self,execlist):
 
+        """
+
+        :rtype: object
+        """
         print ' '.join(execlist)
         p = subprocess.Popen(execlist)
         elapsetime = 0
@@ -124,8 +128,8 @@ class FaultInjector:
         return str(decvalue^mask)
 
     def getNextPC(self,pc):
-        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,instructionfile),nextinst_config1,str(pc),"--",configure.benchmark,configure.args]
-        p = self.execute(execlist)
+        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,nextinst),nextinst_config1,str(pc),"--",configure.benchmark,configure.args]
+        self.execute(execlist)
         if not os.path.isfile(nextpcfile):
             print "No nextpc file is generated! Exit"
             sys.exit(1)
