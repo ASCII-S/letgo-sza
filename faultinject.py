@@ -29,7 +29,9 @@ class FaultInjector:
 
     def __init__(self,totalInst):
         self.totalInst = totalInst
+        self.flag = 32
 
+    @property
     def getBreakpoint(self):
         ## get
         """
@@ -65,6 +67,8 @@ class FaultInjector:
         if reg == "" and regmem == "":
             print "No reg, Exit"
             sys.exit(1)
+        if reg.startswith("r") or regmem.startswith("r"):
+            self.flag = 64
         execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,str(randomnum),"--",configure.benchmark,configure.args]
         self.execute(execlist)
 
@@ -103,7 +107,13 @@ class FaultInjector:
     def generateFaults(self,ori_value):
 
         ori_value = ori_value.rstrip("\r\n")
-        pos = random.randint(0,31)
+        if "{" in ori_value or "}" in ori_value:
+            ori_value = ori_value.rstrip("}")
+            ori_value = ori_value.lstrip("{")
+        bitsize = 31
+        if self.flag == 64:
+            bitsize = 63
+        pos = random.randint(0,bitsize)
         mask = (1 << pos)
         decvalue = 0
         if "0x" in ori_value:
