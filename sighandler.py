@@ -20,10 +20,13 @@ GDB_PRINT_REG = "print"
 GDB_SET_REG = "set"
 GDB_FAKE = "0"
 GDB_DELETE_BP = "delete breakpoints 1"
+GDB_DISPLAY = "x/i $pc"
 
 GDB_ERROR_SEGV = "Program received signal SIGSEGV"
 GDB_ERROR_BUS = "Program received signal SIGBUS"
 
+is_fake = 0
+is_rewind = 0
 
 class SigHandler:
 
@@ -222,6 +225,26 @@ class SigHandler:
                     return
                 if i == 1:
                     print "Delete all breakpoints"
+
+                ###
+                # print out the current instruction for more info
+                ###
+                process.sendline(GDB_DISPLAY)
+                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                if i == 0:
+                    print "ERROR when displaying the inst"
+                    print process.before, process.after
+                    print str(process)
+                    log.close()
+                    process.close()
+                    sys.stdout = sys.__stdout__
+                    return
+
+                if i == 1:
+
+                    output = process.before
+                    print output
+
                 process.sendline(GDB_CONTINUE)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
@@ -256,7 +279,7 @@ class SigHandler:
                                 return
                             decpc = int(match[0],0)
                             args = fi.getNextPC(decpc)
-                            if len(args) != 2:
+                            if len(args) != 3:
                                 print "Error while returning incorrect length"
                                 log.close()
                                 process.close()
@@ -265,6 +288,7 @@ class SigHandler:
                             print args
                             nextpc = args[0]
                             regwlist = args[1]
+                            stack = args[2]
                             process.sendline(GDB_PRINT_REG+" $pc="+str(nextpc))
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
@@ -294,10 +318,49 @@ class SigHandler:
 
 
                                 # try to set the rbp and rsp to reasonable values
+                                stackinfo = ["rbp","rsp"]
+                                if stack != "":
+                                    rxp = (stackinfo.remove(stack))[0]
+                                    process.sendline(GDB_PRINT_REG+" $"+rxp)
+                                    i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                    if i == 0:
+                                        print "ERROR when getting the value of the rbp or rsp"
+                                        print process.before, process.after
+                                        print str(process)
+                                        log.close()
+                                        process.close()
+                                        sys.stdout = sys.__stdout__
+                                        return
+
+                                    if i == 1:
+                                        output = process.before
+                                        content = ""
+                                        if "0x" in output:
+                                            items = output.split(" ")
+                                            for item in items:
+                                                if "0x" in item:
+                                                    content = item
+                                        else:
+                                            items = output.split(" ")
+                                            content = items[len(items)-1]
+                                        i = process.sendline(GDB_SET_REG+" $"+stack+"="+content)
+                                        if i == 0:
+                                            print "ERROR when resetting the "+stack
+                                            print process.before, process.after
+                                            print str(process)
+                                            log.close()
+                                            process.close()
+                                            sys.stdout = sys.__stdout__
+                                            return
+
+                                        if i == 1:
+                                            print "Set the "+stack+" back! "
+                                            print process.before, process.after
+                                '''
                                 if reg == "":
                                     if "rbp" in regmm or "rsp" in regmm:
                                         process.sendline(GDB_SET_REG+" $"+regmm+"="+str(ori_reg))
-                                        process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                        i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                         if i == 0:
                                             print "ERROR when resetting the rbp and rsp"
                                             print process.before, process.after
@@ -310,6 +373,7 @@ class SigHandler:
                                         if i == 1:
                                             print "Set memory base back!"
                                             print process.before, process.after
+
                                 if regmm == "":
                                     if "rsi" in reg or "rdi" in reg:
                                         process.sendline(GDB_SET_REG+" $"+reg+"="+str(ori_reg))
@@ -326,6 +390,7 @@ class SigHandler:
                                         if i == 1:
                                             print "Set index base back!"
                                             print process.before, process.after
+                                '''
                                 process.sendline(GDB_CONTINUE)
                                 i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                 if i == 0:
