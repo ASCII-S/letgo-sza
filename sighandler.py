@@ -304,48 +304,29 @@ class SigHandler:
                             #####
                             # We can have multiple options here. For now, we feed the value (0) to the supposed-to-write register
                             #####
-                                for regw in regwlist:
-                                    process.sendline(GDB_SET_REG+" $"+regw+"="+GDB_FAKE)
-                                    i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
-                                    if i == 0:
-                                         print "ERROR when setting the reg value"
-                                         print process.before, process.after
-                                         print str(process)
-                                         log.close()
-                                         process.close()
-                                         sys.stdout = sys.__stdout__
-                                         return
+                                if is_fake == 1:
+                                    for regw in regwlist:
+                                        process.sendline(GDB_SET_REG+" $"+regw+"="+GDB_FAKE)
+                                        i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                        if i == 0:
+                                            print "ERROR when setting the reg value"
+                                            print process.before, process.after
+                                            print str(process)
+                                            log.close()
+                                            process.close()
+                                            sys.stdout = sys.__stdout__
+                                            return
 
 
                                 # try to set the rbp and rsp to reasonable values
-                                stackinfo = ["rbp","rsp"]
-                                if stack != "":
-                                    rxp = (stackinfo.remove(stack))[0]
-                                    process.sendline(GDB_PRINT_REG+" $"+rxp)
-                                    i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
-                                    if i == 0:
-                                        print "ERROR when getting the value of the rbp or rsp"
-                                        print process.before, process.after
-                                        print str(process)
-                                        log.close()
-                                        process.close()
-                                        sys.stdout = sys.__stdout__
-                                        return
-
-                                    if i == 1:
-                                        output = process.before
-                                        content = ""
-                                        if "0x" in output:
-                                            items = output.split(" ")
-                                            for item in items:
-                                                if "0x" in item:
-                                                    content = item
-                                        else:
-                                            items = output.split(" ")
-                                            content = items[len(items)-1]
-                                        i = process.sendline(GDB_SET_REG+" $"+stack+"="+content)
+                                if is_rewind == 1:
+                                    stackinfo = ["rbp","rsp"]
+                                    if stack != "":
+                                        rxp = (stackinfo.remove(stack))[0]
+                                        process.sendline(GDB_PRINT_REG+" $"+rxp)
+                                        i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                         if i == 0:
-                                            print "ERROR when resetting the "+stack
+                                            print "ERROR when getting the value of the rbp or rsp"
                                             print process.before, process.after
                                             print str(process)
                                             log.close()
@@ -354,8 +335,29 @@ class SigHandler:
                                             return
 
                                         if i == 1:
-                                            print "Set the "+stack+" back! "
-                                            print process.before, process.after
+                                            output = process.before
+                                            content = ""
+                                            if "0x" in output:
+                                                items = output.split(" ")
+                                                for item in items:
+                                                    if "0x" in item:
+                                                        content = item
+                                            else:
+                                                items = output.split(" ")
+                                                content = items[len(items)-1]
+                                            i = process.sendline(GDB_SET_REG+" $"+stack+"="+content)
+                                            if i == 0:
+                                                print "ERROR when resetting the "+stack
+                                                print process.before, process.after
+                                                print str(process)
+                                                log.close()
+                                                process.close()
+                                                sys.stdout = sys.__stdout__
+                                                return
+
+                                            if i == 1:
+                                                print "Set the "+stack+" back! "
+                                                print process.before, process.after
                                 '''
                                 if reg == "":
                                     if "rbp" in regmm or "rsp" in regmm:
