@@ -66,7 +66,7 @@ class FaultInjector:
                 #    next = line.split(":")[1]
         if reg == "" and regmem == "":
             print "No reg, Exit"
-            sys.exit(1)
+            return []
         if reg.startswith("r") or regmem.startswith("r"):
             self.flag = 64
         execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,str(randomnum),"--",configure.benchmark,configure.args]
@@ -74,7 +74,7 @@ class FaultInjector:
 
         if not os.path.isfile(iterationfile):
             print "No iteration file generated! Exit"
-            sys.exit(1)
+            return []
 
         with open(iterationfile,"r") as f:
             lines = f.readlines()

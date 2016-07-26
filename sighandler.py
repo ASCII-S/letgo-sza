@@ -21,6 +21,7 @@ GDB_SET_REG = "set"
 GDB_FAKE = "0"
 GDB_DELETE_BP = "delete breakpoints 1"
 GDB_DISPLAY = "x/i $pc"
+GDB_SINGLE_STEP = "stepi"
 
 GDB_ERROR_SEGV = "Program received signal SIGSEGV"
 GDB_ERROR_BUS = "Program received signal SIGBUS"
@@ -213,6 +214,32 @@ class SigHandler:
                             output = process.before
                             if "=" in output:
                                 print "Fault injection is done mem"
+                        ## change the regmm back to its original data after execution
+                        ## need to single step one inst
+                        process.sendline(GDB_SINGLE_STEP)
+                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                        if i == 0:
+                            print "ERROR when deleting breakpoints"
+                            print process.before, process.after
+                            print str(process)
+                            log.close()
+                            process.close()
+                            sys.stdout = sys.__stdout__
+                            return
+                        if i == 1:
+                            print "Single step"
+                        process.sendline(GDB_SET_REG+" $"+regmm+"="+ori_reg)
+                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                        if i == 0:
+                            print "ERROR when setting the regmm back after single step"
+                            print process.before, process.after
+                            print str(process)
+                            log.close()
+                            process.close()
+                            sys.stdout = sys.__stdout__
+                            return
+                        if i == 1:
+                            print "Single step"
                 process.sendline(GDB_DELETE_BP)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
