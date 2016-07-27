@@ -161,6 +161,7 @@ class SigHandler:
                             else:
                                 items = output.split(" ")
                                 content = items[len(items)-1]
+                            content = content.lstrip("nan")
                             content = fi.generateFaults(content)
                             process.sendline(GDB_SET_REG+" $"+reg+"="+content)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -198,6 +199,7 @@ class SigHandler:
                         else:
                             items = output.split(" ")
                             content = items[len(items)-1]
+                        content = content.lstrip("nan")
                         ori_reg = content.rstrip("\r\n")
                         content = fi.generateFaults(content)
                         process.sendline(GDB_SET_REG+" $"+regmm+"="+content)
@@ -219,7 +221,7 @@ class SigHandler:
                         process.sendline(GDB_SINGLE_STEP)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 0:
-                            print "ERROR when deleting breakpoints"
+                            print "ERROR when single step"
                             print process.before, process.after
                             print str(process)
                             log.close()
@@ -228,6 +230,9 @@ class SigHandler:
                             return
                         if i == 1:
                             print "Single step"
+                            output = process.before
+                            if GDB_ERROR_BUS in output or GDB_ERROR_SEGV in output:
+                                print "Crash after single step, considered working!"
                         process.sendline(GDB_SET_REG+" $"+regmm+"="+ori_reg)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 0:
@@ -239,7 +244,7 @@ class SigHandler:
                             sys.stdout = sys.__stdout__
                             return
                         if i == 1:
-                            print "Single step"
+                            print "Change the value back"
                 process.sendline(GDB_DELETE_BP)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
@@ -305,6 +310,7 @@ class SigHandler:
                                 sys.stdout = sys.__stdout__
                                 return
                             decpc = int(match[0],0)
+                            decpc = decpc.lstrip("nan")
                             args = fi.getNextPC(decpc)
                             if len(args) != 3:
                                 print "Error while returning incorrect length"
@@ -349,7 +355,8 @@ class SigHandler:
                                 if is_rewind == 1:
                                     stackinfo = ["rbp","rsp"]
                                     if stack != "":
-                                        rxp = (stackinfo.remove(stack))[0]
+                                        stackinfo.remove(stack)
+                                        rxp = stackinfo[0]
                                         process.sendline(GDB_PRINT_REG+" $"+rxp)
                                         i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                                         if i == 0:

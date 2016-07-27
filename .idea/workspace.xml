@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6546e40d-248d-4b0f-b151-537848ea962a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/faultinject.py" afterPath="$PROJECT_DIR$/faultinject.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sighandler.py" afterPath="$PROJECT_DIR$/sighandler.py" />
     </list>
     <ignored path="LetGo.iws" />
@@ -83,8 +82,8 @@
       <file leaf-file-name="sighandler.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/sighandler.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="3.804781">
-              <caret line="233" column="86" selection-start-line="233" selection-start-column="86" selection-end-line="233" selection-end-column="86" />
+            <state vertical-scroll-proportion="0.52191234">
+              <caret line="358" column="58" selection-start-line="358" selection-start-column="58" selection-end-line="358" selection-end-column="58" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -116,8 +115,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="4" />
-    <option name="y" value="23" />
+    <option name="x" value="1687" />
+    <option name="y" value="41" />
     <option name="width" value="1436" />
     <option name="height" value="877" />
   </component>
@@ -311,7 +310,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="4" y="23" width="1436" height="877" extended-state="6" />
+    <frame x="1687" y="41" width="1436" height="877" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -416,8 +415,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/sighandler.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="3.804781">
-          <caret line="233" column="86" selection-start-line="233" selection-start-column="86" selection-end-line="233" selection-end-column="86" />
+        <state vertical-scroll-proportion="0.52191234">
+          <caret line="358" column="58" selection-start-line="358" selection-start-column="58" selection-end-line="358" selection-end-column="58" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
