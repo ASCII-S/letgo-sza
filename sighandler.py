@@ -21,7 +21,6 @@ GDB_SET_REG = "set"
 GDB_FAKE = "0"
 GDB_DELETE_BP = "delete breakpoints 1"
 GDB_DISPLAY = "x/i $pc"
-GDB_SINGLE_STEP = "stepi"
 
 GDB_ERROR_SEGV = "Program received signal SIGSEGV"
 GDB_ERROR_BUS = "Program received signal SIGBUS"
@@ -218,7 +217,7 @@ class SigHandler:
                                 print "Fault injection is done mem"
                         ## change the regmm back to its original data after execution
                         ## need to single step one inst
-                        process.sendline(GDB_SINGLE_STEP)
+                        process.sendline(GDB_NEXT)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 0:
                             print "ERROR when single step"
@@ -291,7 +290,6 @@ class SigHandler:
                 if i == 1:
 
                     output = process.before
-                    print output
                     if GDB_ERROR_SEGV in output or GDB_ERROR_BUS in output:
                         ##
                         # Need to pass the current pc to pin, and get all the info
@@ -310,7 +308,6 @@ class SigHandler:
                                 sys.stdout = sys.__stdout__
                                 return
                             decpc = int(match[0],0)
-                            decpc = decpc.lstrip("nan")
                             args = fi.getNextPC(decpc)
                             if len(args) != 3:
                                 print "Error while returning incorrect length"
