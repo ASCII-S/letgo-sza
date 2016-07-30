@@ -136,6 +136,7 @@ class FaultInjector:
         nextpc = ""
         regw = []
         stack = ""
+        flag = 0 # stackw: 1, stackr: 2 , nostack: 3
         with open(nextpcfile,"r") as f:
             lines = f.readlines()
             for line in lines:
@@ -144,6 +145,12 @@ class FaultInjector:
                     nextpc = line.split(":")[1]
                 if "regw" in line:
                     regw.append(line.split(":")[1])
-                if "stack:" in line:
+                if "stackr:" in line:
                     stack = line.split(":")[1]
-        return [nextpc,regw,stack]
+                    flag = 2
+                if "stackw:" in line:
+                    stack = line.split(":")[1]
+                    flag = 1
+                if "nostack" in line:
+                    flag = 3
+        return [nextpc,regw,stack,flag]

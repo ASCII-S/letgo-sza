@@ -38,7 +38,7 @@ class SigHandler:
         global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT,GDB_CONTINUE,GDB_FAKE
         log = open(str(self.trial),"w")
         sys.stdout = log
-        ori_reg = 0
+        ori_reg = ""
         process = pexpect.spawn(GDB_LAUNCH)
         i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
         if i == 0:
@@ -127,6 +127,25 @@ class SigHandler:
                         return
                     if i == 1:
                         iteration -= 1
+
+                ###
+                # print out the current instruction for more info
+                ###
+                process.sendline(GDB_DISPLAY)
+                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                if i == 0:
+                    print "ERROR when displaying the inst"
+                    print process.before, process.after
+                    print str(process)
+                    log.close()
+                    process.close()
+                    sys.stdout = sys.__stdout__
+                    return
+
+                if i == 1:
+
+                    output = process.before
+                    print output
 
                 if regmm == "": # it means that it is a normal instruction and we need to inject the fault to the dest reg
                     process.sendline(GDB_NEXT)
@@ -217,6 +236,7 @@ class SigHandler:
                                 print "Fault injection is done mem"
                         ## change the regmm back to its original data after execution
                         ## need to single step one inst
+                        '''
                         process.sendline(GDB_NEXT)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 0:
@@ -244,6 +264,7 @@ class SigHandler:
                             return
                         if i == 1:
                             print "Change the value back"
+                        '''
                 process.sendline(GDB_DELETE_BP)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
@@ -257,24 +278,7 @@ class SigHandler:
                 if i == 1:
                     print "Delete all breakpoints"
 
-                ###
-                # print out the current instruction for more info
-                ###
-                process.sendline(GDB_DISPLAY)
-                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                if i == 0:
-                    print "ERROR when displaying the inst"
-                    print process.before, process.after
-                    print str(process)
-                    log.close()
-                    process.close()
-                    sys.stdout = sys.__stdout__
-                    return
 
-                if i == 1:
-
-                    output = process.before
-                    print output
 
                 process.sendline(GDB_CONTINUE)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -294,6 +298,22 @@ class SigHandler:
                         ##
                         # Need to pass the current pc to pin, and get all the info
                         ##
+                        if reg == "" and ori_reg != "":
+                            process.sendline(GDB_SET_REG+" $"+regmm+"="+ori_reg)
+                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                            if i == 0:
+                                print "ERROR when setting the regmm back after single step"
+                                print process.before, process.after
+                                print str(process)
+                                log.close()
+                                process.close()
+                                sys.stdout = sys.__stdout__
+                                return
+                            if i == 1:
+                                print "Change the value back"
+                        ######
+                        ###  LetGo framework steps in
+                        #####
                         process.sendline(GDB_PRINT_PC)
                         i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
                         if i == 1:
@@ -309,7 +329,7 @@ class SigHandler:
                                 return
                             decpc = int(match[0],0)
                             args = fi.getNextPC(decpc)
-                            if len(args) != 3:
+                            if len(args) != 4:
                                 print "Error while returning incorrect length"
                                 log.close()
                                 process.close()
@@ -319,6 +339,7 @@ class SigHandler:
                             nextpc = args[0]
                             regwlist = args[1]
                             stack = args[2]
+                            flag = args[3]
                             process.sendline(GDB_PRINT_REG+" $pc="+str(nextpc))
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
@@ -349,7 +370,7 @@ class SigHandler:
 
 
                                 # try to set the rbp and rsp to reasonable values
-                                if is_rewind == 1:
+                                if is_rewind == 1 and flag == 1:
                                     stackinfo = ["rbp","rsp"]
                                     if stack != "":
                                         stackinfo.remove(stack)
