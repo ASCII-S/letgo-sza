@@ -2,8 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6546e40d-248d-4b0f-b151-537848ea962a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/faultinject.py" afterPath="$PROJECT_DIR$/faultinject.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/sighandler.py" afterPath="$PROJECT_DIR$/sighandler.py" />
     </list>
     <ignored path="LetGo.iws" />
@@ -84,8 +82,8 @@
       <file leaf-file-name="sighandler.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/sighandler.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="2.5192308">
-              <caret line="447" column="62" selection-start-line="447" selection-start-column="62" selection-end-line="447" selection-end-column="62" />
+            <state vertical-scroll-proportion="1.2884616">
+              <caret line="373" column="64" selection-start-line="373" selection-start-column="64" selection-end-line="373" selection-end-column="64" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -473,8 +471,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/sighandler.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.5192308">
-          <caret line="447" column="62" selection-start-line="447" selection-start-column="62" selection-end-line="447" selection-end-column="62" />
+        <state vertical-scroll-proportion="1.2884616">
+          <caret line="373" column="64" selection-start-line="373" selection-start-column="64" selection-end-line="373" selection-end-column="64" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>

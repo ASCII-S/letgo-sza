@@ -218,6 +218,7 @@ class SigHandler:
                             items = output.split(" ")
                             content = items[len(items)-1]
                         content = content.lstrip("nan")
+                        content = content.lstrip("-nan")
                         ori_reg = content.rstrip("\r\n")
                         content = fi.generateFaults(content)
                         process.sendline(GDB_SET_REG+" $"+regmm+"="+content)
