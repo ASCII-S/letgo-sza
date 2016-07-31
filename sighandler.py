@@ -295,6 +295,7 @@ class SigHandler:
                 if i == 1:
 
                     output = process.before
+                    print output
                     if GDB_ERROR_SEGV in output or GDB_ERROR_BUS in output:
                         ##
                         # Need to pass the current pc to pin, and get all the info
