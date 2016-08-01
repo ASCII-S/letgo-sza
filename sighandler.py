@@ -13,6 +13,7 @@ GDB_RUN = "run "+configure.args
 GDB_LAUNCH = "gdb "+configure.benchmark
 GDB_HANDLE_BUS = "handle SIGBUS nopass"
 GDB_HANDLE_SEGV = "handle SIGSEGV nopass"
+GDB_HANDLE_ABT = "handle SIGABRT nopass"
 GDB_PRINT_PC = "print $pc"
 GDB_CONTINUE = "c"
 GDB_NEXT = "stepi"
@@ -24,6 +25,7 @@ GDB_DISPLAY = "x/i $pc"
 
 GDB_ERROR_SEGV = "Program received signal SIGSEGV"
 GDB_ERROR_BUS = "Program received signal SIGBUS"
+GDB_ERROR_ABT = "Program received signal SIGABT"
 
 is_fake = 0
 is_rewind = 0
@@ -297,7 +299,7 @@ class SigHandler:
 
                     output = process.before
                     print output
-                    if GDB_ERROR_SEGV in output or GDB_ERROR_BUS in output:
+                    if GDB_ERROR_SEGV in output or GDB_ERROR_BUS in output or GDB_ERROR_ABT in output:
                         ##
                         # Need to pass the current pc to pin, and get all the info
                         ##
@@ -460,12 +462,14 @@ class SigHandler:
                                     return
 
                                 if i == 1:
+                                    print "Application output"
                                     print process.before, process.after
                                     log.close()
                                     process.close()
                                     sys.stdout = sys.__stdout__
                     else:
                         print "No triggering crashes"
+                        print "Application output"
                         print process.before
                         sys.stdout = sys.__stdout__
 
