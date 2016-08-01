@@ -180,6 +180,7 @@ class SigHandler:
                                 items = output.split(" ")
                                 content = items[len(items)-1]
                             content = content.lstrip("nan")
+                            content = content.lstrip("-nan")
                             content = fi.generateFaults(content)
                             process.sendline(GDB_SET_REG+" $"+reg+"="+content)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
