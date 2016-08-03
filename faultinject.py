@@ -137,6 +137,10 @@ class FaultInjector:
         regw = []
         stack = ""
         flag = 0 # stackw: 1, stackr: 2 , nostack: 3
+        displacement = 0
+        scale = 0
+        index = ""
+        base = ""
         with open(nextpcfile,"r") as f:
             lines = f.readlines()
             for line in lines:
@@ -153,4 +157,12 @@ class FaultInjector:
                     flag = 1
                 if "nostack" in line:
                     flag = 3
-        return [nextpc,regw,stack,flag]
+                if "base:" in line:
+                    base = line.split(":")[1]
+                if "index:" in line:
+                    index = line.split(":")[1]
+                if "displacement:" in line:
+                    displacement = line.split(":")[1]
+                if "scale:" in line:
+                    scale = line.split(":")[1]
+        return [nextpc,regw,stack,flag,base,index,displacement,scale]

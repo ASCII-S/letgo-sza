@@ -60,6 +60,9 @@ class SigHandler:
             process.sendline(GDB_HANDLE_SEGV)
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
             print(process.before)
+            process.sendline(GDB_HANDLE_ABT)
+            process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+            print(process.before)
 
         ##
         # Set a breakpoint: need pc and iteration number
@@ -334,7 +337,7 @@ class SigHandler:
                                 return
                             decpc = int(match[0],0)
                             args = fi.getNextPC(decpc)
-                            if len(args) != 4:
+                            if len(args) != 8:
                                 print "Error while returning incorrect length"
                                 log.close()
                                 process.close()
@@ -345,6 +348,10 @@ class SigHandler:
                             regwlist = args[1]
                             stack = args[2]
                             flag = args[3]
+                            base = args[4]
+                            index = args[5]
+                            displacement = args[6]
+                            scale = args[7]
                             process.sendline(GDB_PRINT_REG+" $pc="+str(nextpc))
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
@@ -362,16 +369,117 @@ class SigHandler:
                             #####
                                 if is_fake == 1:
                                     for regw in regwlist:
-                                        process.sendline(GDB_SET_REG+" $"+regw+"="+GDB_FAKE)
-                                        i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
-                                        if i == 0:
-                                            print "ERROR when setting the reg value"
-                                            print process.before, process.after
-                                            print str(process)
-                                            log.close()
-                                            process.close()
-                                            sys.stdout = sys.__stdout__
-                                            return
+                                        if flag == 2:
+                                            final_b = 0
+                                            final_i = 0
+                                            final_d = 0
+                                            final_s = 0
+                                            ## we can try to calculate a valid number for regw
+                                            if base == "":
+                                                print "no base"
+                                                continue
+                                            process.send(GDB_PRINT_REG+" $"+base)
+                                            i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                            if i == 0:
+                                                print "ERROR when getting the base"
+                                                print process.before, process.after
+                                                print str(process)
+                                                log.close()
+                                                process.close()
+                                                sys.stdout = sys.__stdout__
+                                                return
+                                            basestr = process.before
+                                            content = ""
+                                            if "0x" in basestr:
+                                                items = basestr.split(" ")
+                                                for item in items:
+                                                    if "0x" in item:
+                                                        content = item
+                                            else:
+                                                items = basestr.split(" ")
+                                                content = items[len(items)-1]
+                                            content = content.lstrip("nan")
+                                            content = content.lstrip("-nan")
+                                            if "0x" in content:
+                                                final_b = int(content,16)
+                                            else:
+                                                final_b = int(content)
+                                            if index == "":
+                                                print "no index"
+                                            else:
+                                                process.send(GDB_PRINT_REG+" $"+index)
+                                                i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                                if i == 0:
+                                                    print "ERROR when getting the index"
+                                                    print process.before, process.after
+                                                    print str(process)
+                                                    log.close()
+                                                    process.close()
+                                                    sys.stdout = sys.__stdout__
+                                                    return
+                                                indexstr = process.before
+                                                content = ""
+                                                if "0x" in indexstr:
+                                                    items = indexstr.split(" ")
+                                                    for item in items:
+                                                        if "0x" in item:
+                                                            content = item
+                                                else:
+                                                    items = indexstr.split(" ")
+                                                    content = items[len(items)-1]
+                                                content = content.lstrip("nan")
+                                                content = content.lstrip("-nan")
+                                                if "0x" in content:
+                                                    final_i = int(content,16)
+                                                else:
+                                                    final_i = int(content)
+
+                                                final_d = int(displacement)
+                                                final_s = int(scale)
+                                                address = final_b+final_d+final_i*final_s
+                                                process.sendline(GDB_PRINT_REG+" *"+str(address))
+                                                i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                                if i == 0:
+                                                    print "ERROR when getting the final value"
+                                                    print process.before, process.after
+                                                    print str(process)
+                                                    log.close()
+                                                    process.close()
+                                                    sys.stdout = sys.__stdout__
+                                                    return
+                                                finalres = process.before
+                                                content = ""
+                                                if "0x" in finalres:
+                                                    items = finalres.split(" ")
+                                                    for item in items:
+                                                        if "0x" in item:
+                                                            content = item
+                                                else:
+                                                    items = finalres.split(" ")
+                                                    content = items[len(items)-1]
+                                                content = content.lstrip("nan")
+                                                content = content.lstrip("-nan")
+                                                process.sendline(GDB_SET_REG+" $"+regw+"="+content)
+                                                i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                                if i == 0:
+                                                    print "ERROR when setting the final value"
+                                                    print process.before, process.after
+                                                    print str(process)
+                                                    log.close()
+                                                    process.close()
+                                                    sys.stdout = sys.__stdout__
+                                                    return
+                                        else:
+                                            process.sendline(GDB_SET_REG+" $"+regw+"="+GDB_FAKE)
+                                            i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                            if i == 0:
+                                                print "ERROR when setting the reg value"
+                                                print process.before, process.after
+                                                print str(process)
+                                                log.close()
+                                                process.close()
+                                                sys.stdout = sys.__stdout__
+                                                return
 
 
                                 # try to set the rbp and rsp to reasonable values
