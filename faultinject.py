@@ -5,6 +5,7 @@ import time
 import random
 import pexpect
 import configure
+import re
 
 
 randinst_lib = "obj-intel64/randomInst.so"
@@ -110,10 +111,12 @@ class FaultInjector:
 
     def generateFaults(self,ori_value):
 
-        ori_value = ori_value.rstrip("\r\n")
-        if "{" in ori_value or "}" in ori_value:
-            ori_value = ori_value.rstrip("}")
-            ori_value = ori_value.lstrip("{")
+        ## it is complicated because if it is a 0x then non-digital chars are allowed, need a complicated regex.
+        if "0x" in ori_value:
+            res = re.findall('0[xX]?[A-Fa-f0-9]+',ori_value)
+            ori_value = res[0]
+        else:
+            ori_value = re.sub("\D","",ori_value)
         bitsize = 31
         if self.flag == 64:
             bitsize = 63
