@@ -9,8 +9,8 @@ import configure
 import random
 
 GDB_PROMOPT = "\(gdb\)"
-GDB_RUN = "run "+configure.args
-GDB_LAUNCH = "gdb "+configure.benchmark
+GDB_RUN = "run"
+GDB_LAUNCH = "gdb " + configure.benchmark
 GDB_HANDLE_BUS = "handle SIGBUS nopass"
 GDB_HANDLE_SEGV = "handle SIGSEGV nopass"
 GDB_HANDLE_ABT = "handle SIGABRT nopass"
@@ -30,19 +30,21 @@ GDB_ERROR_ABT = "Program received signal SIGABT"
 is_fake = 0
 is_rewind = 0
 
-class SigHandler:
 
-    def __init__(self, insts,trial):
+class SigHandler:
+    def __init__(self, insts, trial):
         self.insts = int(insts)
         self.trial = trial
 
     def executeProgram(self):
-        global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT,GDB_CONTINUE,GDB_FAKE
-        log = open(str(self.trial),"w")
+        global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT, GDB_CONTINUE, GDB_FAKE
+        for item in configure.args:
+            GDB_RUN += " " + item
+        log = open(str(self.trial), "w")
         sys.stdout = log
         ori_reg = ""
         process = pexpect.spawn(GDB_LAUNCH)
-        i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
         if i == 0:
             print('ERROR! Could not run GDB')
             print(process.before, process.after)
@@ -52,7 +54,7 @@ class SigHandler:
             sys.stdout = sys.__stdout__
             return
         if i == 1:
-            temp = process.before ## just to flush the before buffer
+            temp = process.before  ## just to flush the before buffer
             print('Program starts!')
             process.sendline(GDB_HANDLE_BUS)
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -81,11 +83,11 @@ class SigHandler:
         reg = args[1].rstrip("\n")
         pc = args[2].rstrip("\n")
         iteration = int(args[3].rstrip("\n"))
-        #next = hex(int(args[4]))
+        # next = hex(int(args[4]))
         print args
         hexpc = hex(int(pc))
         print hexpc
-        GDB_BREAKPOINT = "break *"+str(hexpc)
+        GDB_BREAKPOINT = "break *" + str(hexpc)
         process.sendline(GDB_BREAKPOINT)
         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
         if i == 0:
@@ -99,7 +101,6 @@ class SigHandler:
         if i == 1:
             print process.before
             print 'Successfully set the breakpoint'
-
 
         process.sendline(GDB_RUN)
         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -117,7 +118,7 @@ class SigHandler:
                 print "Pause at the breakpoint for the first time!"
                 # inject a fault
                 if iteration > 1024:
-                    iteration = random.randint(0,1024)
+                    iteration = random.randint(0, 1024)
                 print iteration
                 while iteration > 0:
                     process.sendline(GDB_CONTINUE)
@@ -148,11 +149,10 @@ class SigHandler:
                     return
 
                 if i == 1:
-
                     output = process.before
                     print output
 
-                if regmm == "": # it means that it is a normal instruction and we need to inject the fault to the dest reg
+                if regmm == "":  # it means that it is a normal instruction and we need to inject the fault to the dest reg
                     process.sendline(GDB_NEXT)
                     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                     if i == 0:
@@ -164,7 +164,7 @@ class SigHandler:
                         sys.stdout = sys.__stdout__
                         return
                     if i == 1:
-                        process.sendline(GDB_PRINT_REG+" $"+reg)
+                        process.sendline(GDB_PRINT_REG + " $" + reg)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 0:
                             print 'ERROR while analyzing the content of the register'
@@ -183,11 +183,11 @@ class SigHandler:
                                         content = item
                             else:
                                 items = output.split(" ")
-                                content = items[len(items)-1]
+                                content = items[len(items) - 1]
                             content = content.lstrip("nan")
                             content = content.lstrip("-nan")
                             content = fi.generateFaults(content)
-                            process.sendline(GDB_SET_REG+" $"+reg+"="+content)
+                            process.sendline(GDB_SET_REG + " $" + reg + "=" + content)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
                                 print 'ERROR while waiting for changing the value'
@@ -201,8 +201,8 @@ class SigHandler:
                                 output = process.before
                                 if "=" in output:
                                     print "Fault injection is done"
-                if reg == "": # it means that it is a memory instruction. Need to inject before it is executed.
-                    process.sendline(GDB_PRINT_REG+" $"+regmm)
+                if reg == "":  # it means that it is a memory instruction. Need to inject before it is executed.
+                    process.sendline(GDB_PRINT_REG + " $" + regmm)
                     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                     if i == 0:
                         print 'ERROR while analyzing the content of the register mem'
@@ -222,12 +222,12 @@ class SigHandler:
                                     content = item
                         else:
                             items = output.split(" ")
-                            content = items[len(items)-1]
+                            content = items[len(items) - 1]
                         content = content.lstrip("nan")
                         content = content.lstrip("-nan")
                         ori_reg = content.rstrip("\r\n")
                         content = fi.generateFaults(content)
-                        process.sendline(GDB_SET_REG+" $"+regmm+"="+content)
+                        process.sendline(GDB_SET_REG + " $" + regmm + "=" + content)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 0:
                             print 'ERROR while waiting for changing the value mem'
@@ -285,8 +285,6 @@ class SigHandler:
                 if i == 1:
                     print "Delete all breakpoints"
 
-
-
                 process.sendline(GDB_CONTINUE)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
@@ -307,7 +305,7 @@ class SigHandler:
                         # Need to pass the current pc to pin, and get all the info
                         ##
                         if reg == "" and ori_reg != "":
-                            process.sendline(GDB_SET_REG+" $"+regmm+"="+ori_reg)
+                            process.sendline(GDB_SET_REG + " $" + regmm + "=" + ori_reg)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
                                 print "ERROR when setting the regmm back after single step"
@@ -323,19 +321,19 @@ class SigHandler:
                         ###  LetGo framework steps in
                         #####
                         process.sendline(GDB_PRINT_PC)
-                        i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 1:
                             # parse the pc value by regex 0x
                             # send the pc to pin, and get all info we need
                             print process.before
-                            match = re.findall('0[xX]?[A-Fa-f0-9]+',process.before)
+                            match = re.findall('0[xX]?[A-Fa-f0-9]+', process.before)
                             if len(match) == 0:
                                 print "Error while getting no PC!"
                                 log.close()
                                 process.close()
                                 sys.stdout = sys.__stdout__
                                 return
-                            decpc = int(match[0],0)
+                            decpc = int(match[0], 0)
                             args = fi.getNextPC(decpc)
                             if len(args) != 8:
                                 print "Error while returning incorrect length"
@@ -352,7 +350,7 @@ class SigHandler:
                             index = args[5]
                             displacement = args[6]
                             scale = args[7]
-                            process.sendline(GDB_PRINT_REG+" $pc="+str(nextpc))
+                            process.sendline(GDB_PRINT_REG + " $pc=" + str(nextpc))
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
                                 print "ERROR when setting the pc value"
@@ -364,9 +362,9 @@ class SigHandler:
                                 return
 
                             if i == 1:
-                            #####
-                            # We can have multiple options here. For now, we feed the value (0) to the supposed-to-write register
-                            #####
+                                #####
+                                # We can have multiple options here. For now, we feed the value (0) to the supposed-to-write register
+                                #####
                                 if is_fake == 1:
                                     for regw in regwlist:
                                         if flag == 2:
@@ -378,8 +376,8 @@ class SigHandler:
                                             if base == "":
                                                 print "no base"
                                                 continue
-                                            process.send(GDB_PRINT_REG+" $"+base)
-                                            i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                            process.send(GDB_PRINT_REG + " $" + base)
+                                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                             if i == 0:
                                                 print "ERROR when getting the base"
                                                 print process.before, process.after
@@ -397,18 +395,18 @@ class SigHandler:
                                                         content = item
                                             else:
                                                 items = basestr.split(" ")
-                                                content = items[len(items)-1]
+                                                content = items[len(items) - 1]
                                             content = content.lstrip("nan")
                                             content = content.lstrip("-nan")
                                             if "0x" in content:
-                                                final_b = int(content,16)
+                                                final_b = int(content, 16)
                                             else:
                                                 final_b = int(content)
                                             if index == "":
                                                 print "no index"
                                             else:
-                                                process.send(GDB_PRINT_REG+" $"+index)
-                                                i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                                process.send(GDB_PRINT_REG + " $" + index)
+                                                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                                 if i == 0:
                                                     print "ERROR when getting the index"
                                                     print process.before, process.after
@@ -426,19 +424,19 @@ class SigHandler:
                                                             content = item
                                                 else:
                                                     items = indexstr.split(" ")
-                                                    content = items[len(items)-1]
+                                                    content = items[len(items) - 1]
                                                 content = content.lstrip("nan")
                                                 content = content.lstrip("-nan")
                                                 if "0x" in content:
-                                                    final_i = int(content,16)
+                                                    final_i = int(content, 16)
                                                 else:
                                                     final_i = int(content)
 
                                                 final_d = int(displacement)
                                                 final_s = int(scale)
-                                                address = final_b+final_d+final_i*final_s
-                                                process.sendline(GDB_PRINT_REG+" *"+str(address))
-                                                i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                                address = final_b + final_d + final_i * final_s
+                                                process.sendline(GDB_PRINT_REG + " *" + str(address))
+                                                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                                 if i == 0:
                                                     print "ERROR when getting the final value"
                                                     print process.before, process.after
@@ -456,11 +454,11 @@ class SigHandler:
                                                             content = item
                                                 else:
                                                     items = finalres.split(" ")
-                                                    content = items[len(items)-1]
+                                                    content = items[len(items) - 1]
                                                 content = content.lstrip("nan")
                                                 content = content.lstrip("-nan")
-                                                process.sendline(GDB_SET_REG+" $"+regw+"="+content)
-                                                i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                                process.sendline(GDB_SET_REG + " $" + regw + "=" + content)
+                                                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                                 if i == 0:
                                                     print "ERROR when setting the final value"
                                                     print process.before, process.after
@@ -470,8 +468,8 @@ class SigHandler:
                                                     sys.stdout = sys.__stdout__
                                                     return
                                         else:
-                                            process.sendline(GDB_SET_REG+" $"+regw+"="+GDB_FAKE)
-                                            i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                            process.sendline(GDB_SET_REG + " $" + regw + "=" + GDB_FAKE)
+                                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                             if i == 0:
                                                 print "ERROR when setting the reg value"
                                                 print process.before, process.after
@@ -481,15 +479,14 @@ class SigHandler:
                                                 sys.stdout = sys.__stdout__
                                                 return
 
-
                                 # try to set the rbp and rsp to reasonable values
                                 if is_rewind == 1 and flag == 1:
-                                    stackinfo = ["rbp","rsp"]
+                                    stackinfo = ["rbp", "rsp"]
                                     if stack != "":
                                         stackinfo.remove(stack)
                                         rxp = stackinfo[0]
-                                        process.sendline(GDB_PRINT_REG+" $"+rxp)
-                                        i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                        process.sendline(GDB_PRINT_REG + " $" + rxp)
+                                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                         if i == 0:
                                             print "ERROR when getting the value of the rbp or rsp"
                                             print process.before, process.after
@@ -509,10 +506,10 @@ class SigHandler:
                                                         content = item
                                             else:
                                                 items = output.split(" ")
-                                                content = items[len(items)-1]
-                                            i = process.sendline(GDB_SET_REG+" $"+stack+"="+content)
+                                                content = items[len(items) - 1]
+                                            i = process.sendline(GDB_SET_REG + " $" + stack + "=" + content)
                                             if i == 0:
-                                                print "ERROR when resetting the "+stack
+                                                print "ERROR when resetting the " + stack
                                                 print process.before, process.after
                                                 print str(process)
                                                 log.close()
@@ -521,7 +518,7 @@ class SigHandler:
                                                 return
 
                                             if i == 1:
-                                                print "Set the "+stack+" back! "
+                                                print "Set the " + stack + " back! "
                                                 print process.before, process.after
                                 '''
                                 if reg == "":
@@ -559,7 +556,7 @@ class SigHandler:
                                             print process.before, process.after
                                 '''
                                 process.sendline(GDB_CONTINUE)
-                                i = process.expect([pexpect.TIMEOUT,GDB_PROMOPT])
+                                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                 if i == 0:
                                     print "ERROR when continue after feeding the regsters"
                                     print process.before, process.after
@@ -580,13 +577,3 @@ class SigHandler:
                         print "Application output"
                         print process.before
                         sys.stdout = sys.__stdout__
-
-
-
-
-
-
-
-
-
-
