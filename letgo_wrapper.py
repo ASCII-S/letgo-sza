@@ -43,7 +43,11 @@ def silentremove(filename):
 
 instcount = configure.pin_base+"/source/tools/ManualExamples/obj-intel64/inscount0.so"
 
-execlist = [configure.pin_home,"-t",instcount,"--",configure.benchmark,configure.args]
+execlist = [configure.pin_home,"-t",instcount,"--",configure.benchmark]
+
+for item in configure.args:
+    execlist.append(item)
+
 
 out = "sampleout"
 err = "sampleerr"
