@@ -467,6 +467,10 @@ class SigHandler:
                                                     process.close()
                                                     sys.stdout = sys.__stdout__
                                                     return
+                                                if i == 1:
+                                                    print "set reg with address calculation "
+                                                    print content
+
                                         else:
                                             process.sendline(GDB_SET_REG + " $" + regw + "=" + GDB_FAKE)
                                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -478,6 +482,8 @@ class SigHandler:
                                                 process.close()
                                                 sys.stdout = sys.__stdout__
                                                 return
+                                            if i == 1:
+                                               print "set reg with fake"
 
                                 # try to set the rbp and rsp to reasonable values
                                 if is_rewind == 1 and flag == 1:
