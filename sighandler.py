@@ -376,7 +376,7 @@ class SigHandler:
                                             if base == "":
                                                 print "no base"
                                                 continue
-                                            process.send(GDB_PRINT_REG + " $" + base)
+                                            process.sendline(GDB_PRINT_REG + " $" + base)
                                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                             if i == 0:
                                                 print "ERROR when getting the base"
@@ -405,7 +405,7 @@ class SigHandler:
                                             if index == "":
                                                 print "no index"
                                             else:
-                                                process.send(GDB_PRINT_REG + " $" + index)
+                                                process.sendline(GDB_PRINT_REG + " $" + index)
                                                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                                 if i == 0:
                                                     print "ERROR when getting the index"
