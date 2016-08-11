@@ -402,7 +402,7 @@ class SigHandler:
                                                 final_b = int(content, 16)
                                             else:
                                                 final_b = int(content)
-                                            if index == "":
+                                            if index == "null":
                                                 print "no index"
                                             else:
                                                 process.sendline(GDB_PRINT_REG + " $" + index)
