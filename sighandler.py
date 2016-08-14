@@ -109,6 +109,7 @@ class SigHandler:
             print process.before, process.after
             print str(process)
             log.close()
+            process.terminate()
             process.close()
             sys.stdout = sys.__stdout__
             return
