@@ -38,6 +38,7 @@ class SigHandler:
 
     def executeProgram(self):
         global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT, GDB_CONTINUE, GDB_FAKE
+        GDB_RUN = "run"
         for item in configure.args:
             GDB_RUN += " " + item
         log = open(str(self.trial), "w")
