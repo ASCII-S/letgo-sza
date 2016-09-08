@@ -74,11 +74,22 @@ for i in range(0,configure.numFI):
     sys.stdout = sys.__stdout__
     print "Test "+str(i)
     sig = sighandler.SigHandler(totalcount,i)
+    for item in configure.outputfile:
+        try:
+            os.remove(item)
+            print "remove output file in the wrapper"
+        except:
+            print "Oops, no "+item+" file found. Ignore in wrapper"
     sig.executeProgram()
     #clean up for next round
     silentremove(faultinject.instructionfile)
     silentremove(faultinject.iterationfile)
     silentremove(faultinject.nextpcfile)
+    for item in configure.outputfile:
+        try:
+            os.rename(item,item+"-"+str(i))
+        except:
+            print "Oops, no "+item+" file found. Ignoring"
 
 
 

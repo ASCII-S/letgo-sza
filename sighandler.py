@@ -80,6 +80,13 @@ class SigHandler:
             sys.stdout = sys.__stdout__
             return
 
+        for item in configure.outputfile:
+            try:
+                os.remove(item)
+                print "remove output file "+item
+            except:
+                print "Oops, no "+item+" file found. Ignore in 1"
+
         regmm = args[0].rstrip("\n")
         reg = args[1].rstrip("\n")
         pc = args[2].rstrip("\n")
@@ -344,6 +351,12 @@ class SigHandler:
                                 sys.stdout = sys.__stdout__
                                 return
                             print args
+                            for item in configure.outputfile:
+                                try:
+                                    os.remove(item)
+                                    print "remove output file "+item
+                                except:
+                                    print "Oops, no "+item+" file found. Ignore in 2"
                             nextpc = args[0]
                             regwlist = args[1]
                             stack = args[2]
