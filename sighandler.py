@@ -195,7 +195,15 @@ class SigHandler:
                                 content = items[len(items) - 1]
                             content = content.lstrip("nan")
                             content = content.lstrip("-nan")
+
                             content = fi.generateFaults(content)
+                            if content == "nodigit":
+                                print "ERROR when generating faults"
+                                print str(process)
+                                log.close()
+                                process.close()
+                                sys.stdout = sys.__stdout__
+                                return
                             process.sendline(GDB_SET_REG + " $" + reg + "=" + content)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
@@ -236,6 +244,13 @@ class SigHandler:
                         content = content.lstrip("-nan")
                         ori_reg = content.rstrip("\r\n")
                         content = fi.generateFaults(content)
+                        if content == "nodigit":
+                                print "ERROR when generating faults"
+                                print str(process)
+                                log.close()
+                                process.close()
+                                sys.stdout = sys.__stdout__
+                                return
                         process.sendline(GDB_SET_REG + " $" + regmm + "=" + content)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 0:
