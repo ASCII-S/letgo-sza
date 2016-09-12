@@ -7,6 +7,7 @@ import objdump
 import faultinject
 import configure
 import random
+import datetime
 
 GDB_PROMOPT = "\(gdb\)"
 GDB_RUN = "run"
@@ -321,7 +322,7 @@ class SigHandler:
                     return
 
                 if i == 1:
-
+                    print datetime.datetime.now()
                     output = process.before
                     print output
                     if GDB_ERROR_SEGV in output or GDB_ERROR_BUS in output or GDB_ERROR_ABT in output:
@@ -591,6 +592,7 @@ class SigHandler:
                                             print "Set index base back!"
                                             print process.before, process.after
                                 '''
+                                print datetime.datetime.now()
                                 process.sendline(GDB_CONTINUE)
                                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                 if i == 0:
