@@ -120,9 +120,9 @@ class FaultInjector:
             res = re.findall('0[xX]?[A-Fa-f0-9]+',ori_value)
             ori_value = res[0]
         else:
+            ori_value = re.sub("\D","",ori_value)
             if ori_value.isdigit() == False:
                 return "nodigit"
-            ori_value = re.sub("\D","",ori_value)
         bitsize = 31
         if self.flag == 64:
             bitsize = 63
