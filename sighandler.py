@@ -592,6 +592,7 @@ class SigHandler:
                                             print "Set index base back!"
                                             print process.before, process.after
                                 '''
+                                print "Time end for LetGo: "
                                 print datetime.datetime.now()
                                 process.sendline(GDB_CONTINUE)
                                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -610,6 +611,8 @@ class SigHandler:
                                     log.close()
                                     process.close()
                                     sys.stdout = sys.__stdout__
+                                print "Time end for App: "
+                                print datetime.datetime.now()
                     else:
                         print "No triggering crashes"
                         print "Application output"
