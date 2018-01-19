@@ -121,8 +121,6 @@ class FaultInjector:
             ori_value = res[0]
         else:
             ori_value = re.sub("\D","",ori_value)
-            if ori_value.isdigit() == False:
-                return "nodigit"
         bitsize = 31
         if self.flag == 64:
             bitsize = 63

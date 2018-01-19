@@ -28,8 +28,8 @@ GDB_ERROR_SEGV = "Program received signal SIGSEGV"
 GDB_ERROR_BUS = "Program received signal SIGBUS"
 GDB_ERROR_ABT = "Program received signal SIGABT"
 
-is_fake = 0
-is_rewind = 0
+is_fake = 1
+is_rewind = 1
 
 
 class SigHandler:
@@ -310,6 +310,7 @@ class SigHandler:
                 if i == 1:
                     print "Delete all breakpoints"
 
+                print datetime.datetime.now()
                 process.sendline(GDB_CONTINUE)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
@@ -592,7 +593,6 @@ class SigHandler:
                                             print "Set index base back!"
                                             print process.before, process.after
                                 '''
-                                print "Time end for LetGo: "
                                 print datetime.datetime.now()
                                 process.sendline(GDB_CONTINUE)
                                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -607,13 +607,14 @@ class SigHandler:
 
                                 if i == 1:
                                     print "Application output"
+                                    print "After continue"
+                                    print datetime.datetime.now()
                                     print process.before, process.after
                                     log.close()
                                     process.close()
                                     sys.stdout = sys.__stdout__
-                                print "Time end for App: "
-                                print datetime.datetime.now()
                     else:
+                        print datetime.datetime.now()
                         print "No triggering crashes"
                         print "Application output"
                         print process.before
