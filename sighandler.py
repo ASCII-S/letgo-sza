@@ -521,6 +521,7 @@ class SigHandler:
                                 if is_rewind == 1 and flag == 1:
                                     stackinfo = ["rbp", "rsp"]
                                     if stack != "":
+                                        size = fi.getStackSize()
                                         stackinfo.remove(stack)
                                         rxp = stackinfo[0]
                                         process.sendline(GDB_PRINT_REG + " $" + rxp)
@@ -536,18 +537,18 @@ class SigHandler:
 
                                         if i == 1:
                                             output = process.before
-                                            content = ""
+                                            content_rxp = ""
                                             if "0x" in output:
                                                 items = output.split(" ")
                                                 for item in items:
                                                     if "0x" in item:
-                                                        content = item
+                                                        content_rxp = item
                                             else:
                                                 items = output.split(" ")
-                                                content = items[len(items) - 1]
-                                            i = process.sendline(GDB_SET_REG + " $" + stack + "=" + content)
+                                                content_rxp = items[len(items) - 1]
+                                            process.sendline(GDB_PRINT_REG+" $"+stack)
                                             if i == 0:
-                                                print "ERROR when resetting the " + stack
+                                                print "ERROR when getting the value of the rbp or rsp"
                                                 print process.before, process.after
                                                 print str(process)
                                                 log.close()
@@ -556,8 +557,30 @@ class SigHandler:
                                                 return
 
                                             if i == 1:
-                                                print "Set the " + stack + " back! "
-                                                print process.before, process.after
+                                                output = process.before
+                                                content_stack = ""
+                                                if "0x" in output:
+                                                    items = output.split(" ")
+                                                    for item in items:
+                                                        if "0x" in item:
+                                                            content_stack = item
+                                                else:
+                                                    items = output.split(" ")
+                                                    content_stack = items[len(items) - 1]
+                                            if abs(int(content_stack,16) - int(content_rxp,16)) > int(size,16):
+                                                i = process.sendline(GDB_SET_REG + " $" + stack + "=" + content_rxp)
+                                                if i == 0:
+                                                    print "ERROR when resetting the " + stack
+                                                    print process.before, process.after
+                                                    print str(process)
+                                                    log.close()
+                                                    process.close()
+                                                    sys.stdout = sys.__stdout__
+                                                    return
+
+                                                if i == 1:
+                                                    print "Set the " + stack + " back! "
+                                                    print process.before, process.after
                                 '''
                                 if reg == "":
                                     if "rbp" in regmm or "rsp" in regmm:

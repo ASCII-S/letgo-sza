@@ -24,6 +24,7 @@ timeout = 500
 instructionfile = "instruction"
 iterationfile = "iteration"
 nextpcfile = "nextpc"
+stacksize = "spsize"
 
 
 class FaultInjector:
@@ -175,3 +176,15 @@ class FaultInjector:
                 if "scale:" in line:
                     scale = line.split(":")[1]
         return [nextpc,regw,stack,flag,base,index,displacement,scale]
+
+    def getStackSize(self):
+        size = 0
+        with open(stacksize,"r") as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.rstrip("\n")
+                if "," in line:
+                    items = line.split(",")
+                    size = items[len(items)-1]
+
+        return size
