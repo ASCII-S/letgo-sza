@@ -6,8 +6,11 @@ LetGo offers the users the prototype of the roll-forward recovery system for HPC
 ## Files explained
 
 configure.py - to setup the application configurations 
+
 faultinject.py - to handle the fault injection experiment functions
+
 sighandler.py - the main LetGo implementation
+
 letgo_wrapper.py - the wrapper to launch fault injections and applications with LetGo
 
 ### Prerequisites
