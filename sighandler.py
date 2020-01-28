@@ -7,8 +7,8 @@ import objdump
 import faultinject
 import configure
 import random
+import shutil
 import datetime
-
 GDB_PROMOPT = "\(gdb\)"
 GDB_RUN = "run"
 GDB_LAUNCH = "gdb " + configure.benchmark
@@ -31,6 +31,13 @@ GDB_ERROR_ABT = "Program received signal SIGABT"
 is_fake = 1
 is_rewind = 1
 
+
+def is_hexnumber(s):
+    try:
+        int(s,16)
+        return True
+    except ValueError:
+        return False
 
 class SigHandler:
     def __init__(self, insts, trial):
@@ -80,13 +87,11 @@ class SigHandler:
             process.close()
             sys.stdout = sys.__stdout__
             return
-
-        for item in configure.outputfile:
-            try:
-                os.remove(item)
-                print "remove output file "+item
-            except:
-                print "Oops, no "+item+" file found. Ignore in 1"
+        try:
+            shutil.rmtree("graphics_output")
+            print "remove output file 2"
+        except:
+            print "Oops, no x.vec file found. Ignoring. 2"
 
         regmm = args[0].rstrip("\n")
         reg = args[1].rstrip("\n")
@@ -196,15 +201,7 @@ class SigHandler:
                                 content = items[len(items) - 1]
                             content = content.lstrip("nan")
                             content = content.lstrip("-nan")
-
                             content = fi.generateFaults(content)
-                            if content == "nodigit":
-                                print "ERROR when generating faults"
-                                print str(process)
-                                log.close()
-                                process.close()
-                                sys.stdout = sys.__stdout__
-                                return
                             process.sendline(GDB_SET_REG + " $" + reg + "=" + content)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
@@ -245,13 +242,6 @@ class SigHandler:
                         content = content.lstrip("-nan")
                         ori_reg = content.rstrip("\r\n")
                         content = fi.generateFaults(content)
-                        if content == "nodigit":
-                                print "ERROR when generating faults"
-                                print str(process)
-                                log.close()
-                                process.close()
-                                sys.stdout = sys.__stdout__
-                                return
                         process.sendline(GDB_SET_REG + " $" + regmm + "=" + content)
                         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                         if i == 0:
@@ -310,7 +300,6 @@ class SigHandler:
                 if i == 1:
                     print "Delete all breakpoints"
 
-                print datetime.datetime.now()
                 process.sendline(GDB_CONTINUE)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
@@ -323,7 +312,7 @@ class SigHandler:
                     return
 
                 if i == 1:
-                    print datetime.datetime.now()
+
                     output = process.before
                     print output
                     if GDB_ERROR_SEGV in output or GDB_ERROR_BUS in output or GDB_ERROR_ABT in output:
@@ -368,12 +357,11 @@ class SigHandler:
                                 sys.stdout = sys.__stdout__
                                 return
                             print args
-                            for item in configure.outputfile:
-                                try:
-                                    os.remove(item)
-                                    print "remove output file "+item
-                                except:
-                                    print "Oops, no "+item+" file found. Ignore in 2"
+                            try:
+                                shutil.rmtree("graphics_output")
+                                print "remove output file 1"
+                            except:
+                                print "Oops, no x.vec file found. Ignoring. 1"
                             nextpc = args[0]
                             regwlist = args[1]
                             stack = args[2]
@@ -504,6 +492,8 @@ class SigHandler:
                                                     print content
 
                                         else:
+                                            if "xmm" in regw:
+                                                regw = regw+".uint128"
                                             process.sendline(GDB_SET_REG + " $" + regw + "=" + GDB_FAKE)
                                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                             if i == 0:
@@ -521,32 +511,12 @@ class SigHandler:
                                 if is_rewind == 1 and flag == 1:
                                     stackinfo = ["rbp", "rsp"]
                                     if stack != "":
-                                        size = fi.getStackSize()
-                                        stackinfo.remove(stack)
-                                        rxp = stackinfo[0]
-                                        process.sendline(GDB_PRINT_REG + " $" + rxp)
-                                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                                        if i == 0:
-                                            print "ERROR when getting the value of the rbp or rsp"
-                                            print process.before, process.after
-                                            print str(process)
-                                            log.close()
-                                            process.close()
-                                            sys.stdout = sys.__stdout__
-                                            return
-
-                                        if i == 1:
-                                            output = process.before
-                                            content_rxp = ""
-                                            if "0x" in output:
-                                                items = output.split(" ")
-                                                for item in items:
-                                                    if "0x" in item:
-                                                        content_rxp = item
-                                            else:
-                                                items = output.split(" ")
-                                                content_rxp = items[len(items) - 1]
-                                            process.sendline(GDB_PRINT_REG+" $"+stack)
+                                        size = fi.get_stack_size()
+                                        if size != "":
+                                            stackinfo.remove(stack)
+                                            rxp = stackinfo[0]
+                                            process.sendline(GDB_PRINT_REG + " $" + rxp)
+                                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                             if i == 0:
                                                 print "ERROR when getting the value of the rbp or rsp"
                                                 print process.before, process.after
@@ -558,29 +528,72 @@ class SigHandler:
 
                                             if i == 1:
                                                 output = process.before
-                                                content_stack = ""
+                                                content_rxp = ""
                                                 if "0x" in output:
                                                     items = output.split(" ")
                                                     for item in items:
                                                         if "0x" in item:
-                                                            content_stack = item
+                                                            content_rxp = item
                                                 else:
                                                     items = output.split(" ")
-                                                    content_stack = items[len(items) - 1]
-                                            if abs(int(content_stack,16) - int(content_rxp,16)) > int(size,16):
-                                                i = process.sendline(GDB_SET_REG + " $" + stack + "=" + content_rxp)
+                                                    content_rxp = items[len(items) - 1]
+                                                content_rxp = content_rxp.lstrip("nan")
+                                                content_rxp = content_rxp.lstrip("-nan")
+                                                size_rxp = 0
+                                                if "0x" in content_rxp:
+                                                    if is_hexnumber(content_rxp):
+                                                        size_rxp = int(content_rxp, 16)
+                                                else:
+                                                    if is_number(content_rxp):
+                                                        size_rxp = int(content_rxp)
+                                                process.sendline(GDB_PRINT_REG + " $" + stack)
+                                                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                                 if i == 0:
-                                                    print "ERROR when resetting the " + stack
+                                                    print "ERROR when getting the value of the rbp or rsp"
                                                     print process.before, process.after
                                                     print str(process)
                                                     log.close()
                                                     process.close()
                                                     sys.stdout = sys.__stdout__
                                                     return
-
                                                 if i == 1:
-                                                    print "Set the " + stack + " back! "
-                                                    print process.before, process.after
+                                                    output = process.before
+                                                    print output
+                                                    content_stack = ""
+                                                    if "0x" in output:
+                                                        items = output.split(" ")
+                                                        for item in items:
+                                                            if "0x" in item:
+                                                                content_stack = item
+                                                    else:
+                                                        items = output.split(" ")
+                                                        content_stack = items[len(items) - 1]
+                                                    content_stack = content_stack.lstrip("nan")
+                                                    content_stack = content_stack.lstrip("-nan")
+                                                    size_stack = 0
+                                                    if "0x" in content_stack:
+                                                        if is_hexnumber(content_stack):
+                                                            size_stack = int(content_stack, 16)
+                                                    else:
+                                                        if is_number(content_stack):
+                                                            size_stack = int(content_stack)
+                                                if abs(size_rxp - size_stack) > int(size, 16) and size_stack > size and size_rxp > size:
+                                                    process.sendline(GDB_SET_REG + " $" + stack + "=" + content_rxp)
+                                                    i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                                                    if i == 0:
+                                                        print "ERROR when resetting the " + stack
+                                                        print process.before, process.after
+                                                        print str(process)
+                                                        log.close()
+                                                        process.close()
+                                                        sys.stdout = sys.__stdout__
+                                                        return
+
+                                                    if i == 1:
+                                                        print "Set the " + stack + " back! "
+                                                        print process.before, process.after
+                                    else:
+                                        print "Cannot get the size of the current stack frame"
                                 '''
                                 if reg == "":
                                     if "rbp" in regmm or "rsp" in regmm:
@@ -630,14 +643,12 @@ class SigHandler:
 
                                 if i == 1:
                                     print "Application output"
-                                    print "After continue"
-                                    print datetime.datetime.now()
                                     print process.before, process.after
                                     log.close()
                                     process.close()
                                     sys.stdout = sys.__stdout__
+                                print datetime.datetime.now()
                     else:
-                        print datetime.datetime.now()
                         print "No triggering crashes"
                         print "Application output"
                         print process.before

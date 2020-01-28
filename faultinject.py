@@ -26,7 +26,6 @@ iterationfile = "iteration"
 nextpcfile = "nextpc"
 stacksize = "spsize"
 
-
 class FaultInjector:
 
     def __init__(self,totalInst):
@@ -134,6 +133,18 @@ class FaultInjector:
             decvalue = int(ori_value)
         print "New value is "+str(decvalue^mask)+" Old value is "+str(decvalue)
         return str(decvalue^mask)
+    
+    def get_stack_size(self):
+        size = ""
+        with open(stacksize,"r") as f:
+            lines = f.readlines()
+            for line in lines:
+                line = line.rstrip("\n")
+                if "," in line:
+                    items = line.split(",")
+                    size = items[len(items)-1]
+
+        return size
 
     def getNextPC(self,pc):
         execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,nextinst),nextinst_config1,str(pc),"--",configure.benchmark]
@@ -176,15 +187,3 @@ class FaultInjector:
                 if "scale:" in line:
                     scale = line.split(":")[1]
         return [nextpc,regw,stack,flag,base,index,displacement,scale]
-
-    def getStackSize(self):
-        size = 0
-        with open(stacksize,"r") as f:
-            lines = f.readlines()
-            for line in lines:
-                line = line.rstrip("\n")
-                if "," in line:
-                    items = line.split(",")
-                    size = items[len(items)-1]
-
-        return size

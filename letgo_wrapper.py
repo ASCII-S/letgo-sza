@@ -73,23 +73,22 @@ with open(configure.instcount,"r") as f:
 for i in range(0,configure.numFI):
     sys.stdout = sys.__stdout__
     print "Test "+str(i)
+    try:
+        os.remove("x.asc")
+        print "remove output file 3"
+    except:
+        print "Oops, no x.asc file found. Ignoring. 3"
     sig = sighandler.SigHandler(totalcount,i)
-    for item in configure.outputfile:
-        try:
-            os.remove(item)
-            print "remove output file in the wrapper"
-        except:
-            print "Oops, no "+item+" file found. Ignore in wrapper"
     sig.executeProgram()
     #clean up for next round
     silentremove(faultinject.instructionfile)
     silentremove(faultinject.iterationfile)
     silentremove(faultinject.nextpcfile)
-    for item in configure.outputfile:
-        try:
-            os.rename(item,item+"-"+str(i))
-        except:
-            print "Oops, no "+item+" file found. Ignoring"
+    ## add trial number to the output file 
+    try:
+        os.rename("x.asc", "x.asc-" + str(i))
+    except:
+        print "Oops, no x.vec file found. Ignoring."
 
 
 
