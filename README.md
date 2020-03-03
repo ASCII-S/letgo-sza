@@ -18,9 +18,9 @@ letgo_wrapper.py - the wrapper to launch fault injections and applications with 
 Please use https://github.com/flyree/pb_interceptor to build the Pintool
 
 
-## Running the tests
+## To run
 
-python letgo_wrapper.py 
+python letgo_wrapper.py your app
 
 ## Authors
 
