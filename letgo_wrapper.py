@@ -15,7 +15,7 @@ def execute(execlist,out,err):
 
         outFile = open(out,"w")
         errFile = open(err,"w")
-        print ' '.join(execlist)
+        print(' '.join(execlist))
         p = subprocess.Popen(execlist, stdout=outFile,stderr=errFile)
         elapsetime = 0
         while (elapsetime < timeout):
@@ -23,12 +23,12 @@ def execute(execlist,out,err):
             time.sleep(1)
             #print p.poll()
             if p.poll() is not None:
-                print "\t program finish", p.returncode
-                print "\t time taken", elapsetime
+                print("\t program finish", p.returncode)
+                print("\t time taken", elapsetime)
                 return str(p.returncode)
         outFile.close()
         errFile.close()
-        print "\tParent : Child timed out. Cleaning up ... "
+        print("\tParent : Child timed out. Cleaning up ... ")
         p.kill()
         return "timed-out"
 
@@ -55,40 +55,55 @@ err = "sampleerr"
 execute(execlist,out,err)
 
 if not os.path.isfile(instcount):
-    print "No instcount file! Exit"
+    print("No instcount file! Exit")
     sys.exit(1)
 
 totalcount = ""
 with open(configure.instcount,"r") as f:
     lines = f.readlines()
     if len(lines) > 1:
-        print "Error while loading inst count."
+        print("Error while loading inst count.")
         sys.exit(1)
     count = lines[0]
     count = count.rstrip("\n")
-    print count
+    print(count)
     totalcount = count.split(" ")[1]
 
+log_count = 0
+for root, dirs, files in os.walk(sighandler.log_path):
+    log_count += len(files)
+    #print(log_count,"\tlogs in ./log")
+    #exit(0)
 
-for i in range(0,configure.numFI):
+for i in range(log_count,log_count+configure.numFI):
     sys.stdout = sys.__stdout__
-    print "Test "+str(i)
+    print("Test "+str(i))
     try:
         os.remove("x.asc")
-        print "remove output file 3"
+        print("remove output file 3")
     except:
-        print "Oops, no x.asc file found. Ignoring. 3"
-    sig = sighandler.SigHandler(totalcount,i)
-    sig.executeProgram()
+        print("Oops, no x.asc file found. Ignoring. 3")
+    try:
+        print("sig.executeProgram start......")
+        sig = sighandler.SigHandler(totalcount,i)	
+        sig.executeProgram()
+        print("sig.executeProgram done!")
+    except SystemExit as e:
+        print(f"SystemExit encountered during sig.executeProgram: (exit due to sighandle: timeout){e}")
+        continue  # continue to the next iteration
+    except Exception as e:
+        print(f"Error during sig.executeProgram: {e}")
+        continue
+
     #clean up for next round
-    silentremove(faultinject.instructionfile)
-    silentremove(faultinject.iterationfile)
-    silentremove(faultinject.nextpcfile)
+    #silentremove(faultinject.instructionfile)
+    #silentremove(faultinject.iterationfile)
+    #silentremove(faultinject.nextpcfile)
     ## add trial number to the output file 
     try:
         os.rename("x.asc", "x.asc-" + str(i))
     except:
-        print "Oops, no x.vec file found. Ignoring."
+        print("Oops, no x.vec file found. Ignoring.")
 
 
 

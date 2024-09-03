@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+import configure as cf
 crash_1 = []
 crash_2 = []
 finish = []
@@ -23,17 +24,29 @@ checkingstring4 = 'TotalAbsDiff = 6.230039e-11'
 checkingstring5 = 'MaxRelDiff   = 2.178209e-15'
 #basedir = "/data/pwu/LULESH3"
 
-for f in os.listdir("."):
+#log_dir = "./lu"
+log_dir = os.path.join(cf.progname)
+print(log_dir)
+if not (os.path.exists(log_dir) and os.path.isdir(log_dir)):
+    print("{} does not exist or is not a directory".format(log_dir))
+    exit(0)
+
+for f in os.listdir(log_dir):
     #print f
     if ".py" in f:
         continue
-    with open(f,"r") as log:
+    if "log_" not in f:
+        continue
+    f = os.path.join(log_dir,f)
+    with open(f,"r",encoding='utf-8', errors='ignore') as log:
        flag_sdc = -1000
-       flag_output = -1000
+       flag_output = -1000  ##默认程序没有结果输出
        unfinished = 0
        lines = log.readlines()
        flag = 0
        for line in lines:
+          if "Traceback" in line:
+            print("Bug in:\t",f)
           if "received" in line and "Segmentation fault" in line:
               flag += 1
           if "Application output" in line:
@@ -76,10 +89,12 @@ for f in os.listdir("."):
               unfinished = 1
           if "Error" in line:
               unfinished = 1
+          if "Cannot insert breakpoint" in line:
+              unfinished = 1
        if unfinished == 1:
            unfinishedlist.append(f)
            continue
-       if flag_output < 6 and flag_output != -1000:
+       if flag_output < 6 and flag_output != -1000: ##程序有输出
            sdc.append(f)
        if flag_sdc < 5 and flag_sdc != -1000:
               detected.append(f)
@@ -93,22 +108,85 @@ for f in os.listdir("."):
        if flag == 0:
            finish.append(f)
        #break
-print len(crash_1)
-print len(crash_2)
-print len(finish)
-############
-print len(sdc)
-print len(detected)
-print len(unfinishedlist)
-print len(list(set(crash_1).difference((set(crash_1) & set(correct)))))
-#print list(set(set(crash_1).difference((set(crash_1) & set(correct)))).difference(set(sdc)))
-print "### sdc -> detected"
-print len(list(set(sdc).difference(set(detected))))
-print len(list(set(detected).difference(set(sdc))))
-print "#### crash and detected"
-print len(list(set(crash_1) & set(detected)))
-print "#### crash and sdc"
-print len(list(set(crash_1) & set(sdc)))
-#print list(set(crash_2) & set(correct))
 
-        
+
+print("crash1:\t",len(crash_1)) ##只收到一次越界错误segmentfault
+print("crash2:\t",len(crash_2)) ##收到两次越界错误
+print("finish:\t",len(finish))  ##一次错误都没有,直接结束
+############
+print("sdc:\t",len(sdc))
+print("detected:\t",len(detected))
+print("unfinishedlist:",len(unfinishedlist))
+print(len(list(set(crash_1).difference((set(crash_1) & set(correct))))))
+#print list(set(set(crash_1).difference((set(crash_1) & set(correct)))).difference(set(sdc)))
+print("### sdc -> detected")
+print(len(list(set(sdc).difference(set(detected)))))
+print(len(list(set(detected).difference(set(sdc)))))
+print("#### crash and detected")
+print(len(list(set(crash_1) & set(detected))))
+print("#### crash and sdc")
+print(len(list(set(crash_1) & set(sdc))))
+#print((list(set(crash_1) & set(sdc))))
+#print list(set(crash_2) & set(correct))
+n = 5
+print("crash1:\t",crash_1[:n])
+print("crash2:\t",crash_2[:n])
+print("sdc:\t",sdc[:n])
+#print(detected[:n])
+print("finish:\t",finish[:n]) 
+print("unfinishedlist:",unfinishedlist[:n])
+#print(list(set(crash_1).difference((set(crash_1) & set(correct))))[:n])
+
+def ss():
+    ##下面统计文本
+
+    # 定义要查找的字符串
+    search_strings = [
+        "set reg with address calculation",
+        "set reg with fake",
+        "Cannot get the size of the current stack frame",
+        "set rbp and rsp to reasonable values"
+    ]
+
+    # 定义文件夹路径
+    folder_path = log_dir # 修改为你实际的文件夹路径
+
+    # 用于存储结果的字典
+    results = {key: [] for key in search_strings}
+
+    # 遍历文件夹中的所有文件
+    for filename in os.listdir(folder_path):
+        # 构建完整文件路径
+        file_path = os.path.join(folder_path, filename)
+
+        # 只处理文本文件
+        if os.path.isfile(file_path):
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+                content = file.read()
+                for search_string in search_strings:
+                    if search_string in content:
+                        results[search_string].append(filename)
+
+    # 统计每个字符串匹配的文件数
+    counted_results = {key: len(set(val)) for key, val in results.items()}
+
+    # 将结果按计数排序
+    sorted_results = sorted(counted_results.items(), key=lambda item: item[1], reverse=True)
+
+    # 输出前几项结果
+    top_n = len(search_strings)  # 设置你想要输出的前几项
+    for i, (string, count) in enumerate(sorted_results[:top_n], 1):
+        print("{}. '{}' found in {} files".format(i, string, count))
+
+
+    # 如果你还需要显示具体的文件名，可以按以下方式输出
+    for string, filenames in results.items():
+        print("\nFiles containing '{}':".format(string))
+        top_n = 3
+        for filename in set(filenames):
+            if top_n <=0 :
+                break
+            print("- {}".format(filename))
+            top_n -=1
+
+ss()
