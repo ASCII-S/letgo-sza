@@ -114,7 +114,7 @@ class FaultInjector:
 
 
     def generateFaults(self,ori_value):
-
+        print("ori_value:\n",ori_value)
         ## it is complicated because if it is a 0x then non-digital chars are allowed, need a complicated regex.
         if "0x" in ori_value:
             res = re.findall('0[xX]?[A-Fa-f0-9]+',ori_value)

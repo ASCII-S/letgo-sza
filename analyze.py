@@ -2,6 +2,7 @@ import sys
 import os
 import re
 import configure as cf
+file_count = 0
 crash_1 = []
 crash_2 = []
 finish = []
@@ -32,6 +33,7 @@ if not (os.path.exists(log_dir) and os.path.isdir(log_dir)):
     exit(0)
 
 for f in os.listdir(log_dir):
+    file_count +=1
     #print f
     if ".py" in f:
         continue
@@ -112,10 +114,11 @@ for f in os.listdir(log_dir):
 
 print("crash1:\t",len(crash_1)) ##只收到一次越界错误segmentfault
 print("crash2:\t",len(crash_2)) ##收到两次越界错误
-print("finish:\t",len(finish))  ##一次错误都没有,直接结束
+print("no crash finish:\t",len(finish))  ##一次错误都没有,直接结束
 ############
 print("sdc:\t",len(sdc))
 print("detected:\t",len(detected))
+print("file count:",file_count)
 print("unfinishedlist:",len(unfinishedlist))
 print(len(list(set(crash_1).difference((set(crash_1) & set(correct))))))
 #print list(set(set(crash_1).difference((set(crash_1) & set(correct)))).difference(set(sdc)))
@@ -145,7 +148,15 @@ def ss():
         "set reg with address calculation",
         "set reg with fake",
         "Cannot get the size of the current stack frame",
-        "set rbp and rsp to reasonable values"
+        "set rbp and rsp to reasonable values",
+        "Cannot insert breakpoint",
+        "No reg, Exit",
+        "Error",
+        "Error during sig.executeProgram",
+        "SystemExit encountered during sig.executeProgram",
+        "received signal SIGSEGV, Segmentation fault.",
+        "received signal SIGBUS, Bus error.",
+        "received signal SIGABRT, Aborted."
     ]
 
     # 定义文件夹路径
@@ -182,7 +193,7 @@ def ss():
     # 如果你还需要显示具体的文件名，可以按以下方式输出
     for string, filenames in results.items():
         print("\nFiles containing '{}':".format(string))
-        top_n = 3
+        top_n = 1
         for filename in set(filenames):
             if top_n <=0 :
                 break

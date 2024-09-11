@@ -50,6 +50,7 @@ class SigHandler:
 
     def executeProgram(self):
         global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT, GDB_CONTINUE, GDB_FAKE
+        sig_time1 = datetime.datetime.now()
         GDB_RUN = "run"
         for item in configure.args:
             GDB_RUN += " " + item
@@ -218,6 +219,7 @@ class SigHandler:
                                 content = items[len(items) - 1]
                             content = content.lstrip("nan")
                             content = content.lstrip("-nan")
+                            print("content:\n",content)
                             content = fi.generateFaults(content)
                             process.sendline(GDB_SET_REG + " $" + reg + "=" + content)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -260,6 +262,7 @@ class SigHandler:
                         content = content.lstrip("-nan")
                         ori_reg = content.rstrip("\r\n")
                         if content!="":
+                            print(content)
                             content = fi.generateFaults(content)
                         else:
                             print('error! content is null!')
@@ -612,7 +615,7 @@ class SigHandler:
                                                             size_stack = int(content_stack)
 
                                                 size = int(size,16)
-                                                if abs(size_rxp - size_stack) > int(size, 16) and size_stack > size and size_rxp > size:##检测是否栈溢出
+                                                if abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size:##检测是否栈溢出
                                                     process.sendline(GDB_SET_REG + " $" + stack + "=" + content_rxp)
                                                     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                                     if i == 0:
@@ -679,12 +682,19 @@ class SigHandler:
                                 if i == 1:
                                     print("Process Continue!\nApplication output")
                                     print((process.before.decode('utf-8'), process.after))
+                                    sig_time2 = datetime.datetime.now()
+                                    print("sig time: ",sig_time2 - sig_time1)
                                     log.close()
                                     process.close()
                                     sys.stdout = sys.__stdout__
                                 print((datetime.datetime.now()))
+                                
                     else:
                         print("No triggering crashes")
                         print("Application output")
                         print((process.before.decode('utf-8')))
+                        sig_time2 = datetime.datetime.now()
+                        print("sig time: ",sig_time2 - sig_time1)
                         sys.stdout = sys.__stdout__
+        
+            
