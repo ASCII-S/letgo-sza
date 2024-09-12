@@ -145,7 +145,13 @@ def ss():
         "set reg with address calculation",
         "set reg with fake",
         "Cannot get the size of the current stack frame",
-        "set rbp and rsp to reasonable values"
+        "set rbp and rsp to reasonable values",
+        "received signal SIGSEGV, Segmentation fault.",
+        "received signal SIGBUS",
+        "received signal SIGABRT",
+        "Error",
+        "Cannot insert breakpoint",
+        "No reg"
     ]
 
     # 定义文件夹路径

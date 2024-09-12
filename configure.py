@@ -1,7 +1,7 @@
 import os
 pin_home = "/home/tongshiyu/pin/pin"
 
-progname = 'hpl'
+progname = 'hotspot'
 
 if progname == 'hpl':
     progbin = "/home/tongshiyu/programs/hpl-2.3/testing/xhpl"
@@ -24,7 +24,7 @@ elif progname == "myocyte":
     optionlist = ['1000', '1', '0', '4']
 elif progname == "hotspot":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/hotspot"
-    optionlist = ['64','64','2','1',"/home/tongsy/programs/rodinia-master/data/hotspot/temp_64",'/home/tongsy/programs/rodinia-master/data/hotspot/power_64', './hotspot/outfile']
+    optionlist = ['64','64','2','1',"/home/tongshiyu/programs/rodinia-master/data/hotspot/temp_64",'/home/tongshiyu/programs/rodinia-master/data/hotspot/power_64', './hotspot/outfile']
 elif progname == "knn":                                 ## KNN
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn"
     datafile = "./filelist.txt"
@@ -37,5 +37,5 @@ args = optionlist
 toolbase = "/home/tongshiyu/pin/source/tools/pb_interceptor-master"
 pin_base = "/home/tongshiyu/pin"
 instcount = "inscount.out"
-numFI = 20
+numFI = 200
 log_path = progname

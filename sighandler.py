@@ -207,6 +207,7 @@ class SigHandler:
                             sys.exit(1)
                         if i == 1:
                             output = process.before.decode('utf-8')
+                            print(output)
                             content = ""
                             if "0x" in output:
                                 items = output.split(" ")
@@ -258,6 +259,7 @@ class SigHandler:
                             content = items[len(items) - 1]
                         content = content.lstrip("nan")
                         content = content.lstrip("-nan")
+                        print("content:\n",content)
                         ori_reg = content.rstrip("\r\n")
                         if content!="":
                             content = fi.generateFaults(content)

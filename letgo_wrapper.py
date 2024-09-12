@@ -5,6 +5,7 @@ import faultinject
 import configure
 import subprocess
 import time
+import re
 
 timeout = 500
 
@@ -41,6 +42,33 @@ def silentremove(filename):
             raise # re-raise exception if a different error occured
 
 
+def find_max_log_suffix(directory):
+    # 初始化最大值
+    max_number = -1
+    max_file = None
+    
+    # 定义匹配以 "log_" 开头，后面跟数字的正则表达式
+    pattern = re.compile(r"log_(\d+)")
+    
+    # 遍历指定文件夹中的所有文件
+    for filename in os.listdir(directory):
+        # 使用正则表达式匹配文件名
+        match = pattern.match(filename)
+        if match:
+            # 提取匹配的数字部分
+            number = int(match.group(1))
+            # 如果找到更大的数字，更新最大值和对应的文件名
+            if number > max_number:
+                max_number = number
+                max_file = filename
+    
+    if max_file:
+        print(f"最大的 log 文件是: {max_file}, 后缀数字是: {max_number}")
+        return max_number
+    else:
+        print("没有找到符合条件的文件。")
+        return None
+
 instcount = configure.pin_base+"/source/tools/ManualExamples/obj-intel64/inscount0.so"
 
 execlist = [configure.pin_home,"-t",instcount,"--",configure.benchmark]
@@ -74,6 +102,10 @@ for root, dirs, files in os.walk(sighandler.log_path):
     log_count += len(files)
     #print(log_count,"\tlogs in ./log")
     #exit(0)
+if log_count != 0:
+    directory = sighandler.log_path  # 替换为你的文件夹路径
+    max_suffix = find_max_log_suffix(directory)
+    log_count = max_suffix + 1
 
 for i in range(log_count,log_count+configure.numFI):
     sys.stdout = sys.__stdout__
