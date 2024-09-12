@@ -2,6 +2,7 @@ import sys
 import os
 import re
 import configure as cf
+
 file_count = 0
 crash_1 = []
 crash_2 = []
@@ -12,6 +13,7 @@ correct = []
 sdc = []
 unfinishedlist = []
 output = []
+
 checkingstring = 'Problem size        =  5'
 #checkingstring1 = 'Iteration count     =  306'
 checkingstring1 = 'Iteration count     =  306'
@@ -24,8 +26,18 @@ checkingstring4 = 'TotalAbsDiff = 6.230039e-11'
 #checkingstring5 = 'MaxRelDiff   = 2.178209e-15'
 checkingstring5 = 'MaxRelDiff   = 2.178209e-15'
 #basedir = "/data/pwu/LULESH3"
-
 #log_dir = "./lu"
+
+def find_and_print_sig_time(file_path):
+    # 打开文件，逐行读取内容
+    with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+        for line in file:
+            # 检查是否有 "sig time:"
+            if "sig time:" in line:
+                # 输出包含 "sig time:" 的行
+                print(line.strip())  
+
+
 log_dir = os.path.join(cf.progname)
 print(log_dir)
 if not (os.path.exists(log_dir) and os.path.isdir(log_dir)):
@@ -116,11 +128,11 @@ print("crash1:\t",len(crash_1)) ##只收到一次越界错误segmentfault
 print("crash2:\t",len(crash_2)) ##收到两次越界错误
 print("no crash finish:\t",len(finish))  ##一次错误都没有,直接结束
 ############
-print("sdc:\t",len(sdc))
-print("detected:\t",len(detected))
+#print("sdc:\t",len(sdc))
+#print("detected:\t",len(detected))
 print("file count:",file_count)
 print("unfinishedlist:",len(unfinishedlist))
-print(len(list(set(crash_1).difference((set(crash_1) & set(correct))))))
+"""print(len(list(set(crash_1).difference((set(crash_1) & set(correct))))))
 #print list(set(set(crash_1).difference((set(crash_1) & set(correct)))).difference(set(sdc)))
 print("### sdc -> detected")
 print(len(list(set(sdc).difference(set(detected)))))
@@ -130,14 +142,18 @@ print(len(list(set(crash_1) & set(detected))))
 print("#### crash and sdc")
 print(len(list(set(crash_1) & set(sdc))))
 #print((list(set(crash_1) & set(sdc))))
-#print list(set(crash_2) & set(correct))
+#print list(set(crash_2) & set(correct))"""
 n = 5
-print("crash1:\t",crash_1[:n])
+print("\ncrash1:\t",crash_1[:n])
+find_and_print_sig_time(os.path.join(crash_1[0]))
 print("crash2:\t",crash_2[:n])
-print("sdc:\t",sdc[:n])
+find_and_print_sig_time(os.path.join(crash_2[0]))
+#print("sdc:\t",sdc[:n])
 #print(detected[:n])
-print("finish:\t",finish[:n]) 
+print("non crash finish:\t",finish[:n]) 
+find_and_print_sig_time(os.path.join(finish[0]))
 print("unfinishedlist:",unfinishedlist[:n])
+find_and_print_sig_time(os.path.join(unfinishedlist[0]))
 #print(list(set(crash_1).difference((set(crash_1) & set(correct))))[:n])
 
 def ss():
@@ -186,7 +202,9 @@ def ss():
 
     # 输出前几项结果
     top_n = len(search_strings)  # 设置你想要输出的前几项
-    for i, (string, count) in enumerate(sorted_results[:top_n], 1):
+    for i, (string, count) in enumerate(counted_results.items(), 1):
+        if i > top_n:
+            break
         print("{}. '{}' found in {} files".format(i, string, count))
 
 
@@ -198,6 +216,15 @@ def ss():
             if top_n <=0 :
                 break
             print("- {}".format(filename))
+            file_path = os.path.join(folder_path, filename)
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+                for line in file:
+                    # 检查是否有 "sig time:"
+                    if "sig time:" in line:
+                        # 输出包含 "sig time:" 的行
+                        print(line.strip())
             top_n -=1
+
+
 
 ss()
