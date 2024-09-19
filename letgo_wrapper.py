@@ -5,11 +5,8 @@ import faultinject
 import configure
 import subprocess
 import time
-<<<<<<< HEAD
 import datetime
 import traceback
-=======
->>>>>>> 019b7c1714290f0d8bb14321cf687fa2b1ae1a5e
 import re
 
 timeout = 500
