@@ -28,6 +28,10 @@ GDB_ERROR_SEGV = "Program received signal SIGSEGV"
 GDB_ERROR_BUS = "Program received signal SIGBUS"
 GDB_ERROR_ABT = "Program received signal SIGABT"
 
+ERR_LEN_INJ_SIG = "Valid FaultInject2Sig:\t"
+ERR_LEN_FIX_SIG = "Valid Fix2Sig:\t"
+ERR_LEN_OVR_50 = "More than 50 instruction..."
+
 is_fake = 1
 is_rewind = 1
 
@@ -129,6 +133,9 @@ class SigHandler:
         if i == 1:
             print((process.before.decode('utf-8')))
             print('Successfully set the breakpoint')
+
+        """print("GDB is now interactive. You can type GDB commands.")
+        process.interact()  # 交互模式，允许用户直接控制 GDB"""
 
         process.sendline(GDB_RUN)
         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -326,8 +333,42 @@ class SigHandler:
                 if i == 1:
                     print("Delete all breakpoints")
 
+                ##逐步执行,检查从注错到出错的错误传播;
+                stepi_num = 0
+                output = ''
+                i = 1
+                while True:
+                    try:
+                        process.sendline("stepi")
+                        i = process.expect([pexpect.TIMEOUT, "(gdb)"])
+                        if i == 0 :
+                            break
+                        # 打印当前指令
+                        if "received signal" in process.before.decode('utf-8'):
+                            output = process.before.decode('utf-8')
+                            break
+                        else:
+                            process.sendline("x/i $pc")
+                            i = process.expect([pexpect.TIMEOUT, "(gdb)"])
+                            print(process.before.decode('utf-8'))
+                            stepi_num += 1
+                            if stepi_num >= 50:
+                                break
+
+                    except pexpect.EOF:
+                        print("GDB process ended.")
+                        break
+                    except pexpect.TIMEOUT:
+                        print("Timeout waiting for GDB response.")
+                        break
+                if stepi_num < 50 :
+                    print(ERR_LEN_INJ_SIG,stepi_num)
+                else:
+                    print("After inject:" + ERR_LEN_OVR_50)
+                
                 process.sendline(GDB_CONTINUE)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+
                 if i == 0:
                     print("ERROR when passing to signal handler")
                     print((process.before.decode('utf-8'), process.after))
@@ -338,9 +379,9 @@ class SigHandler:
                     return
 
                 if i == 1:
-
+                    
                     output = process.before.decode('utf-8')
-                    print('judge letgo framwork2:',output)
+                    #print('judge letgo framwork2:\n',output)
                     if GDB_ERROR_SEGV in output or GDB_ERROR_BUS in output or GDB_ERROR_ABT in output:
                         ##
                         # Need to pass the current pc to pin, and get all the info
@@ -670,6 +711,42 @@ class SigHandler:
                                             print process.before.decode('utf-8'), process.after
                                 '''
                                 print((datetime.datetime.now()))
+
+
+                                ##逐步执行,检查从注错到出错的错误传播;
+                                stepi_num = 0
+                                output = ''
+                                i = 1
+                                while True:
+                                    try:
+                                        process.sendline("stepi")
+                                        i = process.expect([pexpect.TIMEOUT, "(gdb)"])
+                                        if i == 0 :
+                                            break
+                                        # 打印当前指令
+                                        if "received signal" in process.before.decode('utf-8'):
+                                            output = process.before.decode('utf-8')
+                                            break
+                                        else:
+                                            process.sendline("x/i $pc")
+                                            i = process.expect([pexpect.TIMEOUT, "(gdb)"])
+                                            print(process.before.decode('utf-8'))
+                                            stepi_num += 1
+                                            if stepi_num >= 50:
+                                                break
+
+                                    except pexpect.EOF:
+                                        print("GDB process ended.")
+                                        break
+                                    except pexpect.TIMEOUT:
+                                        print("Timeout waiting for GDB response.")
+                                        break
+                                if stepi_num < 50 :
+                                    print(ERR_LEN_FIX_SIG,stepi_num)
+                                else:
+                                    print("After Fixed:" + ERR_LEN_OVR_50)
+
+
                                 process.sendline(GDB_CONTINUE)
                                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                 if i == 0:
