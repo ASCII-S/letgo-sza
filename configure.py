@@ -1,7 +1,12 @@
 import os
 pin_home = "/home/tongshiyu/pin/pin"
+<<<<<<< HEAD
 letgo_base_home = "/home/tongshiyu/pin/source/tools/letgo"
 progname = 'bfs'
+=======
+
+progname = 'hotspot'
+>>>>>>> 019b7c1714290f0d8bb14321cf687fa2b1ae1a5e
 
 if progname == 'hpl':
     progbin = "/home/tongshiyu/programs/hpl-2.3/testing/xhpl"
@@ -36,6 +41,6 @@ args = optionlist
 toolbase = "/home/tongshiyu/pin/source/tools/pb_interceptor-master"
 pin_base = "/home/tongshiyu/pin"
 instcount = "inscount.out"
-numFI = 30000
+numFI = 300
 #log_path = progname
 log_path = os.path.join(letgo_base_home,progname)

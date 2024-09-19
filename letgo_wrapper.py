@@ -5,8 +5,11 @@ import faultinject
 import configure
 import subprocess
 import time
+<<<<<<< HEAD
 import datetime
 import traceback
+=======
+>>>>>>> 019b7c1714290f0d8bb14321cf687fa2b1ae1a5e
 import re
 
 timeout = 500
@@ -43,6 +46,33 @@ def silentremove(filename):
         if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
             raise # re-raise exception if a different error occured
 
+
+def find_max_log_suffix(directory):
+    # 初始化最大值
+    max_number = -1
+    max_file = None
+    
+    # 定义匹配以 "log_" 开头，后面跟数字的正则表达式
+    pattern = re.compile(r"log_(\d+)")
+    
+    # 遍历指定文件夹中的所有文件
+    for filename in os.listdir(directory):
+        # 使用正则表达式匹配文件名
+        match = pattern.match(filename)
+        if match:
+            # 提取匹配的数字部分
+            number = int(match.group(1))
+            # 如果找到更大的数字，更新最大值和对应的文件名
+            if number > max_number:
+                max_number = number
+                max_file = filename
+    
+    if max_file:
+        print(f"最大的 log 文件是: {max_file}, 后缀数字是: {max_number}")
+        return max_number
+    else:
+        print("没有找到符合条件的文件。")
+        return None
 
 instcount = configure.pin_base+"/source/tools/ManualExamples/obj-intel64/inscount0.so"
 
