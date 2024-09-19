@@ -132,6 +132,7 @@ print("no crash finish:\t",len(finish))  ##一次错误都没有,直接结束
 #print("detected:\t",len(detected))
 print("file count:",file_count)
 print("unfinishedlist:",len(unfinishedlist))
+print("valid countL",file_count-len(unfinishedlist))
 """print(len(list(set(crash_1).difference((set(crash_1) & set(correct))))))
 #print list(set(set(crash_1).difference((set(crash_1) & set(correct)))).difference(set(sdc)))
 print("### sdc -> detected")
@@ -198,7 +199,7 @@ def ss():
     counted_results = {key: len(set(val)) for key, val in results.items()}
 
     # 将结果按计数排序
-    sorted_results = sorted(counted_results.items(), key=lambda item: item[1], reverse=True)
+    #sorted_results = sorted(counted_results.items(), key=lambda item: item[1], reverse=True)
 
     # 输出前几项结果
     top_n = len(search_strings)  # 设置你想要输出的前几项

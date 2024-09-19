@@ -32,7 +32,7 @@ is_fake = 1
 is_rewind = 1
 
 ##log_path = "./log"
-log_path = "./" + configure.log_path
+log_path = os.path.join(configure.letgo_base_home,configure.progname)
 if not os.path.exists(log_path):
     os.makedirs(log_path)
     

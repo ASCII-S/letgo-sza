@@ -1,7 +1,7 @@
 import os
 pin_home = "/home/tongshiyu/pin/pin"
 letgo_base_home = "/home/tongshiyu/pin/source/tools/letgo"
-progname = 'hotspot'
+progname = 'bfs'
 
 if progname == 'hpl':
     progbin = "/home/tongshiyu/programs/hpl-2.3/testing/xhpl"
@@ -9,10 +9,7 @@ if progname == 'hpl':
 elif progname == 'lu':
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/lud/lud"
     optionlist = ['-s512']
-elif progname == 'fft':
-    progbin = "/root/localTool/HPL/splash2/codes/kernels/fft/FFT"
-    optionlist = ['']
-elif progname == "amg":                                   ## amg
+elif progname == "amg":                                   ## amg    ----------有效实验太少
     progbin = "/home/tongshiyu/programs/LLNL/AMG-master/test/amg"
     optionlist = ['-n','5','5','5']
 elif progname == "bfs": 

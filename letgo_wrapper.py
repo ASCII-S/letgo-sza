@@ -98,12 +98,18 @@ def find_max_log_suffix(directory):
                 max_file = filename
     
     if max_file:
-        print(f"最大的 log 文件是: {max_file}, 后缀数字是: {max_number}")
+        print(f"最大的 log 文件是: {max_file}, 后缀数字是: {max_number},所在地址是: {directory}")
         return max_number
     else:
         print("没有找到符合条件的文件。")
         return None
-log_count = find_max_log_suffix(sighandler.log_path) + 1
+
+log_count = 0
+for root, dirs, files in os.walk(sighandler.log_path):
+    # 统计文件数
+    log_count += len(files)
+if log_count != 0:
+    log_count = find_max_log_suffix(sighandler.log_path) + 1
 
 for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开始写记录
     sys.stdout = sys.__stdout__
