@@ -174,6 +174,10 @@ def ss():
         "received signal SIGSEGV, Segmentation fault.",
         "received signal SIGBUS, Bus error.",
         "received signal SIGABRT, Aborted."
+        "Valid FaultInject2Sig:",
+        "Valid Fix2Sig:",
+        "After inject",
+        "After Fixed"
     ]
 
     # 定义文件夹路径
@@ -198,15 +202,13 @@ def ss():
     # 统计每个字符串匹配的文件数
     counted_results = {key: len(set(val)) for key, val in results.items()}
 
-    # 将结果按计数排序
-    #sorted_results = sorted(counted_results.items(), key=lambda item: item[1], reverse=True)
-
-    # 输出前几项结果
-    top_n = len(search_strings)  # 设置你想要输出的前几项
+    # 输出前几项结果（不排序）
+    top_n = len(search_strings)+1  # 设置你想要输出的前几项
     for i, (string, count) in enumerate(counted_results.items(), 1):
         if i > top_n:
             break
         print("{}. '{}' found in {} files".format(i, string, count))
+
 
 
     # 如果你还需要显示具体的文件名，可以按以下方式输出
