@@ -2,6 +2,13 @@ import sys
 import os
 import re
 import configure as cf
+import shutil
+
+## clsfy == 1 to move unfinished record to folder "unfinish"
+clsfy = 0
+## delbug = 1 to delete file that encounters Traceback
+delbug = 0
+
 
 file_count = 0
 crash_1 = []
@@ -28,6 +35,13 @@ checkingstring5 = 'MaxRelDiff   = 2.178209e-15'
 #basedir = "/data/pwu/LULESH3"
 #log_dir = "./lu"
 
+log_dir = os.path.join(cf.progname)
+print(log_dir)
+if not (os.path.exists(log_dir) and os.path.isdir(log_dir)):
+    print("{} does not exist or is not a directory".format(log_dir))
+    exit(0)
+
+
 def find_and_print_sig_time(file_path):
     # 打开文件，逐行读取内容
     with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
@@ -38,124 +52,21 @@ def find_and_print_sig_time(file_path):
                 print(line.strip())  
 
 
-log_dir = os.path.join(cf.progname)
-print(log_dir)
-if not (os.path.exists(log_dir) and os.path.isdir(log_dir)):
-    print("{} does not exist or is not a directory".format(log_dir))
-    exit(0)
+def move_file_to_dir(f, log_dir, folder_name):
+    # 创建目标文件夹路径
+    target_dir = os.path.join(log_dir, folder_name)
 
-for f in os.listdir(log_dir):
-    file_count +=1
-    #print f
-    if ".py" in f:
-        continue
-    if "log_" not in f:
-        continue
-    f = os.path.join(log_dir,f)
-    with open(f,"r",encoding='utf-8', errors='ignore') as log:
-       flag_sdc = -1000
-       flag_output = -1000  ##默认程序没有结果输出
-       unfinished = 0
-       lines = log.readlines()
-       flag = 0
-       for line in lines:
-          if "Traceback" in line:
-            print("Bug in:\t",f)
-          if "received" in line and "Segmentation fault" in line:
-              flag += 1
-          if "Application output" in line:
-              flag_sdc = 0
-              flag_output = 0
-          if flag_output != -1000 and flag_sdc != -1000 :
-              if checkingstring in line:
-                  flag_output += 1
-                  flag_sdc+= 1
-              if checkingstring1 in line:
-                  flag_output += 1
-                  flag_sdc += 1
-                #print line
-              if checkingstring2 in line:
-                  flag_output += 1
-                  flag_sdc += 1
-              if checkingstring3 in line:
-                  flag_output += 1
-              if checkingstring4 in line:
-                  flag_output += 1
-              if checkingstring5 in line:
-                  flag_output += 1
-              #print line
-              #print flag_sdc
-              if 'Diff' in line:
-                  if 'e-' not in line:
-                      flag_sdc -= 1
-                      continue
-                  parser = line.split('e-')[1]
-                  res = re.findall('\d+', parser)
-                  if len(res) > 0:
-                    #pre = parser.split('-')[1]
-                      if int(res[0]) >= 8:
-                        #print line
-                          flag_sdc += 1
-                          #print line
-                          #print flag_sdc
-       #print flag_sdc
-          if "Exit" in line:
-              unfinished = 1
-          if "Error" in line:
-              unfinished = 1
-          if "Cannot insert breakpoint" in line:
-              unfinished = 1
-       if unfinished == 1:
-           unfinishedlist.append(f)
-           continue
-       if flag_output < 6 and flag_output != -1000: ##程序有输出
-           sdc.append(f)
-       if flag_sdc < 5 and flag_sdc != -1000:
-              detected.append(f)
-       if flag_output == 6:
-           correct.append(f)     
-           
-       if flag == 1:
-           crash_1.append(f)
-       if flag == 2:
-           crash_2.append(f)
-       if flag == 0:
-           finish.append(f)
-       #break
+    # 检查目标文件夹是否存在，如果不存在则创建
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
 
+    # 构造目标路径
+    destination = os.path.join(target_dir, os.path.basename(f))
 
-print("crash1:\t",len(crash_1)) ##只收到一次越界错误segmentfault
-print("crash2:\t",len(crash_2)) ##收到两次越界错误
-print("no crash finish:\t",len(finish))  ##一次错误都没有,直接结束
-############
-#print("sdc:\t",len(sdc))
-#print("detected:\t",len(detected))
-print("file count:",file_count)
-print("unfinishedlist:",len(unfinishedlist))
-print("valid countL",file_count-len(unfinishedlist))
-"""print(len(list(set(crash_1).difference((set(crash_1) & set(correct))))))
-#print list(set(set(crash_1).difference((set(crash_1) & set(correct)))).difference(set(sdc)))
-print("### sdc -> detected")
-print(len(list(set(sdc).difference(set(detected)))))
-print(len(list(set(detected).difference(set(sdc)))))
-print("#### crash and detected")
-print(len(list(set(crash_1) & set(detected))))
-print("#### crash and sdc")
-print(len(list(set(crash_1) & set(sdc))))
-#print((list(set(crash_1) & set(sdc))))
-#print list(set(crash_2) & set(correct))"""
-n = 5
-print("\ncrash1:\t",crash_1[:n])
-find_and_print_sig_time(os.path.join(crash_1[0]))
-print("crash2:\t",crash_2[:n])
-find_and_print_sig_time(os.path.join(crash_2[0]))
-#print("sdc:\t",sdc[:n])
-#print(detected[:n])
-print("non crash finish:\t",finish[:n]) 
-find_and_print_sig_time(os.path.join(finish[0]))
-print("unfinishedlist:",unfinishedlist[:n])
-find_and_print_sig_time(os.path.join(unfinishedlist[0]))
-#print(list(set(crash_1).difference((set(crash_1) & set(correct))))[:n])
+    # 移动文件到目标文件夹
+    shutil.move(f, destination)
+    print(f"File {f} has been moved to {target_dir}")
+    
 
 def ss():
     ##下面统计文本
@@ -173,10 +84,10 @@ def ss():
         "SystemExit encountered during sig.executeProgram",
         "received signal SIGSEGV, Segmentation fault.",
         "received signal SIGBUS, Bus error.",
-        "received signal SIGABRT, Aborted."
+        "received signal SIGABRT, Aborted.",
         "Valid FaultInject2Sig:",
         "Valid Fix2Sig:",
-        "After inject",
+        "After Inject:",
         "After Fixed"
     ]
 
@@ -229,5 +140,125 @@ def ss():
             top_n -=1
 
 
+def ana1():
+    global file_count, crash_1, crash_2, finish, flag, detected, correct, sdc, unfinishedlist, output
+    for f in os.listdir(log_dir):
+        file_count +=1
+        #print f
+        if "log_" not in f:
+            continue
+        f = os.path.join(log_dir,f)
+        with open(f,"r",encoding='utf-8', errors='ignore') as log:
+            flag_sdc = -1000
+            flag_output = -1000  ##默认程序没有结果输出
+            unfinished = 0
+            lines = log.readlines()
+            flag = 0
+            for line in lines:
+                if "Traceback" in line:
+                    print("Bug in:\t",f)
+                    if delbug == 1:
+                        os.remove(f)  # 删除文件
+                        print("delete:\t",f)
+                if "received" in line and "Segmentation fault" in line:
+                    flag += 1
+                if "Application output" in line:
+                    flag_sdc = 0
+                    flag_output = 0
+                if flag_output != -1000 and flag_sdc != -1000 :
+                    if checkingstring in line:
+                        flag_output += 1
+                        flag_sdc+= 1
+                    if checkingstring1 in line:
+                        flag_output += 1
+                        flag_sdc += 1
+                        #print line
+                    if checkingstring2 in line:
+                        flag_output += 1
+                        flag_sdc += 1
+                    if checkingstring3 in line:
+                        flag_output += 1
+                    if checkingstring4 in line:
+                        flag_output += 1
+                    if checkingstring5 in line:
+                        flag_output += 1
+                    #print line
+                    #print flag_sdc
+                    if 'Diff' in line:
+                        if 'e-' not in line:
+                            flag_sdc -= 1
+                            continue
+                        parser = line.split('e-')[1]
+                        res = re.findall('\d+', parser)
+                        if len(res) > 0:
+                            #pre = parser.split('-')[1]
+                            if int(res[0]) >= 8:
+                                #print line
+                                flag_sdc += 1
+                                #print line
+                                #print flag_sdc
+            #print flag_sdc
+                if "Exit" in line:
+                    unfinished = 1
+                if "Error" in line:
+                    unfinished = 1
+                if "Cannot insert breakpoint" in line:
+                    unfinished = 1
+            if unfinished == 1:
+                unfinishedlist.append(f)
+                if clsfy == 1:
+                    move_file_to_dir(f,log_dir,"unfinish")
+                continue
+            if flag_output < 6 and flag_output != -1000: ##程序有输出
+                sdc.append(f)
+            if flag_sdc < 5 and flag_sdc != -1000:
+                    detected.append(f)
+            if flag_output == 6:
+                correct.append(f)     
+                
+            if flag == 1:
+                crash_1.append(f)
+            if flag == 2:
+                crash_2.append(f)
+            if flag == 0:
+                finish.append(f)
+            #break
 
-ss()
+
+    print("crash1:\t",len(crash_1)) ##只收到一次越界错误segmentfault
+    print("crash2:\t",len(crash_2)) ##收到两次越界错误
+    print("no crash finish:\t",len(finish))  ##一次错误都没有,直接结束
+    ############
+    #print("sdc:\t",len(sdc))
+    #print("detected:\t",len(detected))
+    print("file count:",file_count)
+    print("unfinishedlist:",len(unfinishedlist))
+    print("valid countL",file_count-len(unfinishedlist))
+    """print(len(list(set(crash_1).difference((set(crash_1) & set(correct))))))
+    #print list(set(set(crash_1).difference((set(crash_1) & set(correct)))).difference(set(sdc)))
+    print("### sdc -> detected")
+    print(len(list(set(sdc).difference(set(detected)))))
+    print(len(list(set(detected).difference(set(sdc)))))
+    print("#### crash and detected")
+    print(len(list(set(crash_1) & set(detected))))
+    print("#### crash and sdc")
+    print(len(list(set(crash_1) & set(sdc))))
+    #print((list(set(crash_1) & set(sdc))))
+    #print list(set(crash_2) & set(correct))"""
+    n = 5
+    print("\ncrash1:\t",crash_1[:n])
+    find_and_print_sig_time(os.path.join(crash_1[0]))
+    print("crash2:\t",crash_2[:n])
+    find_and_print_sig_time(os.path.join(crash_2[0]))
+    #print("sdc:\t",sdc[:n])
+    #print(detected[:n])
+    print("non crash finish:\t",finish[:n]) 
+    find_and_print_sig_time(os.path.join(finish[0]))
+    #print("unfinishedlist:",unfinishedlist[:n])
+    #find_and_print_sig_time(os.path.join(unfinishedlist[0]))
+    #print(list(set(crash_1).difference((set(crash_1) & set(correct))))[:n])
+
+
+if __name__ == "__main__":
+    ana1()
+    ss()
