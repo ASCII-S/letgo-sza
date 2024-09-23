@@ -150,9 +150,13 @@ for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开�
         print("sig.executeProgram start......")
         sig_time1 = datetime.datetime.now()
         print(sig_time1)
-        sig = sighandler.SigHandler(totalcount,i)	
-        sig.executeProgram()
+
+        GDB_LAUNCH = "gdb " + configure.benchmark
+        sig = sighandler.SigHandler(totalcount,i,GDB_LAUNCH)	
+        sig.executeProgram(sig.process)
+        
         sig_time2 = datetime.datetime.now()
+        print("sig.executeProgram end.")
         print(sig_time2)
     except SystemExit as e:
         print(f"SystemExit encountered during sig.executeProgram: (exit due to sighandle: timeout){e}")
