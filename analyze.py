@@ -3,11 +3,18 @@ import os
 import re
 import configure as cf
 import shutil
+import pandas as pd
+import csv
+import findins as fdi
 
 ## clsfy == 1 to move unfinished record to folder "unfinish"
-clsfy = 0
+clsfy = 1
 ## delbug = 1 to delete file that encounters Traceback
-delbug = 0
+delbug = 1
+## to_csv =1 will collect all information to csv under log_path,but cost much more time
+to_csv = 1
+## findins = 1 will auto fix Sig1ins and Sig2ins according to Sig*pc and asm  
+findins = 1
 
 
 file_count = 0
@@ -52,6 +59,19 @@ def find_and_print_sig_time(file_path):
                 print(line.strip())  
 
 
+def next_i_line_content(file,i):
+    while i>0:
+        try:
+            next_line = next(file).strip()  # 获取下一行
+            #print("Next line:", next_line)
+            i -= 1
+        except StopIteration:
+            # 如果到达文件末尾，则停止获取下一行
+            #print("Reached end of file.")
+            #print(next(file).strip())
+            return 'null'
+    return next_line
+
 def move_file_to_dir(f, log_dir, folder_name):
     # 创建目标文件夹路径
     target_dir = os.path.join(log_dir, folder_name)
@@ -65,7 +85,8 @@ def move_file_to_dir(f, log_dir, folder_name):
 
     # 移动文件到目标文件夹
     shutil.move(f, destination)
-    print(f"File {f} has been moved to {target_dir}")
+    print("File {} has been moved to {}".format(f, target_dir))
+
     
 
 def ss():
@@ -140,20 +161,32 @@ def ss():
             top_n -=1
 
 
-def ana1():
+def ana1(progname):
     global file_count, crash_1, crash_2, finish, flag, detected, correct, sdc, unfinishedlist, output
+    
+    
+    csv_file_path = os.path.join(log_dir,"../CSV", progname+'.csv')
+    # 检查文件是否存在，如果存在则删除
+    if os.path.exists(csv_file_path):
+        os.remove(csv_file_path)
+        print("Deleted test.csv.")
+    else:
+        print(progname+'.csv'," does not exist.")
+
+
     for f in os.listdir(log_dir):
         file_count +=1
         #print f
         if "log_" not in f:
             continue
         f = os.path.join(log_dir,f)
+        flag = 0
         with open(f,"r",encoding='utf-8', errors='ignore') as log:
             flag_sdc = -1000
             flag_output = -1000  ##默认程序没有结果输出
             unfinished = 0
             lines = log.readlines()
-            flag = 0
+            
             for line in lines:
                 if "Traceback" in line:
                     print("Bug in:\t",f)
@@ -223,7 +256,8 @@ def ana1():
             if flag == 0:
                 finish.append(f)
             #break
-
+        
+        extract_values_and_append_to_csv(f, log_dir, progname+'.csv', flag)
 
     print("crash1:\t",len(crash_1)) ##只收到一次越界错误segmentfault
     print("crash2:\t",len(crash_2)) ##收到两次越界错误
@@ -249,16 +283,163 @@ def ana1():
     print("\ncrash1:\t",crash_1[:n])
     find_and_print_sig_time(os.path.join(crash_1[0]))
     print("crash2:\t",crash_2[:n])
-    find_and_print_sig_time(os.path.join(crash_2[0]))
+    if len(crash_2)>1:
+        find_and_print_sig_time(os.path.join(crash_2[0]))
     #print("sdc:\t",sdc[:n])
     #print(detected[:n])
-    print("non crash finish:\t",finish[:n]) 
+    print("no crash finish:\t",finish[:n]) 
     find_and_print_sig_time(os.path.join(finish[0]))
     #print("unfinishedlist:",unfinishedlist[:n])
     #find_and_print_sig_time(os.path.join(unfinishedlist[0]))
     #print(list(set(crash_1).difference((set(crash_1) & set(correct))))[:n])
 
 
+def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
+    # 创建 CSV 文件保存的目录
+    output_dir = os.path.join(log_dir, '../CSV')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)  # 如果目录不存在则创建
+
+    # 创建一个空的 DataFrame
+    df = pd.DataFrame(columns=['input_file','reg', 'regmm', 'injreg', 'pc', 'iteration1', 'ins', 'opcode', 'func', 'result', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','ErrSpd_Fix' ])
+    
+    if flag == 0:
+        df.loc[0,'result'] = 'masked'
+    elif flag == 1:
+        df.loc[0,'result'] = 'crash1'
+    else:
+        df.loc[0,'result'] = 'crash2'
+    # 获取文件名
+    file_name = os.path.basename(input_file)
+
+    # 读取文件并提取所需内容
+    with open(input_file, 'r') as file:
+        values = ['null'] * 4
+        SIGcount = 0
+        for line in file:
+            if "args ready for set breakpoint" in line:
+                # 使用正则表达式提取方括号中的内容
+                match = re.search(r"\['(.*?)'\]", line)
+                if match :
+                    # 提取匹配的内容并分割成列表
+                    values = match.group(1).split("', '")
+
+                    # 用 'null' 替代没有内容的列
+                    values = [v if v else 'null' for v in values]
+
+                    # 将 pc 的值转换为十六进制并添加前缀 0x
+                    if len(values) > 2:  # 确保有足够的值
+                        try:
+                            values[2] = "0x{:x}".format(int(values[2]))
+                        except ValueError:
+                            print("Warning: Could not convert pc value to hex: {}".format(values[2]))
+                    # 检查 values 的长度
+                    #if len(values) != len(df.columns):
+                     #   print("Warning: Mismatched columns. Expected {}, got {}".format(len(df.columns), len(values)))
+                     #   continue  # 或者使用 `raise` 抛出异常
+                    df.loc[0,'reg'] = values[0]
+                    df.loc[0,'regmm'] = values[1]
+                    df.loc[0,'pc'] = values[2]
+                    df.loc[0,'iteration1'] = values[3]
+                    if values[0] != 'null':
+                        df.loc[0,'injreg'] = values[0]
+                    elif values[1] != 'null':
+                        df.loc[0,'injreg'] = values[1]
+                    else:
+                        df.loc[0,'injreg'] = 'null'
+                continue
+
+            if "start inject a fault" in line:
+                next_3_line = next_i_line_content(file,3)
+                #print(next_3_line)
+                # 提取指令和函数名
+                ins = ""
+                func = ""
+                # 查找指令和函数名
+                parts = next_3_line.split(':')
+                #print (parts)
+                if len(parts) > 1:
+                    # 提取指令
+                    ins = parts[1].strip('\t')  # 冒号后面的内容，去除多余空格
+                    opcode = ins.split(' ')[0]
+                    # 提取函数名
+                    func_part = parts[0].split('<')[1]  # 获取尖括号内容
+                    func = func_part.split('+')[0]  # 提取函数名，不包括+部分
+                
+                #print (ins,func)
+                # 将提取到的值添加到 DataFrame 中
+                df.loc[0,'ins'] = ins 
+                df.loc[0,'opcode'] = opcode
+                df.loc[0,'func'] = func
+                df.loc[0,'input_file'] = file_name
+                
+                #df.loc[len(df)] = values + [ins, func, file_name]  # 合并值和新提取的字段
+                continue
+
+            #首次遇到SIG
+            if "received signal" in line and SIGcount == 0 and df.loc[0,'result'] != 'masked':  
+                tmp = line.split(',')[0]
+                tmp = tmp.split('signal')[1]
+                df.loc[0,'Sig1'] = tmp
+                df.loc[0,'Sig1pc'] = '0x'+next_i_line_content(file,1).split(' ')[0][-6:]
+                
+                nexl = next_i_line_content(file,3)
+                if "=>" in nexl:
+                    df.loc[0,'Sig1Ins'] = nexl.split(':')[-1]
+                    print(nexl)
+                    df.loc[0,'Sig1Ins'] = nexl.split(':')[-1]
+                    df.loc[0,'Sig1Ope'] = str(df.loc[0,'Sig1Ins']).split(' ')[0]
+                SIGcount += 1
+                continue
+
+            if ("Valid Inj2Sig" in line):
+                df.loc[0,'ErrSpd_Inj'] = int(line.split(':')[-1])
+                continue
+            if ("After Inject:" in line):
+                df.loc[0,'ErrSpd_Inj'] = 999
+                continue
+
+            #再次遇到SIG
+            if "received signal" in line and SIGcount == 1 and df.loc[0,'result'] == 'crash2':  
+                tmp = line.split(',')[0]
+                tmp = tmp.split('signal')[1]
+                df.loc[0,'Sig2'] = tmp
+                nexl = next_i_line_content(file,3)
+                if nexl == 'null':
+                    try:
+                        df.loc[0,'Sig2pc'] = '0x'+line.split('0x00000000')[1][:6]
+                    except:
+                        print("Sig2 not pc! :",input_file)
+                        break
+                if "=>" in nexl:
+                    df.loc[0,'Sig2Ins'] = nexl.split(':')[-1]
+                    df.loc[0,'Sig2Ope'] = str(df.loc[0,'Sig2Ins']).split(' ')[0]
+                
+
+                continue
+
+            if df.loc[0,'result'] == 'crash2':
+                if ("Valid Fix2Sig" in line):
+                    df.loc[0,'ErrSpd_Fix'] = int(line.split(':')[-1])
+                if ("After Fixed" in line) :
+                    df.loc[0,'ErrSpd_Fix'] = 999
+
+
+        print(df.to_string(header=False, index=False))
+
+    # 构造输出文件路径
+    output_file = os.path.join(output_dir, outputname)
+
+    # 以追加的形式写入到CSV文件
+    df.to_csv(output_file, mode='a+', header=not os.path.exists(output_file), index=False, na_rep='null')
+
+    #print("Data has been extracted and appended to {}.".format(output_file))
+
+
+
+
 if __name__ == "__main__":
-    ana1()
+    ana1(cf.progname)
     ss()
+    if findins == 1:
+        fdi.findinsbyasm(cf.progname)
