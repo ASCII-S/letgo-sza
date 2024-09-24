@@ -6,15 +6,20 @@ import shutil
 import pandas as pd
 import csv
 import findins as fdi
-
+#######---------------FOLLOWED ARE SWITCH---------------#########
 ## clsfy == 1 to move unfinished record to folder "unfinish"
 clsfy = 1
 ## delbug = 1 to delete file that encounters Traceback
-delbug = 1
+delbug = 0
 ## to_csv =1 will collect all information to csv under log_path,but cost much more time
 to_csv = 1
 ## findins = 1 will auto fix Sig1ins and Sig2ins according to Sig*pc and asm  
 findins = 1
+## the more debug_mode increase ,the more info been printed
+debug_mode = 6
+## show file example find by string like "No reg, Exit"
+show_ss_example = 0
+
 
 
 file_count = 0
@@ -58,6 +63,8 @@ def find_and_print_sig_time(file_path):
                 # 输出包含 "sig time:" 的行
                 print(line.strip())  
 
+def is_valid_hex_address(s):
+    return len(s) == 6 and all(c in '0123456789abcdefABCDEF' for c in s)
 
 def next_i_line_content(file,i):
     while i>0:
@@ -84,8 +91,10 @@ def move_file_to_dir(f, log_dir, folder_name):
     destination = os.path.join(target_dir, os.path.basename(f))
 
     # 移动文件到目标文件夹
-    shutil.move(f, destination)
-    print("File {} has been moved to {}".format(f, target_dir))
+    try: 
+        shutil.move(f, destination)
+    except:
+        print("File {} cannot been moved to {}".format(f, target_dir))
 
     
 
@@ -96,13 +105,10 @@ def ss():
     search_strings = [
         "set reg with address calculation",
         "set reg with fake",
-        "Cannot get the size of the current stack frame",
         "set rbp and rsp to reasonable values",
         "Cannot insert breakpoint",
         "No reg, Exit",
         "Error",
-        "Error during sig.executeProgram",
-        "SystemExit encountered during sig.executeProgram",
         "received signal SIGSEGV, Segmentation fault.",
         "received signal SIGBUS, Bus error.",
         "received signal SIGABRT, Aborted.",
@@ -131,34 +137,37 @@ def ss():
                     if search_string in content:
                         results[search_string].append(filename)
 
-    # 统计每个字符串匹配的文件数
+     # 统计每个字符串匹配的文件数
     counted_results = {key: len(set(val)) for key, val in results.items()}
 
-    # 输出前几项结果（不排序）
-    top_n = len(search_strings)+1  # 设置你想要输出的前几项
-    for i, (string, count) in enumerate(counted_results.items(), 1):
+    # 按照字典序排序 counted_results
+    sorted_counted_results = sorted(counted_results.items())
+
+    # 输出前几项结果（已按字典序排序）
+    top_n = len(search_strings) + 1  # 设置你想要输出的前几项
+    for i, (string, count) in enumerate(sorted_counted_results, 1):
         if i > top_n:
             break
         print("{}. '{}' found in {} files".format(i, string, count))
 
 
-
     # 如果你还需要显示具体的文件名，可以按以下方式输出
-    for string, filenames in results.items():
-        print("\nFiles containing '{}':".format(string))
-        top_n = 1
-        for filename in set(filenames):
-            if top_n <=0 :
-                break
-            print("- {}".format(filename))
-            file_path = os.path.join(folder_path, filename)
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
-                for line in file:
-                    # 检查是否有 "sig time:"
-                    if "sig time:" in line:
-                        # 输出包含 "sig time:" 的行
-                        print(line.strip())
-            top_n -=1
+    if show_ss_example == 1:
+        for string, filenames in results.items():
+            print("\nFiles containing '{}':".format(string))
+            top_n = 1
+            for filename in set(filenames):
+                if top_n <=0 :
+                    break
+                print("- {}".format(filename))
+                file_path = os.path.join(folder_path, filename)
+                with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
+                    for line in file:
+                        # 检查是否有 "sig time:"
+                        if "sig time:" in line:
+                            # 输出包含 "sig time:" 的行
+                            print(line.strip())
+                top_n -=1
 
 
 def ana1(progname):
@@ -169,7 +178,7 @@ def ana1(progname):
     # 检查文件是否存在，如果存在则删除
     if os.path.exists(csv_file_path):
         os.remove(csv_file_path)
-        print("Deleted test.csv.")
+        print("Deleted ",csv_file_path)
     else:
         print(progname+'.csv'," does not exist.")
 
@@ -256,8 +265,8 @@ def ana1(progname):
             if flag == 0:
                 finish.append(f)
             #break
-        
-        extract_values_and_append_to_csv(f, log_dir, progname+'.csv', flag)
+        if to_csv == 1:
+            extract_values_and_append_to_csv(f, log_dir, progname+'.csv', flag)
 
     print("crash1:\t",len(crash_1)) ##只收到一次越界错误segmentfault
     print("crash2:\t",len(crash_2)) ##收到两次越界错误
@@ -295,6 +304,8 @@ def ana1(progname):
 
 
 def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
+    if debug_mode >=6:
+        print("\nnow do extract_values_and_append_to_csv")
     # 创建 CSV 文件保存的目录
     output_dir = os.path.join(log_dir, '../CSV')
     if not os.path.exists(output_dir):
@@ -316,37 +327,39 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
     with open(input_file, 'r') as file:
         values = ['null'] * 4
         SIGcount = 0
+        Sig1byletgo_Flag = 0
+
         for line in file:
-            if "args ready for set breakpoint" in line:
-                # 使用正则表达式提取方括号中的内容
-                match = re.search(r"\['(.*?)'\]", line)
-                if match :
-                    # 提取匹配的内容并分割成列表
-                    values = match.group(1).split("', '")
+            if "args" in line:
+                args = line
+                if debug_mode >= 9:
+                    print("args:\t",args)
+                # 提取单引号中的内容
+                # 先去掉多余的部分，例如 "args:    "
+                cleaned_args = args.split("[")[1].split("]")[0]  # 得到 "'rsi', '', '4202512', '641371'"
+                values = cleaned_args.split("', '")              # 以 ', ' 作为分隔符
 
-                    # 用 'null' 替代没有内容的列
-                    values = [v if v else 'null' for v in values]
-
-                    # 将 pc 的值转换为十六进制并添加前缀 0x
-                    if len(values) > 2:  # 确保有足够的值
-                        try:
-                            values[2] = "0x{:x}".format(int(values[2]))
-                        except ValueError:
-                            print("Warning: Could not convert pc value to hex: {}".format(values[2]))
-                    # 检查 values 的长度
-                    #if len(values) != len(df.columns):
-                     #   print("Warning: Mismatched columns. Expected {}, got {}".format(len(df.columns), len(values)))
-                     #   continue  # 或者使用 `raise` 抛出异常
+                # 去掉首尾的单引号
+                values[0] = values[0].replace("'", "")           # 'rsi' -> rsi
+                values[-1] = values[-1].replace("'", "")         # '641371' -> 641371
+                values = [v if v else 'null' for v in values]
+                if debug_mode >= 6 :
+                    print("values:\t",values)
+                try:
                     df.loc[0,'reg'] = values[0]
                     df.loc[0,'regmm'] = values[1]
                     df.loc[0,'pc'] = values[2]
                     df.loc[0,'iteration1'] = values[3]
-                    if values[0] != 'null':
-                        df.loc[0,'injreg'] = values[0]
-                    elif values[1] != 'null':
-                        df.loc[0,'injreg'] = values[1]
-                    else:
-                        df.loc[0,'injreg'] = 'null'
+                except:
+                    if debug_mode > 4 :
+                        print(file_name,"\twith not complete args:\t",values)
+                    break
+                if values[0] != 'null' :
+                    df.loc[0,'injreg'] = values[0]
+                elif values[1] != 'null' :
+                    df.loc[0,'injreg'] = values[1]
+                else:
+                    df.loc[0,'injreg'] = 'null'
                 continue
 
             if "start inject a fault" in line:
@@ -382,6 +395,12 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 tmp = tmp.split('signal')[1]
                 df.loc[0,'Sig1'] = tmp
                 df.loc[0,'Sig1pc'] = '0x'+next_i_line_content(file,1).split(' ')[0][-6:]
+                if not is_valid_hex_address(str(df.loc[0,'Sig1pc'])[2:]):
+                    if debug_mode > 5:
+                        print("invalid Sig1pc in:\t",input_file)
+                    df.loc[0,'Sig1pc'] = 'null'
+                    Sig1byletgo_Flag = 1
+                    continue
                 
                 nexl = next_i_line_content(file,3)
                 if "=>" in nexl:
@@ -391,6 +410,19 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                     df.loc[0,'Sig1Ope'] = str(df.loc[0,'Sig1Ins']).split(' ')[0]
                 SIGcount += 1
                 continue
+
+            if Sig1byletgo_Flag == 1 and 'Letgo in!' in line:
+                tmp = next_i_line_content(file,3)
+                tmp = tmp.split('0x')[-1][:6]
+                if is_valid_hex_address(tmp):
+                    df.loc[0,'Sig1pc'] = tmp
+                    SIGcount += 1
+                    if debug_mode > 5:
+                        print("Find Sig1pc by Letgo in!\t",input_file)
+                else:
+                    print("Letgo in! next3line with no valid *pc \t",input_file)
+                
+
 
             if ("Valid Inj2Sig" in line):
                 df.loc[0,'ErrSpd_Inj'] = int(line.split(':')[-1])
@@ -407,9 +439,10 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 nexl = next_i_line_content(file,3)
                 if nexl == 'null':
                     try:
-                        df.loc[0,'Sig2pc'] = '0x'+line.split('0x00000000')[1][:6]
+                        df.loc[0,'Sig2pc'] = '0x'+line.split('0x0000000000')[1][:6]
                     except:
-                        print("Sig2 not pc! :",input_file)
+                        if debug_mode > 4:
+                            print("Sig2 can not find pc! :",input_file)
                         break
                 if "=>" in nexl:
                     df.loc[0,'Sig2Ins'] = nexl.split(':')[-1]
@@ -424,8 +457,8 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 if ("After Fixed" in line) :
                     df.loc[0,'ErrSpd_Fix'] = 999
 
-
-        print(df.to_string(header=False, index=False))
+        if debug_mode > 7:
+            print("after extract_values_and_append_to_csv df Followed:\n",df.to_string(header=False, index=False))
 
     # 构造输出文件路径
     output_file = os.path.join(output_dir, outputname)

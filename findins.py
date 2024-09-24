@@ -3,7 +3,7 @@ import os
 import re
 import configure as cf 
 ##debug_mode = 1 will print debug info
-debug_mode = 1
+debug_mode = 5
 
 def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope):
     # 读取 benchmark CSV 文件为 DataFrame
@@ -30,7 +30,7 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope):
         if len(hex_sig1pc) != 6 or not re.match(r'^[0-9a-fA-F]{6}$', hex_sig1pc):
             continue  # 如果不符合六位十六进制地址的格式，跳过当前循环
 
-        if debug_mode == 1:
+        if debug_mode >= 6:
             print("\nhex_sig1pc:\t",hex_sig1pc)
         # 双指针遍历 asm 文件
         while asm_idx < asm_len:
@@ -52,7 +52,7 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope):
                 instruction = asm_line[30:]
                 df.at[idx, df_Ins] = instruction  # 存储到 DataFrame 中
                 df.at[idx, df_Ope] = instruction.split(' ')[0]  # 存储到 DataFrame 中
-                if debug_mode == 1:
+                if debug_mode >= 6:
                     print("ins:\t",instruction)
                     print("df ins:\t",df.at[idx, df_Ins])
                     print("df ope:\t",df.at[idx, df_Ope])
@@ -73,17 +73,18 @@ def findinsbyasm(program):
     benchmark = program
     csv_folder = './CSV'
     asm_folder  = './asm'
-    csv_output = benchmark+'fix'+'.csv'
+    csv_output = benchmark +'.csv'
 
     benchmark_csv = os.path.join(csv_folder,benchmark+'.csv')  # CSV 文件路径
+    benchmark_fix_csv = os.path.join(csv_folder,csv_output)
     asm_file = os.path.join(asm_folder,benchmark+'.asm')  # asm 文件路径
 
     df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig1pc","Sig1Ins","Sig1Ope")
-    df_updated.to_csv(os.path.join(csv_folder,csv_output), index=False)
+    df_updated.to_csv(benchmark_fix_csv, index=False)
     # 将更新后的 DataFrame 保存回 CSV 文件（可选）
     
-    #df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig2pc","Sig2Ins","Sig2Ope")
-    #df_updated.to_csv(os.path.join(csv_folder,csv_output), index=False)
+    df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig2pc","Sig2Ins","Sig2Ope")
+    df_updated.to_csv(benchmark_fix_csv, index=False)
 
 if __name__ == "__main__":
     findinsbyasm(cf.progname)

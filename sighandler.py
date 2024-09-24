@@ -32,6 +32,8 @@ MAX_ERROR_SPREAD = 30
 PRT_ERR_LEN_INJ_SIG = "Valid Inj2Sig:"
 PRT_ERR_LEN_FIX_SIG = "Valid Fix2Sig:"
 PRT_ERR_LEN_MAX = "Safe " + str(MAX_ERROR_SPREAD)
+PTR_ERR_INJ_MAX = "After Inject:" + PRT_ERR_LEN_MAX
+PTR_ERR_FIX_MAX = "After Fixed:" + PRT_ERR_LEN_MAX
 
 
 is_fake = 1
@@ -393,7 +395,7 @@ class SigHandler:
                 if stepi_num < MAX_ERROR_SPREAD :
                     print(PRT_ERR_LEN_FIX_SIG,stepi_num)
                 else:
-                    print("After Fixed:" + PRT_ERR_LEN_MAX)
+                    print(PTR_ERR_FIX_MAX)
 
                 if rcv_sig == 0:
                     process.sendline(GDB_CONTINUE)
@@ -640,7 +642,7 @@ class SigHandler:
                         print("content:\n",content)
                         ori_reg = content.rstrip("\r\n")
                         if content!="":
-                            print(content)
+                            print("content:\t",content)
                             content = fi.generateFaults(content)
                         else:
                             print('error! content is null!')
@@ -709,7 +711,7 @@ class SigHandler:
                 if stepi_num < MAX_ERROR_SPREAD :
                     print(PRT_ERR_LEN_INJ_SIG,stepi_num)
                 else:
-                    print("After Inject:" + PRT_ERR_LEN_MAX)
+                    print(PTR_ERR_INJ_MAX)
                 
                 if rcv_sig == 0:
                     process.sendline(GDB_CONTINUE)
