@@ -6,6 +6,8 @@ import shutil
 import pandas as pd
 import csv
 import findins as fdi
+import argparse
+
 #######---------------FOLLOWED ARE SWITCH---------------#########
 ## clsfy == 1 to move unfinished record to folder "unfinish"
 clsfy = 1
@@ -16,7 +18,7 @@ to_csv = 1
 ## findins = 1 will auto fix Sig1ins and Sig2ins according to Sig*pc and asm  
 findins = 1
 ## the more debug_mode increase ,the more info been printed
-debug_mode = 6
+debug_mode = 5
 ## show file example find by string like "No reg, Exit"
 show_ss_example = 0
 
@@ -25,27 +27,11 @@ show_ss_example = 0
 file_count = 0
 crash_1 = []
 crash_2 = []
+crash_2p = []
 finish = []
 flag = 0
-detected = []
-correct = []
-sdc = []
 unfinishedlist = []
 output = []
-
-checkingstring = 'Problem size        =  5'
-#checkingstring1 = 'Iteration count     =  306'
-checkingstring1 = 'Iteration count     =  306'
-#checkingstring2 = 'Final Origin Energy = 1.670602e+05'
-checkingstring2 = 'Final Origin Energy = 1.670602e+05'
-#checkingstring3 = 'MaxAbsDiff   = 2.546585e-11'
-checkingstring3 = 'MaxAbsDiff   = 2.546585e-11'
-#checkingstring4 = 'TotalAbsDiff = 6.230039e-11'
-checkingstring4 = 'TotalAbsDiff = 6.230039e-11'
-#checkingstring5 = 'MaxRelDiff   = 2.178209e-15'
-checkingstring5 = 'MaxRelDiff   = 2.178209e-15'
-#basedir = "/data/pwu/LULESH3"
-#log_dir = "./lu"
 
 log_dir = os.path.join(cf.progname)
 print(log_dir)
@@ -64,7 +50,7 @@ def find_and_print_sig_time(file_path):
                 print(line.strip())  
 
 def is_valid_hex_address(s):
-    return len(s) == 6 and all(c in '0123456789abcdefABCDEF' for c in s)
+    return bool(re.fullmatch(r'^[0-9a-fA-F]{6}$', s))
 
 def next_i_line_content(file,i):
     while i>0:
@@ -112,6 +98,7 @@ def ss():
         "received signal SIGSEGV, Segmentation fault.",
         "received signal SIGBUS, Bus error.",
         "received signal SIGABRT, Aborted.",
+        "Program received signal SIGILL",
         "Valid FaultInject2Sig:",
         "Valid Fix2Sig:",
         "After Inject:",
@@ -171,16 +158,16 @@ def ss():
 
 
 def ana1(progname):
-    global file_count, crash_1, crash_2, finish, flag, detected, correct, sdc, unfinishedlist, output
+    global file_count, crash_1, crash_2, crash_2p, finish, flag, detected, correct, sdc, unfinishedlist, output
     
-    
-    csv_file_path = os.path.join(log_dir,"../CSV", progname+'.csv')
-    # 检查文件是否存在，如果存在则删除
-    if os.path.exists(csv_file_path):
-        os.remove(csv_file_path)
-        print("Deleted ",csv_file_path)
-    else:
-        print(progname+'.csv'," does not exist.")
+    if to_csv == 1:
+        csv_file_path = os.path.join(log_dir,"../CSV", progname+'.csv')
+        # 检查文件是否存在，如果存在则删除
+        if os.path.exists(csv_file_path):
+            os.remove(csv_file_path)
+            print("Deleted ",csv_file_path)
+        else:
+            print(progname+'.csv'," does not exist.")
 
 
     for f in os.listdir(log_dir):
@@ -202,43 +189,12 @@ def ana1(progname):
                     if delbug == 1:
                         os.remove(f)  # 删除文件
                         print("delete:\t",f)
-                if "received" in line and "Segmentation fault" in line:
+                if "Program received signal" in line:
                     flag += 1
                 if "Application output" in line:
                     flag_sdc = 0
                     flag_output = 0
-                if flag_output != -1000 and flag_sdc != -1000 :
-                    if checkingstring in line:
-                        flag_output += 1
-                        flag_sdc+= 1
-                    if checkingstring1 in line:
-                        flag_output += 1
-                        flag_sdc += 1
-                        #print line
-                    if checkingstring2 in line:
-                        flag_output += 1
-                        flag_sdc += 1
-                    if checkingstring3 in line:
-                        flag_output += 1
-                    if checkingstring4 in line:
-                        flag_output += 1
-                    if checkingstring5 in line:
-                        flag_output += 1
-                    #print line
-                    #print flag_sdc
-                    if 'Diff' in line:
-                        if 'e-' not in line:
-                            flag_sdc -= 1
-                            continue
-                        parser = line.split('e-')[1]
-                        res = re.findall('\d+', parser)
-                        if len(res) > 0:
-                            #pre = parser.split('-')[1]
-                            if int(res[0]) >= 8:
-                                #print line
-                                flag_sdc += 1
-                                #print line
-                                #print flag_sdc
+                    
             #print flag_sdc
                 if "Exit" in line:
                     unfinished = 1
@@ -251,17 +207,13 @@ def ana1(progname):
                 if clsfy == 1:
                     move_file_to_dir(f,log_dir,"unfinish")
                 continue
-            if flag_output < 6 and flag_output != -1000: ##程序有输出
-                sdc.append(f)
-            if flag_sdc < 5 and flag_sdc != -1000:
-                    detected.append(f)
-            if flag_output == 6:
-                correct.append(f)     
                 
             if flag == 1:
                 crash_1.append(f)
             if flag == 2:
                 crash_2.append(f)
+            if flag >2:
+                crash_2p.append(f)
             if flag == 0:
                 finish.append(f)
             #break
@@ -292,6 +244,11 @@ def ana1(progname):
     print("\ncrash1:\t",crash_1[:n])
     find_and_print_sig_time(os.path.join(crash_1[0]))
     print("crash2:\t",crash_2[:n])
+    try:
+        print("crash2+:\t",crash_2p[:n])
+        print("crash2+len:\t",len(crash_2p))
+    except:
+        print("no crash2+")
     if len(crash_2)>1:
         find_and_print_sig_time(os.path.join(crash_2[0]))
     #print("sdc:\t",sdc[:n])
@@ -312,14 +269,16 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
         os.makedirs(output_dir)  # 如果目录不存在则创建
 
     # 创建一个空的 DataFrame
-    df = pd.DataFrame(columns=['input_file','reg', 'regmm', 'injreg', 'pc', 'iteration1', 'ins', 'opcode', 'func', 'result', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','ErrSpd_Fix' ])
+    df = pd.DataFrame(columns=['input_file','reg', 'regmm', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'func', 'result', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','ErrSpd_Fix' ])
     
     if flag == 0:
         df.loc[0,'result'] = 'masked'
     elif flag == 1:
         df.loc[0,'result'] = 'crash1'
-    else:
+    elif flag == 2:
         df.loc[0,'result'] = 'crash2'
+    else:
+        df.loc[0,'result'] = 'crash2+'
     # 获取文件名
     file_name = os.path.basename(input_file)
 
@@ -346,9 +305,10 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 if debug_mode >= 6 :
                     print("values:\t",values)
                 try:
-                    df.loc[0,'reg'] = values[0]
-                    df.loc[0,'regmm'] = values[1]
+                    df.loc[0,'regmm'] = values[0]
+                    df.loc[0,'reg'] = values[1]
                     df.loc[0,'pc'] = values[2]
+                    df.loc[0,'hexpc'] = hex(int(df.loc[0,'pc']))
                     df.loc[0,'iteration1'] = values[3]
                 except:
                     if debug_mode > 4 :
@@ -373,7 +333,10 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 #print (parts)
                 if len(parts) > 1:
                     # 提取指令
-                    ins = parts[1].strip('\t')  # 冒号后面的内容，去除多余空格
+                    ins = parts[-1].strip(' ')  # 冒号后面的内容，去除多余空格
+                    if ins == '':
+                        ins = next_i_line_content(file,1).split('#')[0].rstrip()
+                        #print(ins)
                     opcode = ins.split(' ')[0]
                     # 提取函数名
                     func_part = parts[0].split('<')[1]  # 获取尖括号内容
@@ -394,18 +357,20 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 tmp = line.split(',')[0]
                 tmp = tmp.split('signal')[1]
                 df.loc[0,'Sig1'] = tmp
-                df.loc[0,'Sig1pc'] = '0x'+next_i_line_content(file,1).split(' ')[0][-6:]
-                if not is_valid_hex_address(str(df.loc[0,'Sig1pc'])[2:]):
-                    if debug_mode > 5:
-                        print("invalid Sig1pc in:\t",input_file)
+                df.loc[0,'Sig1pc'] = '0x'+next_i_line_content(file,1).split(' ')[0][-6:].strip('\n').strip(' ')
+                try:
+                    if not is_valid_hex_address(str(df.loc[0,'Sig1pc'])[2:]):
+                        df.loc[0,'Sig1pc'] = 'null'
+                        Sig1byletgo_Flag = 1
+                        continue
+                except:
+                    print("error Sig1pc",df.loc[0,'Sig1pc'],input_file)
                     df.loc[0,'Sig1pc'] = 'null'
                     Sig1byletgo_Flag = 1
-                    continue
                 
                 nexl = next_i_line_content(file,3)
                 if "=>" in nexl:
-                    df.loc[0,'Sig1Ins'] = nexl.split(':')[-1]
-                    print(nexl)
+                    nexl = nexl.split('#')[0].rstrip()
                     df.loc[0,'Sig1Ins'] = nexl.split(':')[-1]
                     df.loc[0,'Sig1Ope'] = str(df.loc[0,'Sig1Ins']).split(' ')[0]
                 SIGcount += 1
@@ -414,17 +379,21 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
             if Sig1byletgo_Flag == 1 and 'Letgo in!' in line:
                 tmp = next_i_line_content(file,3)
                 tmp = tmp.split('0x')[-1][:6]
-                if is_valid_hex_address(tmp):
-                    df.loc[0,'Sig1pc'] = tmp
-                    SIGcount += 1
-                    if debug_mode > 5:
-                        print("Find Sig1pc by Letgo in!\t",input_file)
-                else:
-                    print("Letgo in! next3line with no valid *pc \t",input_file)
+                try:
+                    if is_valid_hex_address(tmp):
+                        df.loc[0,'Sig1pc'] = '0x' + tmp.strip(' ')
+                        SIGcount += 1
+                        if debug_mode > 5:
+                            print("Find Sig1pc by Letgo in!\t",input_file)
+                except:
+                    if debug_mode > 4:
+                        print("Sig1pc fetched by letgoin:\t",tmp)
+                        print("Letgo in! next3line with no valid Sig1pc \t",input_file)
+                    continue
                 
 
 
-            if ("Valid Inj2Sig" in line):
+            if ("Valid Inj2Sig" in line or "Valid FaultInject2Sig:" in line):
                 df.loc[0,'ErrSpd_Inj'] = int(line.split(':')[-1])
                 continue
             if ("After Inject:" in line):
@@ -432,30 +401,37 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 continue
 
             #再次遇到SIG
-            if "received signal" in line and SIGcount == 1 and df.loc[0,'result'] == 'crash2':  
+            if "received signal" in line and SIGcount == 1 and (df.loc[0,'result'] == 'crash2' or df.loc[0,'result'] == 'crash2+'):  
                 tmp = line.split(',')[0]
                 tmp = tmp.split('signal')[1]
                 df.loc[0,'Sig2'] = tmp
-                nexl = next_i_line_content(file,3)
-                if nexl == 'null':
-                    try:
-                        df.loc[0,'Sig2pc'] = '0x'+line.split('0x0000000000')[1][:6]
-                    except:
-                        if debug_mode > 4:
-                            print("Sig2 can not find pc! :",input_file)
+                #print(df.loc[0,'Sig2pc'])
+                near_number = 7
+                while near_number >0 :
+                    if "=>" in nexl:
+                        df.loc[0,'Sig2pc'] = (nexl.split(':')[0]).split('=>')[1].strip(' ').strip('\n')[:8]
+                        if debug_mode >= 6:
+                            print ("Sig2pc by near:\t",df.loc[0,'Sig2pc'])
                         break
-                if "=>" in nexl:
-                    df.loc[0,'Sig2Ins'] = nexl.split(':')[-1]
-                    df.loc[0,'Sig2Ope'] = str(df.loc[0,'Sig2Ins']).split(' ')[0]
+
+                    nexl = next_i_line_content(file,1)
+                    near_number -= 1
+                    if nexl == 'null' or "0x0000000000" in nexl:  ##表明最后一行是接收到信号的内容
+                        try:
+                            df.loc[0,'Sig2pc'] = '0x'+line.split('0x0000000000')[1][:6]
+                        except:
+                            if debug_mode >= 6:
+                                print("Sig2 can not find pc! :",input_file)
+                            break
+                    
                 
 
                 continue
 
-            if df.loc[0,'result'] == 'crash2':
-                if ("Valid Fix2Sig" in line):
-                    df.loc[0,'ErrSpd_Fix'] = int(line.split(':')[-1])
-                if ("After Fixed" in line) :
-                    df.loc[0,'ErrSpd_Fix'] = 999
+            if ("Valid Fix2Sig" in line ):
+                df.loc[0,'ErrSpd_Fix'] = int(line.split(':')[-1])
+            if ("After Fixed" in line) :
+                df.loc[0,'ErrSpd_Fix'] = 999
 
         if debug_mode > 7:
             print("after extract_values_and_append_to_csv df Followed:\n",df.to_string(header=False, index=False))
@@ -469,10 +445,32 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
     #print("Data has been extracted and appended to {}.".format(output_file))
 
 
-
-
-if __name__ == "__main__":
+def all():
     ana1(cf.progname)
     ss()
     if findins == 1:
         fdi.findinsbyasm(cf.progname)
+
+def main():
+    parser = argparse.ArgumentParser(description="Analyze log files.")
+    parser.add_argument('-file', type=str, help='Log file to process,benchmark according to configure.py')
+    parser.add_argument('-flag', type=str, help='flag means the number of Sig received')
+
+    args = parser.parse_args()
+
+    if args.file and args.flag:
+        extract_values_and_append_to_csv(os.path.join(log_dir,str(args.file)),log_dir,args.file+'.csv',args.flag)
+        if debug_mode >=6 :
+            print("Finish EV&ACsv:\t",args.file)
+    else:
+        # 直接运行的情况
+        all()
+        if debug_mode >=6 :
+            print("Running without file argument.")
+
+
+if __name__ == "__main__":
+    main()
+    
+
+    
