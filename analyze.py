@@ -165,7 +165,7 @@ def ana1(progname):
         # 检查文件是否存在，如果存在则删除
         if os.path.exists(csv_file_path):
             os.remove(csv_file_path)
-            print("Deleted ",csv_file_path)
+            print("Deleted old ",csv_file_path)
         else:
             print(progname+'.csv'," does not exist.")
 
@@ -178,8 +178,6 @@ def ana1(progname):
         f = os.path.join(log_dir,f)
         flag = 0
         with open(f,"r",encoding='utf-8', errors='ignore') as log:
-            flag_sdc = -1000
-            flag_output = -1000  ##默认程序没有结果输出
             unfinished = 0
             lines = log.readlines()
             
@@ -191,9 +189,8 @@ def ana1(progname):
                         print("delete:\t",f)
                 if "Program received signal" in line:
                     flag += 1
-                if "Application output" in line:
-                    flag_sdc = 0
-                    flag_output = 0
+                if "1 tests completed and failed residual checks" in line:
+                    sdc_flag = 1
                     
             #print flag_sdc
                 if "Exit" in line:
@@ -269,7 +266,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
         os.makedirs(output_dir)  # 如果目录不存在则创建
 
     # 创建一个空的 DataFrame
-    df = pd.DataFrame(columns=['input_file','reg', 'regmm', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'func', 'result', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','ErrSpd_Fix' ])
+    df = pd.DataFrame(columns=['input_file', 'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'func', 'result', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','ErrSpd_Fix' ])
     
     if flag == 0:
         df.loc[0,'result'] = 'masked'
@@ -351,7 +348,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 
                 #df.loc[len(df)] = values + [ins, func, file_name]  # 合并值和新提取的字段
                 continue
-
+            
             #首次遇到SIG
             if "received signal" in line and SIGcount == 0 and df.loc[0,'result'] != 'masked':  
                 tmp = line.split(',')[0]
@@ -368,11 +365,11 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                     df.loc[0,'Sig1pc'] = 'null'
                     Sig1byletgo_Flag = 1
                 
-                nexl = next_i_line_content(file,3)
+                """nexl = next_i_line_content(file,3)
                 if "=>" in nexl:
                     nexl = nexl.split('#')[0].rstrip()
                     df.loc[0,'Sig1Ins'] = nexl.split(':')[-1]
-                    df.loc[0,'Sig1Ope'] = str(df.loc[0,'Sig1Ins']).split(' ')[0]
+                    df.loc[0,'Sig1Ope'] = str(df.loc[0,'Sig1Ins']).split(' ')[0]"""
                 SIGcount += 1
                 continue
 
@@ -393,7 +390,8 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 
 
 
-            if ("Valid Inj2Sig" in line or "Valid FaultInject2Sig:" in line):
+            if "Inj2Sig" in line.strip():
+                #print(line)
                 df.loc[0,'ErrSpd_Inj'] = int(line.split(':')[-1])
                 continue
             if ("After Inject:" in line):
@@ -408,6 +406,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 #print(df.loc[0,'Sig2pc'])
                 near_number = 7
                 while near_number >0 :
+                    nexl = ''
                     if "=>" in nexl:
                         df.loc[0,'Sig2pc'] = (nexl.split(':')[0]).split('=>')[1].strip(' ').strip('\n')[:8]
                         if debug_mode >= 6:
