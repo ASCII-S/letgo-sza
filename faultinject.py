@@ -39,39 +39,44 @@ class FaultInjector:
 
         :rtype: strings
         """
-        randomnum = random.randint(0,self.totalInst)
-        execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,randinst_lib),randinst_config,str(randomnum),"--",configure.benchmark]
-        for item in configure.args:
-            execlist.append(item)
-        self.execute(execlist)
-        # check if the file is generated
-        if not os.path.isfile(instructionfile):
-            print("No File generated!")
-            sys.exit(1)
+        
         regmem = ""
         reg = ""
         pc = ""
-        iteration = ""
-        with open(instructionfile,"r") as f:##文件中包含的是在动态指令randomnum处的指令和寄存器信息.ip是该动态指令的ins值,mem或reg是ins中随机挑选的寄存器
-            lines = f.readlines()
-            for line in lines:
-                line = line.rstrip("")
-                if "REGNOTVALID" in line:
-                    print("REG not valid! Exit")
-                    sys.exit(1)
-                if "mem:" in line:  
-                    regmem = line.split(":")[1].rstrip("\n")
-                if "reg:" in line:
-                    reg = line.split(":")[1].rstrip("\n")
-                if "pc:" in line:
-                    pc = line.split(":")[1].rstrip("\n")
-                #if "next:" in line:
-                #    next = line.split(":")[1]
-        if reg == "" and regmem == "":
-            print("No reg, Exit")
-            return []
-        if reg.startswith("r") or regmem.startswith("r"):
-            self.flag = 64
+        while(pc == ""or pc == "0" or ( reg == "" and regmem == "")):
+            ##pc不合法就一直随机找断点
+            randomnum = random.randint(0,self.totalInst)
+            execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,randinst_lib),randinst_config,str(randomnum),"--",configure.benchmark]
+            for item in configure.args:
+                execlist.append(item)
+            self.execute(execlist)
+            # check if the file is generated
+            if not os.path.isfile(instructionfile):
+                print("No File generated!")
+                sys.exit(1)
+            iteration = ""
+            with open(instructionfile,"r") as f:##文件中包含的是在动态指令randomnum处的指令和寄存器信息.ip是该动态指令的ins值,mem或reg是ins中随机挑选的寄存器
+                lines = f.readlines()
+                for line in lines:
+                    line = line.rstrip("")
+                    if "REGNOTVALID" in line:
+                        print("REG not valid! Exit")
+                        sys.exit(1)
+                    if "mem:" in line:  
+                        regmem = line.split(":")[1].rstrip("\n")
+                    if "reg:" in line:
+                        reg = line.split(":")[1].rstrip("\n")
+                    if "pc:" in line:
+                        pc = line.split(":")[1].rstrip("\n")
+                    #if "next:" in line:
+                    #    next = line.split(":")[1]
+            if reg == "" and regmem == "":
+                print("No reg, Try again")
+                continue
+                ##return []
+            if reg.startswith("r") or regmem.startswith("r"):
+                self.flag = 64
+
         execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,str(randomnum),"--",configure.benchmark]
         for item in configure.args:
             execlist.append(item)
@@ -114,7 +119,7 @@ class FaultInjector:
 
 
     def generateFaults(self,ori_value):
-        print("ori_value:\n",ori_value)
+        #print("ori_value:\n",ori_value)
         ## it is complicated because if it is a 0x then non-digital chars are allowed, need a complicated regex.
         if "0x" in ori_value:
             res = re.findall('0[xX]?[A-Fa-f0-9]+',ori_value)

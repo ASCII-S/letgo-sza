@@ -1,7 +1,11 @@
 import os
 pin_home = "/home/tongshiyu/pin/pin"
 letgo_base_home = "/home/tongshiyu/pin/source/tools/letgo"
-progname = 'lu'
+
+progname = 'hpl'
+numFI = 1000
+
+
 
 if progname == 'hpl':
     progbin = "/home/tongshiyu/programs/hpl-2.3/testing/xhpl"
@@ -29,13 +33,16 @@ elif progname == "knn":                                 ## KNN
 elif progname == "backprop":                            ## backprop
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/backprop/backprop"
     optionlist = ['65536']
-
 benchmark = progbin
 args = optionlist
-#toolbase = "/home/tongshiyu/pin/source/tools/pinfi"
-toolbase = "/home/tongshiyu/pin/source/tools/pb_interceptor-master"
+
+toolbase = "/home/tongshiyu/pin/source/tools/pinfi"
+pin_tool_config = "/home/tongshiyu/pin/source/tools/pinfi/config_pintool.h"
+
+
+
+#toolbase = "/home/tongshiyu/pin/source/tools/pb_interceptor-master"
 pin_base = "/home/tongshiyu/pin"
 instcount = "inscount.out"
-numFI = 10
 #log_path = progname
 log_path = os.path.join(letgo_base_home,progname)

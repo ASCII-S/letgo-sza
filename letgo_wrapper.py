@@ -65,14 +65,14 @@ def find_max_log_suffix(directory):
                 max_file = filename
     
     if max_file:
-        print(f"最大的 log 文件是: {max_file}, 后缀数字是: {max_number}")
+        print("最大的 log 文件是: ",max_file, "后缀数字是: ","max_number")
         return max_number
     else:
         print("没有找到符合条件的文件。")
         return None
 
-instcount = configure.pin_base+"/source/tools/ManualExamples/obj-intel64/inscount0.so"
-
+instcount = configure.toolbase + "/obj-intel64/instcount_official.so"
+print (instcount)
 execlist = [configure.pin_home,"-t",instcount,"--",configure.benchmark]
 
 for item in configure.args:
@@ -85,7 +85,7 @@ err = "sampleerr"
 execute(execlist,out,err)
 
 if not os.path.isfile(instcount):
-    print("No instcount file! Exit")
+    print("No instcount.so file! Exit")
     sys.exit(1)
 
 totalcount = ""
@@ -96,8 +96,8 @@ with open(configure.instcount,"r") as f:
         sys.exit(1)
     count = lines[0]
     count = count.rstrip("\n")
-    print(count)
     totalcount = count.split(" ")[1]
+    print("Instcount_official:\t",totalcount)
 
 log_count = 0
 """for root, dirs, files in os.walk(sighandler.log_path):
@@ -150,9 +150,13 @@ for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开�
         print("sig.executeProgram start......")
         sig_time1 = datetime.datetime.now()
         print(sig_time1)
-        sig = sighandler.SigHandler(totalcount,i)	
-        sig.executeProgram()
+
+        GDB_LAUNCH = "gdb " + configure.benchmark
+        sig = sighandler.SigHandler(totalcount,i,GDB_LAUNCH)	
+        sig.executeProgram(sig.process)
+        
         sig_time2 = datetime.datetime.now()
+        print("sig.executeProgram end.")
         print(sig_time2)
     except SystemExit as e:
         print(f"SystemExit encountered during sig.executeProgram: (exit due to sighandle: timeout){e}")
