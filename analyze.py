@@ -5,18 +5,18 @@ import configure as cf
 import shutil
 import pandas as pd
 import csv
-import findins as fdi
+import findins
 import argparse
 
 #######---------------FOLLOWED ARE SWITCH---------------#########
 ## clsfy == 1 to move unfinished record to folder "unfinish"
-clsfy = 1
+clsfy = 0
 ## delbug = 1 to delete file that encounters Traceback
 delbug = 0
 ## to_csv =1 will collect all information to csv under log_path,but cost much more time
 to_csv = 1
-## findins = 1 will auto fix Sig1ins and Sig2ins according to Sig*pc and asm  
-findins = 1
+## findins = 1 will auto find Sig1ins and Sig2ins according to Sig*pc and asm  
+findmorebypc = 1
 ## the more debug_mode increase ,the more info been printed
 debug_mode = 5
 ## show file example find by string like "No reg, Exit"
@@ -270,7 +270,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
         os.makedirs(output_dir)  # 如果目录不存在则创建
 
     # 创建一个空的 DataFrame
-    df = pd.DataFrame(columns=['input_file', 'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'result', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','ErrSpd_Fix' ])
+    df = pd.DataFrame(columns=['input_file', 'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
     
     if flag == 0:
         df.loc[0,'result'] = 'Masked'
@@ -401,12 +401,13 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 continue
 
             #再次遇到SIG
-            if "received signal" in line and SIGcount == 1 and (df.loc[0,'result'] == 'crash2' or df.loc[0,'result'] == 'crash2+'):  
+            if "received signal" in line and SIGcount == 1 :  
                 tmp = line.split(',')[0]
                 tmp = tmp.split('signal')[1]
                 df.loc[0,'Sig2'] = tmp
                 #print(df.loc[0,'Sig2pc'])
-                near_number = 7
+                df.loc[0,'Sig2pc'] = '0x'+next_i_line_content(file,2,"in").split(' ')[0][-6:].strip('\n').strip(' ')
+                """near_number = 7#查询signal后有没有地址信息
                 while near_number >0 :
                     nexl = ''
                     if "=>" in nexl:
@@ -423,7 +424,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                         except:
                             if debug_mode >= 6:
                                 print("Sig2 can not find pc! :",input_file)
-                            break
+                            break"""
                     
                 
 
@@ -449,8 +450,8 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
 def all():
     ana1(cf.progname)
     ss()
-    if findins == 1:
-        fdi.findinsbyasm(cf.progname)
+    if findmorebypc == 1:
+        findins.findinsbyasm(cf.progname)
 
 def main():
     parser = argparse.ArgumentParser(description="Analyze log files.")

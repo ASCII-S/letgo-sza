@@ -30,7 +30,8 @@ def decpc_to_op(decpc):
     return None  # 如果没有找到，返回 None
     
 
-def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope):
+def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope,df_Func):
+    ##PC是已知的汇编地址,通过asm_file,将所有缺失df_Ins,df_Ope,df_Func信息的的行补充完成
     # 读取 benchmark CSV 文件为 DataFrame
     df = pd.read_csv(benchmark_csv)
 
@@ -44,7 +45,8 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope):
     # 初始化双指针
     asm_idx = 0
     asm_len = len(asm_lines)
-
+    
+    func = 'error'
     # 查找对应 Sig1pc 的行，并提取指令
     for idx, row in df.iterrows():
         sig1pc = row[PC]
@@ -60,10 +62,12 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope):
         # 双指针遍历 asm 文件
         while asm_idx < asm_len:
             asm_line = asm_lines[asm_idx].strip()
-
             # 获取 asm 行的地址部分 (":") 之前的内容
             asm_address = asm_line.split(':')[0]
-            if len(asm_address) > 6:
+
+            if '0000000000' in asm_line[0:10]:
+                func = asm_line[17:-2]
+            if len(asm_address) > 6:##跳过函数名称部分
                 asm_idx += 1
                 continue
             if not bool(re.fullmatch(r'[0-9A-Fa-f]{6}', asm_address)):
@@ -77,6 +81,7 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope):
                 instruction = asm_line[30:]
                 df.at[idx, df_Ins] = instruction  # 存储到 DataFrame 中
                 df.at[idx, df_Ope] = instruction.split(' ')[0]  # 存储到 DataFrame 中
+                df.at[idx, df_Func] = func
                 if debug_mode >= 6:
                     print("ins:\t",instruction)
                     print("df ins:\t",df.at[idx, df_Ins])
@@ -93,6 +98,7 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope):
     return df
 
 
+
 def findinsbyasm(program):
     # 使用示例：
     benchmark = program
@@ -104,15 +110,15 @@ def findinsbyasm(program):
     benchmark_fix_csv = os.path.join(csv_folder,csv_output)
     asm_file = os.path.join(asm_folder,benchmark+'.asm')  # asm 文件路径
 
-    if(0):
-        df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"hexpc","ins","opcode")
+    if(1):
+        df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"hexpc","ins","opcode","Func")
         df_updated.to_csv(benchmark_fix_csv, index=False)
 
-        df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig1pc","Sig1Ins","Sig1Ope")
+        df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig1pc","Sig1Ins","Sig1Ope","Sig1Func")
         df_updated.to_csv(benchmark_fix_csv, index=False)
         # 将更新后的 DataFrame 保存回 CSV 文件（可选）
         
-        df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig2pc","Sig2Ins","Sig2Ope")
+        df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig2pc","Sig2Ins","Sig2Ope","Sig2Func")
 
         df_updated = df_updated.sort_values(by='result')
 

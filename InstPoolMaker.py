@@ -14,6 +14,9 @@ import csv
 
 NEED = 10000
 
+instructionstart = 1
+instructionend = 2
+
 totalcount = 0
 timeout = 500
 
@@ -118,7 +121,7 @@ def getBreakpoint(totalcount):
 
             with ProcessPoolExecutor() as executor:
                 fi = faultinject.FaultInjector(totalcount)
-                future_to_seq = {executor.submit(fi.searchInInstfile, str(seq)): seq for seq in range(1,3)}
+                future_to_seq = {executor.submit(fi.searchInInstfile, str(seq)): seq for seq in range(instructionstart,instructionend+1)}
                 
                 for future in as_completed(future_to_seq):
                     seq = future_to_seq[future]
