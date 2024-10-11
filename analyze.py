@@ -52,10 +52,14 @@ def find_and_print_sig_time(file_path):
 def is_valid_hex_address(s):
     return bool(re.fullmatch(r'^[0-9a-fA-F]{6}$', s))
 
-def next_i_line_content(file,i):
+def next_i_line_content(file,i,target):
+    #在i行之内,寻找包含target的一行
     while i>0:
         try:
             next_line = next(file).strip()  # 获取下一行
+            if target in next_line:
+                return next_line
+                break
             #print("Next line:", next_line)
             i -= 1
         except StopIteration:
@@ -169,7 +173,7 @@ def ana1(progname):
         else:
             print(progname+'.csv'," does not exist.")
 
-
+    sdc_flag = 0
     for f in os.listdir(log_dir):
         file_count +=1
         #print f
@@ -215,7 +219,7 @@ def ana1(progname):
                 finish.append(f)
             #break
         if to_csv == 1:
-            extract_values_and_append_to_csv(f, log_dir, progname+'.csv', flag)
+            extract_values_and_append_to_csv(f, log_dir, progname+'.csv', flag,sdc_flag)
 
     print("crash1:\t",len(crash_1)) ##只收到一次越界错误segmentfault
     print("crash2:\t",len(crash_2)) ##收到两次越界错误
@@ -257,7 +261,7 @@ def ana1(progname):
     #print(list(set(crash_1).difference((set(crash_1) & set(correct))))[:n])
 
 
-def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
+def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_flag):
     if debug_mode >=6:
         print("\nnow do extract_values_and_append_to_csv")
     # 创建 CSV 文件保存的目录
@@ -266,18 +270,23 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
         os.makedirs(output_dir)  # 如果目录不存在则创建
 
     # 创建一个空的 DataFrame
-    df = pd.DataFrame(columns=['input_file', 'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'func', 'result', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','ErrSpd_Fix' ])
+    df = pd.DataFrame(columns=['input_file', 'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'result', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','ErrSpd_Fix' ])
     
     if flag == 0:
-        df.loc[0,'result'] = 'masked'
+        df.loc[0,'result'] = 'Masked'
+        if sdc_flag==1:
+            df.loc[0,'result'] = 'SDC'
     elif flag == 1:
-        df.loc[0,'result'] = 'crash1'
+        df.loc[0,'result'] = 'C-Masked'
+        if sdc_flag==1:
+            df.loc[0,'result'] = 'C-SDC'
     elif flag == 2:
-        df.loc[0,'result'] = 'crash2'
+        df.loc[0,'result'] = 'Double crash'
     else:
         df.loc[0,'result'] = 'crash2+'
     # 获取文件名
     file_name = os.path.basename(input_file)
+    df.loc[0,'input_file'] = file_name
 
     # 读取文件并提取所需内容
     with open(input_file, 'r') as file:
@@ -286,7 +295,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
         Sig1byletgo_Flag = 0
 
         for line in file:
-            if "args" in line:
+            if "args ready" in line:
                 args = line
                 if debug_mode >= 9:
                     print("args:\t",args)
@@ -319,12 +328,11 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                     df.loc[0,'injreg'] = 'null'
                 continue
 
-            if "start inject a fault" in line:
-                next_3_line = next_i_line_content(file,3)
+            if "display the inst:" in line:
+                next_3_line = next_i_line_content(file,3,"=>")
                 #print(next_3_line)
                 # 提取指令和函数名
                 ins = ""
-                func = ""
                 # 查找指令和函数名
                 parts = next_3_line.split(':')
                 #print (parts)
@@ -332,21 +340,15 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                     # 提取指令
                     ins = parts[-1].strip(' ')  # 冒号后面的内容，去除多余空格
                     if ins == '':
-                        ins = next_i_line_content(file,1).split('#')[0].rstrip()
-                        #print(ins)
+                        ins = next_i_line_content(file,1,"0x").split('#')[0].rstrip()
+                        print("ins not in => line")
+                        print(ins)
                     opcode = ins.split(' ')[0]
-                    # 提取函数名
-                    func_part = parts[0].split('<')[1]  # 获取尖括号内容
-                    func = func_part.split('+')[0]  # 提取函数名，不包括+部分
                 
-                #print (ins,func)
                 # 将提取到的值添加到 DataFrame 中
                 df.loc[0,'ins'] = ins 
                 df.loc[0,'opcode'] = opcode
-                df.loc[0,'func'] = func
-                df.loc[0,'input_file'] = file_name
                 
-                #df.loc[len(df)] = values + [ins, func, file_name]  # 合并值和新提取的字段
                 continue
             
             #首次遇到SIG
@@ -354,7 +356,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 tmp = line.split(',')[0]
                 tmp = tmp.split('signal')[1]
                 df.loc[0,'Sig1'] = tmp
-                df.loc[0,'Sig1pc'] = '0x'+next_i_line_content(file,1).split(' ')[0][-6:].strip('\n').strip(' ')
+                df.loc[0,'Sig1pc'] = '0x'+next_i_line_content(file,1,"in").split(' ')[0][-6:].strip('\n').strip(' ')
                 try:
                     if not is_valid_hex_address(str(df.loc[0,'Sig1pc'])[2:]):
                         df.loc[0,'Sig1pc'] = 'null'
@@ -374,7 +376,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                 continue
 
             if Sig1byletgo_Flag == 1 and 'Letgo in!' in line:
-                tmp = next_i_line_content(file,3)
+                tmp = next_i_line_content(file,3,"=")
                 tmp = tmp.split('0x')[-1][:6]
                 try:
                     if is_valid_hex_address(tmp):
@@ -413,7 +415,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag):
                             print ("Sig2pc by near:\t",df.loc[0,'Sig2pc'])
                         break
 
-                    nexl = next_i_line_content(file,1)
+                    nexl = next_i_line_content(file,1,"=>")
                     near_number -= 1
                     if nexl == 'null' or "0x0000000000" in nexl:  ##表明最后一行是接收到信号的内容
                         try:
@@ -454,11 +456,12 @@ def main():
     parser = argparse.ArgumentParser(description="Analyze log files.")
     parser.add_argument('-file', type=str, help='Log file to process,benchmark according to configure.py')
     parser.add_argument('-flag', type=str, help='flag means the number of Sig received')
+    parser.add_argument('-sdc_flag', type=str, help='flag means the number of Sig received')
 
     args = parser.parse_args()
 
     if args.file and args.flag:
-        extract_values_and_append_to_csv(os.path.join(log_dir,str(args.file)),log_dir,args.file+'.csv',args.flag)
+        extract_values_and_append_to_csv(os.path.join(log_dir,str(args.file)),log_dir,args.file+'.csv',args.flag, args.sdc_flag)
         if debug_mode >=6 :
             print("Finish EV&ACsv:\t",args.file)
     else:

@@ -5,6 +5,31 @@ import configure as cf
 ##debug_mode = 1 will print debug info
 debug_mode = 5
 
+def dec_to_hex(decimal):
+    """将十进制整数转换为十六进制字符串"""
+    if not isinstance(decimal, int):
+        raise ValueError("输入必须是一个整数")
+    # 使用 hex() 函数转换，并去掉前缀 '0x'
+    return hex(decimal)[2:]
+
+def decpc_to_op(decpc):
+    """在 ASM 文件中查找包含指定 PC 值的行"""
+    asm_file = os.path.join("./asm",cf.benchmark+'.asm')
+    print(asm_file)
+    hexpc = dec_to_hex(decpc)
+    try:
+        with open(asm_file, 'r') as file:
+            for line in file:
+                if hexpc in line:  # 查找十六进制 PC 值
+                    return line[30:].strip(' ').strip('\t').split(' ')[0]
+    except FileNotFoundError:
+        print(asm_file,"未找到。")
+    except Exception as e:
+        print("发生错误: ",e)
+
+    return None  # 如果没有找到，返回 None
+    
+
 def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope):
     # 读取 benchmark CSV 文件为 DataFrame
     df = pd.read_csv(benchmark_csv)
@@ -79,12 +104,21 @@ def findinsbyasm(program):
     benchmark_fix_csv = os.path.join(csv_folder,csv_output)
     asm_file = os.path.join(asm_folder,benchmark+'.asm')  # asm 文件路径
 
-    df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig1pc","Sig1Ins","Sig1Ope")
-    df_updated.to_csv(benchmark_fix_csv, index=False)
-    # 将更新后的 DataFrame 保存回 CSV 文件（可选）
-    
-    df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig2pc","Sig2Ins","Sig2Ope")
-    df_updated.to_csv(benchmark_fix_csv, index=False)
+    if(0):
+        df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"hexpc","ins","opcode")
+        df_updated.to_csv(benchmark_fix_csv, index=False)
+
+        df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig1pc","Sig1Ins","Sig1Ope")
+        df_updated.to_csv(benchmark_fix_csv, index=False)
+        # 将更新后的 DataFrame 保存回 CSV 文件（可选）
+        
+        df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig2pc","Sig2Ins","Sig2Ope")
+
+        df_updated = df_updated.sort_values(by='result')
+
+        df_updated.to_csv(benchmark_fix_csv, index=False)
+
+
 
 if __name__ == "__main__":
     findinsbyasm(cf.progname)

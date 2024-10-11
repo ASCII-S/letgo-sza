@@ -9,6 +9,8 @@ import configure
 import random
 import shutil
 import datetime
+import InstPoolMaker
+
 GDB_PROMOPT = "\(gdb\)"
 GDB_RUN = "run"
 GDB_LAUNCH = "gdb " + configure.benchmark
@@ -71,20 +73,20 @@ class SigHandler:
         self.process = pexpect.spawn(GDB_LAUNCH)
         print("do pexpect.spawn: gdb  has launched!")
 
-    def error_spread(self,process):
-        ##逐步执行,检查从注错到出错的错误传播;
+    def error_spread(self,process,seq_casuse_signal):#此处的seq_casuse_signal是指错误引发点的序号,例如注错点是序号1,第一次修复则是2
+        ##出发点是错误引发点,即注错点或第一次修复点,逐步执行,终点是收到signal或程序结束;返回值rcv_sig表示是否出错,output
+        ##检查从注错/修复到出错的错误传播,只打印前MAX_ERROR_SPREAD长度的指令;当出现错误时,需要把signal打印,并且打印x/i $pc;当没有任何错误时;
         ##i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
         #print((process.before.decode('utf-8'), process.after))
         stepi_num = 0
         output = 'NO OUTPUT'##用来保存出错类型,供接下来介入letgo_frame使用
-        reti = 1
         rcv_sig = 0
         try:##清空之前的内容
             #print("before stepi:\t")
             while True:
                 i = process.expect([pexpect.TIMEOUT, "(gdb)"], timeout=5)  # 设置超时等待
                 if i == 0:
-                    print("\nReday to record error spread...\n")
+                    print("\nSite",seq_casuse_signal,"Ready to record error spread.\n")
                     break
                 #pc_output = process.before.decode('utf-8').strip()
                 #print(re.sub(r'[\n()]', '', pc_output))  # 打印当前的 PC 状态
@@ -92,6 +94,7 @@ class SigHandler:
             print("error")
 
         while stepi_num <= MAX_ERROR_SPREAD:
+            #打印前MAX_ERROR_SPREAD条指令
             try:
                 stepi_output = ""
                 process.sendline("stepi")
@@ -99,11 +102,11 @@ class SigHandler:
                 stepioutput = process.before.decode('utf-8')
 
                 if i == 0 :
-                    print("error in error_spread")
+                    print("error in stepi_in",seq_casuse_signal)
                     break
                 # 打印当前指令
                 if "received signal" in stepioutput:
-                    rcv_sig = 1
+                    rcv_sig = 1 #当前出错,不着急打印,等待判断附近之外出现signal后再一起打印
                     output = stepioutput
                     #process.expect([pexpect.TIMEOUT, "(gdb)"])
                     print(re.sub(r'[\n()]', '', stepioutput))
@@ -114,10 +117,10 @@ class SigHandler:
                 if stepi_num >= MAX_ERROR_SPREAD:
                     break
                 
-                process.sendline("x/i $pc")
+                process.sendline(GDB_DISPLAY)
                 i = process.expect([pexpect.TIMEOUT, "(gdb)"], timeout=5)  # 设置超时等待
                 if i == 0:
-                    print("Error: Timeout in error_spread after x/i $pc.")
+                    print("Error: Timeout after x/i $pc.",seq_casuse_signal)
                     break
                 pc_output = process.before.decode('utf-8').strip()
                 print(re.sub(r'[\n()]', '', pc_output))  # 打印当前的 PC 状态
@@ -131,7 +134,39 @@ class SigHandler:
                 break
         #print(i)
         #print("OUTPUT\n",output)
-        return stepi_num,rcv_sig,output,reti
+        ##结束打印MAX_ERROR_SPREAD指令
+        
+        if stepi_num < MAX_ERROR_SPREAD :#满足这个条件,必定在附近出现了signal
+            if seq_casuse_signal == 0:
+                print(PRT_ERR_LEN_INJ_SIG,stepi_num)
+            if seq_casuse_signal == 1:
+                print(PRT_ERR_LEN_FIX_SIG,stepi_num)
+        else:#附近没有出错
+            if seq_casuse_signal == 0:
+                print(PTR_ERR_INJ_MAX)
+            if seq_casuse_signal == 1:
+                print(PTR_ERR_FIX_MAX)
+        
+        if rcv_sig == 0:##附近没有出错,就继续运行直到出错或者结束
+            process.sendline(GDB_CONTINUE)
+            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+            coutput = process.before.decode('utf-8')
+            if "received signal" in coutput:
+                rcv_sig = 1
+                print(re.sub(r'[\n()]', '', coutput))
+            else:       #完美masked
+                print(output)
+            output = coutput
+
+        if rcv_sig == 1:##此处gdb已经由于signal的存在而暂停,无论远近,采取一个方法打印
+            process.sendline(GDB_DISPLAY)
+            process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+            output = process.before.decode('utf-8')
+        if output == "NO OUTPUT":
+            print("seq",seq_casuse_signal,"receive no signal")
+        else:
+            print(output)
+        return rcv_sig,output
 
 
 
@@ -155,7 +190,7 @@ class SigHandler:
                 process.close()
                 sys.stdout = sys.__stdout__
                 return
-            print(match[0])
+            #print(match[0])
             decpc = int(match[0], 0)    ##此处的match[0]是一个包含0x的十六进制地址,使用int将其转化为十进制
             fi = faultinject.FaultInjector(self.insts)
             args = fi.getNextPC(decpc)  ## 此处要关注faultinjecion.cpp中的getNextPC函数
@@ -179,6 +214,7 @@ class SigHandler:
             index = args[5]     ##ins在内存中的索引寄存器值,基地址偏移
             displacement = args[6]  ##指令中内存操作的位移量
             scale = args[7]     ##内存因子,用来和index配合使用,实现复杂内存寻址
+            
             process.sendline(GDB_PRINT_REG + " $pc=" + str(nextpc))
             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
             if i == 0:
@@ -206,7 +242,7 @@ class SigHandler:
                             if base == "":                          ##开始解析base
                                 print("no base")
                                 continue
-                            print("base:/t",base)
+                            print("base:\t",base)
                             process.sendline(GDB_PRINT_REG + " $" + base)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
@@ -218,7 +254,7 @@ class SigHandler:
                                 sys.stdout = sys.__stdout__
                                 return
                             basestr = process.before.decode('utf-8')##开始解析basestr
-                            print("basestr:/t",basestr)
+                            print("basestr:\t",basestr)
                             content = ""
                             if "0x" in basestr:
                                 items = basestr.split(" ")
@@ -291,6 +327,8 @@ class SigHandler:
                                     content = items[len(items) - 1]
                                 content = content.lstrip("nan")
                                 content = content.lstrip("-nan")
+                                print("change regw key:\t",regw)
+                                print("change regw value:\t",content)
                                 process.sendline(GDB_SET_REG + " $" + regw + "=" + content) 
                                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                 if i == 0:
@@ -417,33 +455,15 @@ class SigHandler:
                 
 
                 ##此处开始计算介入letgo_frame后的错误传播
-                stepi_num,rcv_sig,output,i= self.error_spread(process)
-                if stepi_num < MAX_ERROR_SPREAD :
-                    print(PRT_ERR_LEN_FIX_SIG,stepi_num)
-                else:
-                    print(PTR_ERR_FIX_MAX)
-
+                rcv_sig,output= self.error_spread(process,1)
+                
                 if rcv_sig == 0:
-                    process.sendline(GDB_CONTINUE)
-                    i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                    output = process.before.decode('utf-8')
-                    if debug_mode >= 6:
-                        print("after second error spread:\t",process.before.decode('utf-8'))
-
-                if i == 0:
-                    print("ERROR when continue after feeding the regsters")
-                    print((process.before.decode('utf-8'), process.after))
-                    print((str(process)))
-                    self.log.close()
-                    process.close()
-                    sys.stdout = sys.__stdout__
-                    return
-
-                if i == 1:
                     print("Process Continue!\n")
+                    process.sendline(GDB_CONTINUE)
                     print("Application output:\n")
-                    print(output)
-                    while True:
+                    #print(output)
+
+                    while True:#清空内容
                         i = process.expect([pexpect.TIMEOUT, "(gdb)"], timeout=5)  # 设置超时等待
                         if i == 0:
                             #print("Ready to record error spread...")
@@ -505,7 +525,10 @@ class SigHandler:
         ##
         print('Start set a breakpoint...')
         fi = faultinject.FaultInjector(self.insts)
-        args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
+        args = InstPoolMaker.readArgsFromPool()
+        if len(args) != 4:##断点缓冲池空,就手动查找断点            
+            args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
+
         ##参数中包含的是在动态指令randomnum处的指令和寄存器信息.pc是该动态指令的ins值,regmm或reg是ins中随机挑选的寄存器
         ##iteration表示的是在randomnum范围内,ins值和pc值相同的次数;也就是pc值在randomnum范围内的迭代次数
         if len(args) != 4:
@@ -602,7 +625,7 @@ class SigHandler:
                     return
                 if i == 1:
                     output = process.before.decode('utf-8')
-                    print("\nbefore inject insts:--------------------------------------\t\n:",output,"before inject insts end:--------------------------------------\n")
+                    print("\nbefore inject inst:--------------------------------------\t\n:",output,"before inject inst end:--------------------------------------\n")
 
                 
                 process.sendline(GDB_DISPLAY)
@@ -618,7 +641,7 @@ class SigHandler:
 
                 if i == 1:
                     output = process.before.decode('utf-8')
-                    print("display the inst:\n",output,"display the inst end.")
+                    print("display the inject inst start:\n",output,"display the inject inst end.")
 
                 if regmm == "":  # it means that it is a normal instruction and we need to inject the fault to the dest reg
                     print('Meet a normal instruction:')
@@ -770,69 +793,56 @@ class SigHandler:
 
                 
                 ##逐步执行,检查从注错到出错的错误传播;
-                stepi_num,rcv_sig,output,i = self.error_spread(process)
-                if stepi_num < MAX_ERROR_SPREAD :
-                    print(PRT_ERR_LEN_INJ_SIG,stepi_num)
-                else:
-                    print(PTR_ERR_INJ_MAX)
+                rcv_sig,output= self.error_spread(process,0)
                 
-                if rcv_sig == 0:##附近没有出错
-                    process.sendline(GDB_CONTINUE)
-                    i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                    output = process.before.decode('utf-8')
-                    if debug_mode >= 6:
-                        print("after first error spread:\t",process.before.decode('utf-8'))
-                
-                if i == 0:
-                    print("ERROR when passing to signal handler")
-                    print((process.before.decode('utf-8'), process.after))
-                    print((str(process)))
-                    self.log.close()
-                    process.close()
-                    sys.stdout = sys.__stdout__
-                    return
 
-                if i == 1 or rcv_sig == 1:
-                    
+                if  rcv_sig == 1:
                     #output = process.before.decode('utf-8')
                     if debug_mode >= 7 :
                         if "Program received signal"  not in output:
                             print('judge whether letgo in:---------\n',output,"\n----------end judge")
                         else:
                             print("safe to in!")
-                    if GDB_ERROR_SEGV in output or GDB_ERROR_BUS in output or GDB_ERROR_ABT in output:
-                        ##
-                        # Need to pass the current pc to pin, and get all the info
-                        ##
-                        #print("sig in output")
-                        if (rcv_sig == 0):##注错后传播很远才出错
-                            print(output,"\n")
-                        print("reg: \t",reg)
-                        print("ori_reg:\t",ori_reg)
-                        if reg == "" and ori_reg != "":
-                            process.sendline(GDB_SET_REG + " $" + regmm + "=" + ori_reg)
-                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                            if i == 0:
-                                print("ERROR when setting the regmm back after single step")
-                                print((process.before.decode('utf-8'), process.after))
-                                print((str(process)))
-                                self.log.close()
-                                process.close()
-                                sys.stdout = sys.__stdout__
-                                return
-                            if i == 1:
-                                print((process.before.decode('utf-8')))
-                                print("Change the value back")
-                        self.letgo_start_time = datetime.datetime.now()
-                        self.letgo_frame(process)
+                 
+                    ##: \t",reg)
+                    ##print("ori_reg:\t",ori_reg)
+                    if reg == "" and ori_reg != "":
+                        process.sendline(GDB_SET_REG + " $" + regmm + "=" + ori_reg)
+                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                        if i == 0:
+                            print("ERROR when setting the regmm back after single step")
+                            print((process.before.decode('utf-8'), process.after))
+                            print((str(process)))
+                            self.log.close()
+                            process.close()
+                            sys.stdout = sys.__stdout__
+                            return
+                        if i == 1:
+                            print((process.before.decode('utf-8')))
+                            print("Change the value back")
+
+                    self.letgo_start_time = datetime.datetime.now()
+                    self.letgo_frame(process)
                                 
-                    else:
-                        print("No triggering crashes")
-                        print("Application output")
-                        print((process.before.decode('utf-8')),process.after.decode('utf-8'))
-                        self.sig_end_time = datetime.datetime.now()
-                        print("sig time: ",self.sig_end_time - self.sig_start_time)
-                        print("Now Time:\t" , (datetime.datetime.now()))
-                        sys.stdout = sys.__stdout__
+                if  rcv_sig == 0:
+                    #print(output,"\n")
+                    print("\nNo triggering crashes")
+                    print("Application output\n")
+
+                    try:##清空所有的内容
+                        #print("before stepi:\t")
+                        while True:
+                            i = process.expect([pexpect.TIMEOUT, "(gdb)"], timeout=5)  # 设置超时等待
+                            if i == 0:
+                                break
+                            #pc_output = process.before.decode('utf-8').strip()
+                            #print(re.sub(r'[\n()]', '', pc_output))  # 打印当前的 PC 状态
+                    except Exception as e:
+                        print(f"An error occurred: {type(e).__name__}")
+
+                    self.sig_end_time = datetime.datetime.now()
+                    print("sig time: ",self.sig_end_time - self.sig_start_time)
+                    print("Now Time:\t" , (datetime.datetime.now()))
+                    sys.stdout = sys.__stdout__
         
             
