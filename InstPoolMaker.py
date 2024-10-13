@@ -179,8 +179,8 @@ def getBreakpoint(totalcount):
         for line in lines:
             line = line.rstrip("\n")
             iteration = line    ##iteration表示的是在randomnum范围内,ins值和pc值相同的次数;也就是pc值在randomnum范围内的迭代次数
-    print([regmem,reg,pc, iteration])
-    return [regmem,reg,pc, iteration]
+    print([regmem,reg,pc, iteration,randomnum])
+    return [regmem,reg,pc, iteration,randomnum]
 
 
 #fi = faultinject.FaultInjector(int(totalcount))
@@ -202,13 +202,12 @@ def saveargs(args):
 
 def selectOneIns():
     totalcount = int(fetchTotalCount())
-    args = getBreakpoint(totalcount)
-    if len(args) != 4:
-        print("Wrong return values! Exit!")
-        self.log.close()
-        process.close() 
-        sys.stdout = sys.__stdout__
-    saveargs(args)
+    result = getBreakpoint(totalcount)
+    args = result[:-1]
+    randomnum = result[-1]
+    print(args,randomnum)
+
+    saveargs(result)
 
 
 def readArgsFromPool():
@@ -235,7 +234,7 @@ def readArgsFromPool():
     with open(filepath, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(lines)
-    if len(args) == 4:
+    if len(args) == 5:
         print("args from Pool valid!")
     return args
 

@@ -2,7 +2,7 @@ import os
 pin_home = "/home/tongshiyu/pin/pin"
 letgo_base_home = "/home/tongshiyu/pin/source/tools/letgo"
 
-progname = 'hpl'
+progname = 'hotspot'
 numFI = 5000
 inject_op = 'all' ##用all表示不进行启发式注错
 #inject_op = '' 
@@ -22,6 +22,8 @@ elif progname == 'lu':
 elif progname == "amg":                                   ## amg    ----------有效实验太少
     progbin = "/home/tongshiyu/programs/LLNL/AMG-master/test/amg"
     optionlist = ['-n','5','5','5']
+    pcstart = "401cb8"
+    pcend = "49877c"
 elif progname == "bfs": 
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/bfs/bfs"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/bfs/inputGen/graph64k.txt"
@@ -43,16 +45,20 @@ elif progname == "knn":                                 ## KNN
 elif progname == "backprop":                            ## backprop
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/backprop/backprop"
     optionlist = ['65536']
+    pcstart = "400968"
+    pcend = "401f1c"
 benchmark = progbin
 args = optionlist
 
 toolbase = "/home/tongshiyu/pin/source/tools/pinfi"
 pin_tool_config = "/home/tongshiyu/pin/source/tools/pinfi/config_pintool.h"
 
-
-
 #toolbase = "/home/tongshiyu/pin/source/tools/pb_interceptor-master"
 pin_base = "/home/tongshiyu/pin"
 instcount = "inscount.out"
 #log_path = progname
 log_path = os.path.join(letgo_base_home,progname)
+
+csv_folder = os.path.join(letgo_base_home,'CSV')
+asm_folder  = os.path.join(letgo_base_home,'asm')
+pic_folder  = os.path.join(letgo_base_home,'PIC')

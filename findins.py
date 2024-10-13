@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import re
-import configure as cf 
+import configure
 ##debug_mode = 1 will print debug info
 debug_mode = 5
 
@@ -14,8 +14,8 @@ def dec_to_hex(decimal):
 
 def decpc_to_op(decpc):
     """在 ASM 文件中查找包含指定 PC 值的行"""
-    asm_file = os.path.join("./asm",cf.benchmark+'.asm')
-    print(asm_file)
+    asm_file = os.path.join(configure.asm_folder,configure.benchmark+'.asm')
+    #print(asm_file)
     hexpc = dec_to_hex(decpc)
     try:
         with open(asm_file, 'r') as file:
@@ -49,10 +49,18 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope,df_Fun
     func = 'error'
     # 查找对应 Sig1pc 的行，并提取指令
     for idx, row in df.iterrows():
-        sig1pc = row[PC]
+        #sig1pc = row[PC]
+        sig1pc = df.at[idx, PC]
         if sig1pc == 'null':
             continue
-        hex_sig1pc = sig1pc[2:]  # 提取十六进制形式的地址部分，不含 "0x"
+        if pd.isna(df.at[idx, PC]):
+            continue
+        try:
+            hex_sig1pc = sig1pc[2:]  # 提取十六进制形式的地址部分，不含 "0x"
+        except:
+            print(df.at[idx, 'input_file'],str(df.at[idx, PC]),sig1pc)
+            continue
+            #exit(0)
         # 判断 hex_sig1pc 是否是六位的十六进制地址
         if len(hex_sig1pc) != 6 or not re.match(r'^[0-9a-fA-F]{6}$', hex_sig1pc):
             continue  # 如果不符合六位十六进制地址的格式，跳过当前循环
@@ -102,8 +110,8 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope,df_Fun
 def findinsbyasm(program):
     # 使用示例：
     benchmark = program
-    csv_folder = './CSV'
-    asm_folder  = './asm'
+    csv_folder = configure.csv_folder
+    asm_folder  = configure.asm_folder
     csv_output = benchmark +'.csv'
 
     benchmark_csv = os.path.join(csv_folder,benchmark+'.csv')  # CSV 文件路径
@@ -112,19 +120,19 @@ def findinsbyasm(program):
 
     if(1):
         df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"hexpc","ins","opcode","Func")
-        df_updated.to_csv(benchmark_fix_csv, index=False)
+        df_updated.to_csv(benchmark_fix_csv, index=False,na_rep='null')
 
         df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig1pc","Sig1Ins","Sig1Ope","Sig1Func")
-        df_updated.to_csv(benchmark_fix_csv, index=False)
+        df_updated.to_csv(benchmark_fix_csv, index=False,na_rep='null')
         # 将更新后的 DataFrame 保存回 CSV 文件（可选）
         
         df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"Sig2pc","Sig2Ins","Sig2Ope","Sig2Func")
 
         df_updated = df_updated.sort_values(by='result')
 
-        df_updated.to_csv(benchmark_fix_csv, index=False)
+        df_updated.to_csv(benchmark_fix_csv, index=False,na_rep='null')
 
 
 
 if __name__ == "__main__":
-    findinsbyasm(cf.progname)
+    findinsbyasm(configure.progname)

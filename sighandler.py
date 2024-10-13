@@ -474,6 +474,7 @@ class SigHandler:
                     self.sig_end_time = datetime.datetime.now()
                     print("Letgo time: ",self.sig_end_time - self.letgo_start_time)
                     print("sig time: ",self.sig_end_time - self.sig_start_time)
+                    print("Now Time:\t" , (datetime.datetime.now()))
                     self.log.close()
                     process.close()
                     sys.stdout = sys.__stdout__
@@ -525,8 +526,12 @@ class SigHandler:
         ##
         print('Start set a breakpoint...')
         fi = faultinject.FaultInjector(self.insts)
-        args = InstPoolMaker.readArgsFromPool()
-        if len(args) != 4:##断点缓冲池空,就手动查找断点            
+        try:
+            result = InstPoolMaker.readArgsFromPool()
+            args = result[:-1]
+            randomnum = result[-1]
+            print("-randinst",randomnum)
+        except:
             args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
 
         ##参数中包含的是在动态指令randomnum处的指令和寄存器信息.pc是该动态指令的ins值,regmm或reg是ins中随机挑选的寄存器
