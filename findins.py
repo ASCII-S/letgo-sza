@@ -55,8 +55,12 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope,df_Fun
             continue
         if pd.isna(df.at[idx, PC]):
             continue
+        if sig1pc == 'Cannot...':
+            df.at[idx, df_Ins] = df.at[idx, 'ins']
+            df.at[idx, df_Ope] = df.at[idx, 'opcode']
+            df.at[idx, df_Func] = df.at[idx, 'Func']
         try:
-            hex_sig1pc = sig1pc[2:]  # 提取十六进制形式的地址部分，不含 "0x"
+            hex_sig1pc = sig1pc.replace('0x','')  # 提取十六进制形式的地址部分，不含 "0x"
         except:
             print(df.at[idx, 'input_file'],str(df.at[idx, PC]),sig1pc)
             continue
@@ -87,7 +91,7 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope,df_Fun
             if asm_address == hex_sig1pc:
                 # 提取并保存指令部分（: 后面的内容）
                 instruction = asm_line[30:]
-                df.at[idx, df_Ins] = instruction  # 存储到 DataFrame 中
+                df.at[idx, df_Ins] = instruction.strip('"')  # 存储到 DataFrame 中
                 df.at[idx, df_Ope] = instruction.split(' ')[0]  # 存储到 DataFrame 中
                 df.at[idx, df_Func] = func
                 if debug_mode >= 6:

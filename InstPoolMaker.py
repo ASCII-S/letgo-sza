@@ -11,22 +11,11 @@ import os
 import findins
 import csv
 ## 随机查找注错位置,将有效的位置保存在benchmark的指令池中,供sighandler注错时使用
-
-NEED = 10000
-
-instructionstart = 1
-instructionend = 2
-
-totalcount = 0
-timeout = 500
-
 randinst_lib = "obj-intel64/randomInst.so"
 randinst_config = "-randinst"
-
 iterationinst = "obj-intel64/determineInst.so"
 iterationinst_config1 = "-pc"
 iterationinst_config2 = "-randinst"
-
 nextinst = "obj-intel64/findnextinst.so"
 nextinst_config1 = "-pc"
 instructionfile = "instruction"
@@ -34,6 +23,15 @@ iterationfile = "iteration"
 nextpcfile = "nextpc"   ##由pb_interceptor中的findnextpc生成
 stacksize = "spsize"    ##由pb_interceptor中的findnextpc生成
 
+NEED = configure.numFI * 2
+instpool_folder = configure.instpool_folder
+poolname = configure.progname+'_inspool.csv'
+
+instructionstart = 1
+instructionend = 4
+
+totalcount = 0
+timeout = 500
 def execute(execlist):
 
         """
@@ -151,7 +149,13 @@ def getBreakpoint(totalcount):
             print(pc)
             continue
 
+        if reg.startswith("r") or regmem.startswith("r"):
+            flag = 64
+        
         wish_op = configure.inject_op
+        if wish_op == 'all':
+            tarop_flag = 1
+            continue
         opcode = findins.decpc_to_op(int(pc))
         if  opcode != wish_op:
             print("\nWish opcode:\t",wish_op,"\nReceive opcode:\t",opcode)
@@ -159,11 +163,7 @@ def getBreakpoint(totalcount):
         else :
             print("\nBingo!\nWish opcode:\t",wish_op,"\nReceive opcode:\t",opcode)
             tarop_flag = 1
-        if wish_op == 'all':
-            tarop_flag = 1
         
-        if reg.startswith("r") or regmem.startswith("r"):
-            flag = 64
     
     execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,str(randomnum),"--",configure.benchmark]
     for item in configure.args:
@@ -189,10 +189,10 @@ def getBreakpoint(totalcount):
 ##iteration表示的是在randomnum范围内,ins值和pc值相同的次数;也就是pc值在randomnum范围内的迭代次数
 def saveargs(args):
     # 确保目标文件夹存在
-    os.makedirs('./instructionPool', exist_ok=True)
+    os.makedirs(instpool_folder, exist_ok=True)
     
     # 指定文件名
-    filename = os.path.join(configure.letgo_base_home,"instructionPool",configure.progname+'.csv')
+    filename = os.path.join(instpool_folder,poolname)
     print(filename)
     # 以追加模式打开文件
     with open(filename, mode='a', newline='') as file:
@@ -200,9 +200,10 @@ def saveargs(args):
         writer.writerow(args)
 
 
-def selectOneIns():
-    totalcount = int(fetchTotalCount())
+def selectOneIns(totalcount):
     result = getBreakpoint(totalcount)
+    if len(result) < 5:
+        return
     args = result[:-1]
     randomnum = result[-1]
     print(args,randomnum)
@@ -212,7 +213,7 @@ def selectOneIns():
 
 def readArgsFromPool():
     # 构建文件路径
-    filepath = os.path.join(configure.letgo_base_home, "instructionPool", configure.progname+".csv")
+    filepath = os.path.join(configure.instpool_folder, poolname)
     
     # 用于存储最后一行数据
     args = []
@@ -240,10 +241,11 @@ def readArgsFromPool():
 
 
 def instPoolMaker():
+    totalcount = int(fetchTotalCount())
     need = NEED
     while need>0:
         need -=1
-        selectOneIns()
+        selectOneIns(totalcount)
 
 if __name__ == "__main__":
     print("This is a test!")

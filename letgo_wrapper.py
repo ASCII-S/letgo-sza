@@ -99,11 +99,6 @@ with open(configure.instcount,"r") as f:
     totalcount = count.split(" ")[1]
     print("Instcount_official:\t",totalcount)
 
-log_count = 0
-"""for root, dirs, files in os.walk(sighandler.log_path):
-    log_count += len(files)
-    #print(log_count,"\tlogs in ./log")
-    #exit(0)"""
 def find_max_log_suffix(directory):
     # 初始化最大值
     max_number = -1
@@ -131,6 +126,8 @@ def find_max_log_suffix(directory):
         print("没有找到符合条件的文件。")
         return None
 
+
+
 log_count = 0
 for root, dirs, files in os.walk(sighandler.log_path):
     # 统计文件数
@@ -141,11 +138,6 @@ if log_count != 0:
 for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开始写记录
     sys.stdout = sys.__stdout__
     print("\n----------------------------Test "+str(i)+"----------------------------")
-    try:
-        os.remove("x.asc")
-        print("remove output file 3")
-    except:
-        print("Oops, no x.asc file found. Ignoring. 3")
     try:
         print("sig.executeProgram start......")
         sig_time1 = datetime.datetime.now()
@@ -160,21 +152,18 @@ for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开�
         print(sig_time2)
     except SystemExit as e:
         print(f"SystemExit encountered during sig.executeProgram: (exit due to sighandle: timeout){e}")
-        continue  # continue to the next iteration
     except Exception as e:
         print(f"Error during sig.executeProgram: {e}")
         traceback.print_exc()
+    finally:
+        # 确保无论如何都会执行的代码
+        print(f"Finished processing test {i}, moving to the next test.")
         continue
     print("sig time: ",sig_time2 - sig_time1)
     #clean up for next round
-    #silentremove(faultinject.instructionfile)
-    #silentremove(faultinject.iterationfile)
-    #silentremove(faultinject.nextpcfile)
-    ## add trial number to the output file 
-    try:
-        os.rename("x.asc", "x.asc-" + str(i))
-    except:
-        print("Oops, no x.vec file found. Ignoring.")
+    silentremove(faultinject.instructionfile)
+    silentremove(faultinject.iterationfile)
+    silentremove(faultinject.nextpcfile)
 
 
 
