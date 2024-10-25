@@ -9,7 +9,7 @@ pin_base = "/home/tongshiyu/pin"
 instcount = "inscount.out"
 
 
-progname = 'backprop'
+progname = 'lu'
 numFI = 5000
 inject_op = 'all' ##用all表示不进行启发式注错
 #inject_op = '' 
@@ -49,8 +49,8 @@ elif progname == "knn":                                 ## KNN
 elif progname == 'lu':
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/lud/lud"
     optionlist = ['-s512']
-    pcstart = "400c30"
-    pcend = "401980"
+    pcstart = "400b40"
+    pcend = "401c0c"
 elif progname == "myocyte":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/myocyte/myocyte"
     optionlist = ['1000', '1', '0', '4']
@@ -83,3 +83,11 @@ analysis_folder = os.path.join(letgo_base_home,'analysis')
 csv_folder = os.path.join(analysis_folder,'CSV')
 asm_folder  = os.path.join(analysis_folder,'asm')
 pic_folder  = os.path.join(analysis_folder,'PIC')
+
+SdcAppList = ['lu','hpl']
+MASKED = 'Masked'
+SDC = 'SDC'
+C_MASKED = 'C-Masked'
+C_SDC = 'C-SDC'
+DOUBLE_CRASH = 'Double crash'
+CRASH2_PLUS = 'crash2+'

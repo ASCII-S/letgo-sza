@@ -10,12 +10,13 @@ import argparse
 import matplotlib.pyplot as plt
 from pandas.plotting import table
 import numpy as np
+import sighandler
 
 #######---------------FOLLOWED ARE SWITCH---------------#########
 ## clsfy == 1 to move unfinished record to folder "unfinish"
-clsfy = 1
+clsfy = 0
 ## delbug = 1 to delete file that encounters Traceback
-delbug = 1
+delbug = 0
 ## to_csv =1 will collect all information to csv under log_path,but cost much more time
 to_csv = 1
 ## findins = 1 will auto find Sig1ins and Sig2ins according to Sig*pc and asm  
@@ -64,14 +65,15 @@ csv_dir = os.path.join(configure.letgo_base_home,"nosdcarchive/CSV")
 pic_dir = os.path.join(configure.letgo_base_home,"nosdcarchive/PIC")"""
 
 
-# 根据csv汇总文件,定义全局常量
-SdcAppList = ['lu','hpl']
-MASKED = 'Masked'
-SDC = 'SDC'
-C_MASKED = 'C-Masked'
-C_SDC = 'C-SDC'
-DOUBLE_CRASH = 'Double crash'
-CRASH2_PLUS = 'crash2+'
+# 直接从 configure 中导入所需的变量
+SdcAppList = configure.SdcAppList
+MASKED = configure.MASKED
+SDC = configure.SDC
+C_MASKED = configure.C_MASKED
+C_SDC = configure.C_SDC
+DOUBLE_CRASH = configure.DOUBLE_CRASH
+CRASH2_PLUS = configure.CRASH2_PLUS
+
 
 
 def find_and_print_sig_time(file_path):
@@ -86,22 +88,20 @@ def find_and_print_sig_time(file_path):
 def is_valid_hex_address(s):
     return bool(re.fullmatch(r'^[0-9a-fA-F]{6}$', s))
 
-def next_i_line_content(file,i,target):
-    #在i行之内,寻找包含target的一行
-    while i>0:
+def next_i_line_content(file, i, target):
+    lines = []  # 存储读取的行
+    for _ in range(i):
         try:
             next_line = next(file).strip()  # 获取下一行
+            lines.append(next_line)  # 将行添加到列表
             if target in next_line:
-                return next_line
-                break
-            #print("Next line:", next_line)
-            i -= 1
+                return next_line  # 如果找到目标，立即返回该行
         except StopIteration:
-            # 如果到达文件末尾，则停止获取下一行
-            #print("Reached end of file.")
-            #print(next(file).strip())
-            return 'null'
-    return next_line
+            # 如果到达文件末尾，退出循环
+            break
+
+    # 如果没有找到目标，返回所有行的连接
+    return '\n'.join(lines) if lines else 'null'  # 如果没有读取到任何行，返回'null'
 
 def move_file_to_dir(f, log_dir, folder_name):
     # 创建目标文件夹路径
@@ -235,6 +235,8 @@ def read_logs(progname):
                 if "Program received signal" in line:
                     flag += 1
                 if "1 tests completed and failed residual checks" in line:##hpl
+                    sdc_flag = 1
+                if "sdcjuge: The outputs are different." in line:
                     sdc_flag = 1
                 if "dismatch at" in line:##lu
                     sdc_flag = 1
@@ -409,38 +411,34 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 SigOpe = 'Sig1Ope'
                 SigFunc = 'Sig1Func'
 
-                tmp = line.split(',')[0]
-                tmp = tmp.split('signal')[1]
-                df.loc[0,Sig] = tmp
-                insline = next_i_line_content(file,1,'0x')
-                if '0x' in insline:
-                    df.loc[0,Sigpc] = '0x' + insline.split(' ')[0][-6:]
-                    df.loc[0,SigFunc] = insline.split('in')[-1].split(' ')[0].strip()
-                
-                insline = next_i_line_content(file,2,'Inj')
-                if "Inj2Sig" in insline:
-                    #print(line)
-                    df.loc[0,'ErrSpd_Inj'] = insline.split(':')[-1]
-                if ("After Inject:" in insline):
-                    df.loc[0,'ErrSpd_Inj'] = 999
+                try:
+                    tmp = line.split(',')[0]
+                    tmp = tmp.split('signal')[1]
+                    df.loc[0,Sig] = tmp.strip()
+                    insline = next_i_line_content(file,1,'0x')
+                    if '0x' in insline:
+                        df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].lstrip('0')
+                        df.loc[0,SigFunc] = insline.split('in')[-1].split(' ')[0].strip()
+                    
+                    insline = next_i_line_content(file,2,'=>')
+                    if '=>' in insline:
+                        df.loc[0,Sigpc] = insline.split('=>')[-1].split(':')[0].split('<')[0].strip()
+                        if len(insline.split(':')) > 1:
+                            df.loc[0,SigIns] = insline.split(':')[1].strip('"')
+                        else:
+                            df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip('"')
 
-                insline = next_i_line_content(file,4,'=>')
-                if '=>' in insline:
-                    df.loc[0,Sigpc] = insline.split('=>')[-1].split(':')[0].split('<')[0].strip()
-                    if len(insline.split(':')) > 1:
-                        df.loc[0,SigIns] = insline.split(':')[1].strip('"')
-                    else:
-                        df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip('"')
+                        """if 'rex' in df.loc[0,SigIns]:
+                            df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
+                        else:
+                            df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[0]"""
 
-                    if 'rex' in df.loc[0,SigIns]:
-                        df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
-                    else:
-                        df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[0]
-
-                    if len(insline.split('<')) > 1:
-                        df.loc[0,SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0].strip('<')
-                    else:
-                        df.loc[0,SigFunc] = 'null'
+                        if len(insline.split('<')) > 1:
+                            df.loc[0,SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0].strip('<')
+                        else:
+                            df.loc[0,SigFunc] = 'null'
+                except:
+                    print("get info at signal1 fail",input_file)
                 SIGcount = 1
                 continue
 
@@ -477,37 +475,34 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 SigOpe = 'Sig2Ope'
                 SigFunc = 'Sig2Func'
 
-                tmp = line.split(',')[0]
-                tmp = tmp.split('signal')[1]
-                df.loc[0,Sig] = tmp
-                insline = next_i_line_content(file,1,'0x')
-                if '0x' in insline:
-                    df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].split(' ')[0][-6:]
-                    df.loc[0,SigFunc] = insline.split('in')[-1].split(' ')[0].strip()
+                try:
+                    tmp = line.split(',')[0]
+                    tmp = tmp.split('signal')[1]
+                    df.loc[0,Sig] = tmp.strip()
+                    """insline = next_i_line_content(file,1,'0x')
+                    if '0x' in insline:
+                        df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].lstrip('0')
+                        df.loc[0,SigFunc] = insline.split('in')[-1].split(' ')[0].strip()"""
+                    
+                    insline = next_i_line_content(file,2,'=>')
+                    if '=>' in insline:
+                        df.loc[0,Sigpc] = insline.split('=>')[-1].split(':')[0].split('<')[0].strip()
+                        if len(insline.split(':')) > 1:
+                            df.loc[0,SigIns] = insline.split(':')[1].strip('"')
+                        else:
+                            df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip('"')
 
-                insline = next_i_line_content(file,1,'Fix')
-                if ("Valid Fix2Sig" in insline ):
-                    df.loc[0,'ErrSpd_Fix'] = int(insline.split(':')[-1])
-                if ("After Fixed" in insline) :
-                    df.loc[0,'ErrSpd_Fix'] = 999
+                        """if 'rex' in df.loc[0,SigIns]:
+                            df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
+                        else:
+                            df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[0]"""
 
-                insline = next_i_line_content(file,4,'=>')
-                if '=>' in insline:
-                    df.loc[0,Sigpc] = insline.split(' ')[0].split('=>')[-1].split(':')[0].split('<')[0].strip()
-                    if len(insline.split(':')) > 1:
-                        df.loc[0,SigIns] = insline.split(':')[1].strip()
-                    else:
-                        df.loc[0,SigIns] = insline.split(':')[-1].strip()
-
-                    if 'rex' in df.loc[0,SigIns]:
-                        df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
-                    else:
-                        df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[0]
-
-                    if len(insline.split('<')) > 1:
-                        df.loc[0,SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0].strip('<')
-                    else:
-                        df.loc[0,SigFunc] = 'null'
+                        if len(insline.split('<')) > 1:
+                            df.loc[0,SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0].strip('<')
+                        else:
+                            df.loc[0,SigFunc] = 'null'
+                except:
+                    print("get info at signal2 fail",input_file)
                 
                 continue
 
@@ -1081,7 +1076,7 @@ def Tab2SigCrash(csv_dir, sig, output_dir):
 
 
 def all(progname):
-
+    print("Read logs and generate csv")
     read_logs(progname)
     search_string_in_log()
     if findmorebypc == 1:

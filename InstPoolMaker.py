@@ -10,6 +10,8 @@ import datetime
 import os
 import findins
 import csv
+import pandas as pd
+
 ## 随机查找注错位置,将有效的位置保存在benchmark的指令池中,供sighandler注错时使用
 randinst_lib = "obj-intel64/randomInst.so"
 randinst_config = "-randinst"
@@ -23,7 +25,7 @@ iterationfile = "iteration"
 nextpcfile = "nextpc"   ##由pb_interceptor中的findnextpc生成
 stacksize = "spsize"    ##由pb_interceptor中的findnextpc生成
 
-NEED = configure.numFI * 2
+NEED = 100 + configure.numFI * 2
 instpool_folder = configure.instpool_folder
 poolname = configure.progname+'_inspool.csv'
 
@@ -182,6 +184,26 @@ def getBreakpoint(totalcount):
     print([regmem,reg,pc, iteration,randomnum])
     return [regmem,reg,pc, iteration,randomnum]
 
+def extract_easy_crash_example(csv_file):
+    # 读取 CSV 文件
+    df = pd.read_csv(csv_file)
+
+    # 遍历 DataFrame，判断条件并保存
+    for _, row in df.iterrows():
+        if row['result'] in [configure.C_MASKED, configure.C_SDC, configure.DOUBLE_CRASH]:
+            # 判断 dynamicInstNum 是否为 null
+            if pd.notnull(row['dynamicInstNum']):
+                # 提取所需的列
+                args = [
+                    row['regmm'] if pd.notnull(row['regmm']) else '',  # 使用空值代替 nan
+                    row['reg'] if pd.notnull(row['reg']) else '',      # 使用空值代替 nan
+                    row['pc'],
+                    row['iteration1'],
+                    int(row['dynamicInstNum'])  # 保存为整数
+                ]
+                saveargs(args)
+
+
 
 #fi = faultinject.FaultInjector(int(totalcount))
 #args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
@@ -193,7 +215,7 @@ def saveargs(args):
     
     # 指定文件名
     filename = os.path.join(instpool_folder,poolname)
-    print(filename)
+    print("args add to:\t",filename)
     # 以追加模式打开文件
     with open(filename, mode='a', newline='') as file:
         writer = csv.writer(file)
@@ -248,6 +270,7 @@ def instPoolMaker():
         selectOneIns(totalcount)
 
 if __name__ == "__main__":
-    print("This is a test!")
+    print("PoolMaker!")
     instPoolMaker()
-    #readArgsFromPool()
+    #csv_file = "/home/tongshiyu/pin/source/tools/letgo/nosdcarchive/CSV/hpl.csv"
+    #extract_easy_crash_example(csv_file)

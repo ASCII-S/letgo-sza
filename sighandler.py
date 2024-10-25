@@ -34,7 +34,7 @@ GDB_ERROR_SEGV = "Program received signal SIGSEGV"
 GDB_ERROR_BUS = "Program received signal SIGBUS"
 GDB_ERROR_ABT = "Program received signal SIGABRT"
 
-MAX_ERROR_SPREAD = 30
+MAX_ERROR_SPREAD = 50
 PRT_ERR_LEN_INJ_SIG = "Valid Inj2Sig:"
 PRT_ERR_LEN_FIX_SIG = "Valid Fix2Sig:"
 PRT_ERR_LEN_MAX = "Safe " + str(MAX_ERROR_SPREAD)
@@ -69,12 +69,69 @@ class SigHandler:
         sys.stdout = self.log
         sys.stderr = self.log
 
+        self.lastinst = ''
+
         self.sig_start_time = datetime.datetime.now()
         self.sig_end_time = datetime.datetime.now()
         self.letgo_start_time = datetime.datetime.now()
 
         self.process = pexpect.spawn(GDB_LAUNCH)
         print("do pexpect.spawn: gdb  has launched!")
+
+    def track_last_inst(self,process):
+        return
+
+    def run_inject_app(self,process):
+                ##
+        # Set a breakpoint: need pc and iteration number
+        ##
+        print('Start set a breakpoint...')
+        fi = faultinject.FaultInjector(self.insts)
+        try:
+            result = InstPoolMaker.readArgsFromPool()
+            args = result[:-1]
+            randomnum = result[-1]
+            print("-randinst",randomnum)
+        except:
+            args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
+
+        ##参数中包含的是在动态指令randomnum处的指令和寄存器信息.pc是该动态指令的ins值,regmm或reg是ins中随机挑选的寄存器
+        ##iteration表示的是在randomnum范围内,ins值和pc值相同的次数;也就是pc值在randomnum范围内的迭代次数
+        if len(args) != 4:
+            print("Wrong return values! Exit!")
+            self.log.close()
+            process.close()
+            sys.stdout = sys.__stdout__
+            return
+        try:
+            shutil.rmtree("graphics_output")
+            print("remove output file 2")
+        except:
+            print("Oops, no x.vec file found. Ignoring. 2")
+
+        regmm = args[0].rstrip("\n")    ##
+        reg = args[1].rstrip("\n")
+        pc = args[2].rstrip("\n")
+        iteration = int(args[3].rstrip("\n"))
+        # next = hex(int(args[4]))
+        print('args ready for set breakpoint:\t',args)
+        hexpc = hex(int(pc))
+        print('hexpc\t',hexpc)
+        GDB_BREAKPOINT = "break *" + str(hexpc)
+        process.sendline(GDB_BREAKPOINT)
+        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+        if i == 0:
+            print('ERROR! Could not set the breakpoint')
+            print((process.before.decode('utf-8'), process.after))
+            print((str(process)))
+            self.log.close()
+            process.close()
+            sys.stdout = sys.__stdout__
+            return
+        if i == 1:
+            print((process.before.decode('utf-8')))
+            print('Successfully set the breakpoint')
+
 
     def error_spread(self,process,seq_casuse_signal):#此处的seq_casuse_signal是指错误引发点的序号,例如注错点是序号1,第一次修复则是2
         ##出发点是错误引发点,即注错点或第一次修复点,逐步执行,终点是收到signal或程序结束;返回值rcv_sig表示是否出错,output
@@ -198,7 +255,7 @@ class SigHandler:
             gdbout = process.before.decode('utf-8')
             print("\nat sig backtrace:\t",(gdbout),"backrace end")
 
-        if "??" in sigout:
+            """if "??" in sigout:
             process.sendline("set exec-direction reverse")
             process.expect([pexpect.TIMEOUT, "(gdb)"])
             gdbout = process.before.decode('utf-8')
@@ -235,7 +292,7 @@ class SigHandler:
 
             process.sendline("set exec-direction forward")
             process.expect([pexpect.TIMEOUT, "(gdb)"])
-
+            """
             process.sendline("continue")
             process.expect([pexpect.TIMEOUT, "(gdb)"])
         #出错前手动调试
@@ -259,7 +316,7 @@ class SigHandler:
             print((process.before.decode('utf-8')))
             match = re.findall('0[xX]?[A-Fa-f0-9]+', process.before.decode('utf-8'))
             if len(match) == 0:
-                print("Error while getting no PC!")
+                print("Crash place getting no PC!")
                 self.log.close()
                 process.close()
                 sys.stdout = sys.__stdout__
@@ -269,7 +326,7 @@ class SigHandler:
             fi = faultinject.FaultInjector(self.insts)
             args = fi.getNextPC(decpc)  ## 此处要关注faultinjecion.cpp中的getNextPC函数
             if len(args) != 8:
-                print("Error while returning incorrect length")
+                print("No nextpc!")
                 try:
                     self.log.close()
                     process.close()
@@ -531,35 +588,6 @@ class SigHandler:
                         print("Cannot get the size of the current stack frame")
                 
 
-                """##此处开始计算介入letgo_frame后的错误传播
-                rcv_sig,output= self.error_spread(process,1)
-                
-                if rcv_sig == 0:
-                    print("Process Continue!\n")
-                    process.sendline(GDB_CONTINUE)
-                    print("Application output:\n")
-                    #print(output)
-
-                if rcv_sig == 1:
-                    self.info_at_signal(process)
-                
-                while True:#清空内容
-                    i = process.expect([pexpect.TIMEOUT, "(gdb)"], timeout=10)  # 设置超时等待
-                    if i == 0:
-                        #print("Ready to record error spread...")
-                        break
-                    App_output = process.before.decode('utf-8').strip()
-                    print(App_output)  # 打印当前的 PC 状态
-
-                self.sig_end_time = datetime.datetime.now()
-                print("Letgo time: ",self.sig_end_time - self.letgo_start_time)
-                print("sig time: ",self.sig_end_time - self.sig_start_time)
-                print("Now Time:\t" , (datetime.datetime.now()))
-                self.log.close()
-                process.close()
-                sys.stdout = sys.__stdout__
-        print("Now Time:\t" , (datetime.datetime.now()))
-        """
 
 
     def executeProgram(self,process):
@@ -601,22 +629,25 @@ class SigHandler:
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
             print((process.before.decode('utf-8')))
 
-            process.sendline('catch signal')
+            """process.sendline('catch signal')
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-            print((process.before.decode('utf-8')))
+            print((process.before.decode('utf-8')))"""
 
 
-
-        ##
+        #app_set_breakpoint(self,process)
+##
         # Set a breakpoint: need pc and iteration number
         ##
         print('Start set a breakpoint...')
         fi = faultinject.FaultInjector(self.insts)
         try:
             result = InstPoolMaker.readArgsFromPool()
-            args = result[:-1]
+            # 检查 result 的长度是否为 5
+            if len(result) != 5:
+                raise ValueError("Wrong return values! Exit!")  # 抛出异常跳转到 except 块
+            args = result[0:4]
             randomnum = result[-1]
-            print("-randinst",randomnum)
+            print("-randinst", randomnum)
         except:
             args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
 
@@ -657,10 +688,10 @@ class SigHandler:
             print((process.before.decode('utf-8')))
             print('Successfully set the breakpoint')
 
-        """print("GDB is now interactive. You can type GDB commands.")
-        process.interact()  # 交互模式，允许用户直接控制 GDB"""
         
-
+        ##
+        # 开始运行程序
+        ##
         process.sendline(GDB_RUN)
         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
         if i == 0:
@@ -719,15 +750,6 @@ class SigHandler:
                     output = process.before.decode('utf-8')
                     print("\nbefore inject inst:--------------------------------------\t\n:",output,"before inject inst end:--------------------------------------\n")
 
-
-                process.sendline("record")
-                process.expect([pexpect.TIMEOUT, "(gdb)"])
-                gdbout = process.before.decode('utf-8')
-                print(gdbout)
-
-                process.sendline("set record full stop-at-limit off")
-                process.expect([pexpect.TIMEOUT, "(gdb)"])
-
                 process.sendline(GDB_DISPLAY)
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
@@ -738,7 +760,6 @@ class SigHandler:
                     process.close()
                     sys.stdout = sys.__stdout__
                     return
-
                 if i == 1:
                     output = process.before.decode('utf-8')
                     print("display the inject inst start:\n",output,"display the inject inst end.")
@@ -946,7 +967,6 @@ class SigHandler:
                             break
                         App_output = process.before.decode('utf-8').strip()
                         print(App_output)  # 打印当前的 PC 状态
-                    print("\nSDCjudger...")
                     sdcjudger.SDC_judger(index = str(self.trial))
                     self.sig_end_time = datetime.datetime.now()
                     print("Letgo time: ",self.sig_end_time - self.letgo_start_time)
@@ -972,7 +992,6 @@ class SigHandler:
                             #print(re.sub(r'[\n()]', '', pc_output))  # 打印当前的 PC 状态
                     except Exception as e:
                         print(f"An error occurred: {type(e).__name__}")
-                    print("\nSDCjudger...")
                     sdcjudger.SDC_judger(index = str(self.trial))
                     self.sig_end_time = datetime.datetime.now()
                     print("sig time: ",self.sig_end_time - self.sig_start_time)

@@ -39,6 +39,7 @@ def execute(execlist,out,err):
 def silentremove(filename):
     try:
         os.remove(filename)
+        print("remove;\t",filename)
     except OSError as e: # this would be "except OSError, e:" before Python 2.6
         if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
             raise # re-raise exception if a different error occured
@@ -129,15 +130,26 @@ def find_max_log_suffix(directory):
 
 
 log_count = 0
-for root, dirs, files in os.walk(sighandler.log_path):
-    # 统计文件数
-    log_count += len(files)
+
+# 检查 log_path 是否存在，不存在则创建并初始化 log_count 为 0
+if not os.path.exists(configure.log_path):
+    os.makedirs(configure.log_path)
+    print(f"Created directory: {configure.log_path}")
+else:
+    # 遍历 log_path 中的文件，统计文件数
+    for root, dirs, files in os.walk(configure.log_path):
+        log_count += len(files)
+
+# 如果 log_count 不为 0，则计算最大日志后缀
 if log_count != 0:
-    log_count = find_max_log_suffix(sighandler.log_path) + 1
+    log_count = find_max_log_suffix(configure.log_path) + 1
 
 for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开始写记录
     sys.stdout = sys.__stdout__
     print("\n----------------------------Test "+str(i)+"----------------------------")
+    #clean up for this round
+    silentremove(faultinject.instructionfile)
+    silentremove(faultinject.nextpcfile)
     try:
         print("sig.executeProgram start......")
         sig_time1 = datetime.datetime.now()
@@ -160,10 +172,6 @@ for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开�
         print(f"Finished processing test {i}, moving to the next test.")
         continue
     print("sig time: ",sig_time2 - sig_time1)
-    #clean up for next round
-    silentremove(faultinject.instructionfile)
-    silentremove(faultinject.iterationfile)
-    silentremove(faultinject.nextpcfile)
 
 
 
