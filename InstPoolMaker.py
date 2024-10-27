@@ -12,6 +12,9 @@ import findins
 import csv
 import pandas as pd
 
+
+## NEVER RUN THIS　FILE UNDER LETGO_BASE_HOME !!! THIS WILL CAUSE INVALID SDC DATA!
+## CD IN INSTPOOL THEN RUN INSTPOOLMAKER.PY
 ## 随机查找注错位置,将有效的位置保存在benchmark的指令池中,供sighandler注错时使用
 randinst_lib = "obj-intel64/randomInst.so"
 randinst_config = "-randinst"
@@ -262,7 +265,7 @@ def readArgsFromPool():
     return args
 
 
-def instPoolMaker():
+def Random_instPoolMaker():
     totalcount = int(fetchTotalCount())
     need = NEED
     while need>0:
@@ -271,6 +274,6 @@ def instPoolMaker():
 
 if __name__ == "__main__":
     print("PoolMaker!")
-    instPoolMaker()
+    Random_instPoolMaker()
     #csv_file = "/home/tongshiyu/pin/source/tools/letgo/nosdcarchive/CSV/hpl.csv"
     #extract_easy_crash_example(csv_file)

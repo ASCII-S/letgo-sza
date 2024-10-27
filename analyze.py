@@ -51,7 +51,7 @@ flag = 0
 unfinishedlist = []
 output = []
 
-log_dir = configure.log_path   ##数据源目录
+log_dir = os.path.join(configure.result_ptah,progname,"log")  ##数据源目录
 print("log_dir in:\t",log_dir)
 if not (os.path.exists(log_dir) and os.path.isdir(log_dir)):
     print("{} does not exist or is not a directory".format(log_dir))
@@ -234,9 +234,11 @@ def read_logs(progname):
                         break
                 if "Program received signal" in line:
                     flag += 1
+                if "No nextpc file is generated!" in line or "Crash place getting no PC" in line:
+                    flag += 1
                 if "1 tests completed and failed residual checks" in line:##hpl
                     sdc_flag = 1
-                if "sdcjuge: The outputs are different." in line:
+                if "L*U equals M within tolerance( "+str(configure.lu_tolerance)+' )' in line and 'False' in line:
                     sdc_flag = 1
                 if "dismatch at" in line:##lu
                     sdc_flag = 1
@@ -416,27 +418,30 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                     tmp = tmp.split('signal')[1]
                     df.loc[0,Sig] = tmp.strip()
                     insline = next_i_line_content(file,1,'0x')
-                    if '0x' in insline:
-                        df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].lstrip('0')
+                    if '0x' in insline and 'in' in insline:
+                        df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].lstrip('0x').lstrip('0')
                         df.loc[0,SigFunc] = insline.split('in')[-1].split(' ')[0].strip()
                     
-                    insline = next_i_line_content(file,2,'=>')
+                    insline = next_i_line_content(file,3,'=>')
                     if '=>' in insline:
                         df.loc[0,Sigpc] = insline.split('=>')[-1].split(':')[0].split('<')[0].strip()
-                        if len(insline.split(':')) > 1:
-                            df.loc[0,SigIns] = insline.split(':')[1].strip('"')
+                        if 'Cannot' in insline:
+                            df.loc[0,SigIns] = 'Cannot access memory'
                         else:
-                            df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip('"')
+                            if len(insline.split(':')) > 1:
+                                df.loc[0,SigIns] = insline.split(':')[1].strip('"')
+                            else:
+                                df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip('"')
 
-                        """if 'rex' in df.loc[0,SigIns]:
-                            df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
-                        else:
-                            df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[0]"""
+                            if 'rex' in df.loc[0,SigIns]:
+                                df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
+                            else:
+                                df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[0]
 
-                        if len(insline.split('<')) > 1:
-                            df.loc[0,SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0].strip('<')
-                        else:
-                            df.loc[0,SigFunc] = 'null'
+                            if len(insline.split('<')) > 1:
+                                df.loc[0,SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0]
+                            else:
+                                df.loc[0,SigFunc] = 'null'
                 except:
                     print("get info at signal1 fail",input_file)
                 SIGcount = 1
@@ -479,28 +484,31 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                     tmp = line.split(',')[0]
                     tmp = tmp.split('signal')[1]
                     df.loc[0,Sig] = tmp.strip()
-                    """insline = next_i_line_content(file,1,'0x')
-                    if '0x' in insline:
-                        df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].lstrip('0')
-                        df.loc[0,SigFunc] = insline.split('in')[-1].split(' ')[0].strip()"""
+                    insline = next_i_line_content(file,1,'0x')
+                    if '0x' in insline and 'in' in insline:
+                        df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].lstrip('0x').lstrip('0')
+                        df.loc[0,SigFunc] = insline.split('in')[-1].split(' ')[0].strip()
                     
-                    insline = next_i_line_content(file,2,'=>')
+                    insline = next_i_line_content(file,3,'=>')
                     if '=>' in insline:
                         df.loc[0,Sigpc] = insline.split('=>')[-1].split(':')[0].split('<')[0].strip()
-                        if len(insline.split(':')) > 1:
-                            df.loc[0,SigIns] = insline.split(':')[1].strip('"')
+                        if 'Cannot' in insline:
+                            df.loc[0,SigIns] = 'Cannot access memory'
                         else:
-                            df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip('"')
+                            if len(insline.split(':')) > 1:
+                                df.loc[0,SigIns] = insline.split(':')[1].strip('"')
+                            else:
+                                df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip('"')
 
-                        """if 'rex' in df.loc[0,SigIns]:
-                            df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
-                        else:
-                            df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[0]"""
+                            if 'rex' in df.loc[0,SigIns]:
+                                df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
+                            else:
+                                df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[0]
 
-                        if len(insline.split('<')) > 1:
-                            df.loc[0,SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0].strip('<')
-                        else:
-                            df.loc[0,SigFunc] = 'null'
+                            if len(insline.split('<')) > 1:
+                                df.loc[0,SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0].strip('<')
+                            else:
+                                df.loc[0,SigFunc] = 'null'
                 except:
                     print("get info at signal2 fail",input_file)
                 

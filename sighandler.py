@@ -165,7 +165,7 @@ class SigHandler:
                     print("error in stepi_in",seq_casuse_signal)
                     break
                 # 打印当前指令
-                if "received signal" in stepioutput or "??" in stepioutput:
+                if "received signal" in stepioutput:
                     rcv_sig = 1 #当前出错,不着急打印,等待判断附近之外出现signal后再一起打印
                     output = stepioutput
                     #process.expect([pexpect.TIMEOUT, "(gdb)"])
@@ -211,7 +211,7 @@ class SigHandler:
             process.sendline(GDB_CONTINUE)
             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
             coutput = process.before.decode('utf-8')
-            if "received signal" in coutput or "??" in coutput :
+            if "received signal" in coutput  :
                 rcv_sig = 1
                 print(re.sub(r'[\n()]', '', coutput))
             else:       #完美masked
@@ -316,7 +316,7 @@ class SigHandler:
             print((process.before.decode('utf-8')))
             match = re.findall('0[xX]?[A-Fa-f0-9]+', process.before.decode('utf-8'))
             if len(match) == 0:
-                print("Crash place getting no PC!")
+                print("Crash place getting no PC!")                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
                 self.log.close()
                 process.close()
                 sys.stdout = sys.__stdout__
@@ -967,7 +967,7 @@ class SigHandler:
                             break
                         App_output = process.before.decode('utf-8').strip()
                         print(App_output)  # 打印当前的 PC 状态
-                    sdcjudger.SDC_judger(index = str(self.trial))
+                    sdcjudger.SDC_saver(index = str(self.trial))
                     self.sig_end_time = datetime.datetime.now()
                     print("Letgo time: ",self.sig_end_time - self.letgo_start_time)
                     print("sig time: ",self.sig_end_time - self.sig_start_time)
@@ -992,7 +992,7 @@ class SigHandler:
                             #print(re.sub(r'[\n()]', '', pc_output))  # 打印当前的 PC 状态
                     except Exception as e:
                         print(f"An error occurred: {type(e).__name__}")
-                    sdcjudger.SDC_judger(index = str(self.trial))
+                    sdcjudger.SDC_saver(index = str(self.trial))
                     self.sig_end_time = datetime.datetime.now()
                     print("sig time: ",self.sig_end_time - self.sig_start_time)
                     print("Now Time:\t" , (datetime.datetime.now()))

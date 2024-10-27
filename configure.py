@@ -9,7 +9,7 @@ pin_base = "/home/tongshiyu/pin"
 instcount = "inscount.out"
 
 
-progname = 'lu'
+progname = 'hpl'
 numFI = 5000
 inject_op = 'all' ##用all表示不进行启发式注错
 #inject_op = '' 
@@ -48,7 +48,7 @@ elif progname == "knn":                                 ## KNN
     optionlist = [datafile, '5', '30', '90']
 elif progname == 'lu':
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/lud/lud"
-    optionlist = ['-s512']
+    optionlist = ['-s512 -v']
     pcstart = "400b40"
     pcend = "401c0c"
 elif progname == "myocyte":
@@ -85,6 +85,9 @@ asm_folder  = os.path.join(analysis_folder,'asm')
 pic_folder  = os.path.join(analysis_folder,'PIC')
 
 SdcAppList = ['lu','hpl']
+lu_tolerance = 1e-4
+
+
 MASKED = 'Masked'
 SDC = 'SDC'
 C_MASKED = 'C-Masked'
