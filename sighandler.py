@@ -60,7 +60,7 @@ def is_hexnumber(s):
         return False
 
 class SigHandler:
-    def __init__(self, insts, trial,GDB_LAUNCH):
+    def __init__(self, insts, trial):
         self.insts = int(insts)
         self.trial = trial
 
@@ -323,23 +323,20 @@ class SigHandler:
                 return
             #print(match[0])
             decpc = int(match[0], 0)    ##此处的match[0]是一个包含0x的十六进制地址,使用int将其转化为十进制
-            fi = faultinject.FaultInjector(self.insts)
-            args = fi.getNextPC(decpc)  ## 此处要关注faultinjecion.cpp中的getNextPC函数
-            if len(args) != 8:
-                print("No nextpc!")
-                try:
+            try:
+                fi = faultinject.FaultInjector(self.insts)
+                args = fi.getNextPC(decpc)  ## 此处要关注faultinjecion.cpp中的getNextPC函数
+                if len(args) != 8:
+                    print("No nextpc!")
                     self.log.close()
                     process.close()
                     sys.stdout = sys.__stdout__
-                except Exception as process_error:
-                    print("Error closing process: {}".format(process_error))
+                    return
+            except Exception as process_error:
+                print("No nextpc!\nOpen file failed...")
                 return
             print(args)
-            try:
-                shutil.rmtree("graphics_output")
-                print("remove output file 1")
-            except:
-                print("Oops, no x.vec file found. Ignoring. 1")
+
             nextpc = args[0]    ##ins的下一条指令
             regwlist = args[1]  ##ins的所有写寄存器的列表
             stack = args[2]     ##ins是栈操作则和base相同,否则为nostack
@@ -594,6 +591,7 @@ class SigHandler:
         global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT, GDB_CONTINUE, GDB_FAKE
         self.sig_start_time = datetime.datetime.now()
         print("now time:\t",self.sig_start_time)
+
         GDB_RUN = "run"
         for item in configure.args:
             GDB_RUN += " " + item
@@ -635,8 +633,8 @@ class SigHandler:
 
 
         #app_set_breakpoint(self,process)
-##
-        # Set a breakpoint: need pc and iteration number
+        ##
+# Set a breakpoint: need pc and iteration number
         ##
         print('Start set a breakpoint...')
         fi = faultinject.FaultInjector(self.insts)
@@ -690,8 +688,14 @@ class SigHandler:
 
         
         ##
-        # 开始运行程序
+# 开始运行程序
         ##
+        
+        GDB_ENV = "set env OUTPUT 1"
+        process.sendline(GDB_ENV)
+        process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+        print(process.before.decode('utf-8'))
+
         process.sendline(GDB_RUN)
         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
         if i == 0:

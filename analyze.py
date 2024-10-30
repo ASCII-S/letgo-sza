@@ -74,7 +74,7 @@ C_SDC = configure.C_SDC
 DOUBLE_CRASH = configure.DOUBLE_CRASH
 CRASH2_PLUS = configure.CRASH2_PLUS
 
-
+max_error_spread = sighandler.MAX_ERROR_SPREAD
 
 def find_and_print_sig_time(file_path):
     # 打开文件，逐行读取内容
@@ -310,7 +310,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
         os.makedirs(output_dir)  # 如果目录不存在则创建
 
     # 创建一个空的 DataFrame
-    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
+    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
 
 
     if flag == 0:
@@ -382,27 +382,14 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                     print(f"文件 '{input_file}' 需要删除。")
                 continue
 
-            if "display the inst:" in line:
+            if "display the inject inst start" in line:
                 next_3_line = next_i_line_content(file,3,"=>")
-                #print(next_3_line)
-                # 提取指令和函数名
-                ins = ""
-                # 查找指令和函数名
-                parts = next_3_line.split(':')
-                #print (parts)
-                if len(parts) > 1:
-                    # 提取指令
-                    ins = parts[-1].strip(' ')  # 冒号后面的内容，去除多余空格
-                    if ins == '':
-                        ins = next_i_line_content(file,1,"0x").split('#')[0].rstrip()
-                        print("ins not in => line")
-                        print(ins)
-                    opcode = ins.split(' ')[0]
-                
-                # 将提取到的值添加到 DataFrame 中
-                df.loc[0,'ins'] = ins 
-                df.loc[0,'opcode'] = opcode
-                
+                try:
+                    df.loc[0,'Func'] = next_3_line.split(':')[0].split('<')[1].split('>')[0].split('+')[0]
+                    df.loc[0,'ins'] = next_3_line.split(':')[1].strip()
+                    df.loc[0,'opcode'] = df.loc[0,'ins'].split(' ')[0]
+                except:
+                    print(input_file,"extract ins failed")
                 continue
             
             #首次遇到SIG
@@ -429,9 +416,9 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                             df.loc[0,SigIns] = 'Cannot access memory'
                         else:
                             if len(insline.split(':')) > 1:
-                                df.loc[0,SigIns] = insline.split(':')[1].strip('"')
+                                df.loc[0,SigIns] = insline.split(':')[1].strip()
                             else:
-                                df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip('"')
+                                df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip()
 
                             if 'rex' in df.loc[0,SigIns]:
                                 df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
@@ -452,7 +439,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 tmp = tmp.split('0x')[-1][:6]
                 try:
                     if is_valid_hex_address(tmp):
-                        df.loc[0,'Sig1pc'] = '0x' + tmp.strip(' ')
+                        df.loc[0,'Sig1pc'] = '0x' + tmp.strip()
                         SIGcount = 1
                         if debug_mode > 5:
                             print("Find Sig1pc by Letgo in!\t",input_file)
@@ -469,7 +456,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 df.loc[0,'ErrSpd_Inj'] = int(line.split(':')[-1])
                 continue
             if ("After Inject:" in line):
-                df.loc[0,'ErrSpd_Inj'] = 999
+                df.loc[0,'ErrSpd_Inj'] = str(max_error_spread)+'+'
                 continue
 
             #再次遇到SIG
@@ -496,9 +483,9 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                             df.loc[0,SigIns] = 'Cannot access memory'
                         else:
                             if len(insline.split(':')) > 1:
-                                df.loc[0,SigIns] = insline.split(':')[1].strip('"')
+                                df.loc[0,SigIns] = insline.split(':')[1].strip()
                             else:
-                                df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip('"')
+                                df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip()
 
                             if 'rex' in df.loc[0,SigIns]:
                                 df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
@@ -517,7 +504,13 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
             if ("Valid Fix2Sig" in line ):
                 df.loc[0,'ErrSpd_Fix'] = int(line.split(':')[-1])
             if ("After Fixed" in line) :
-                df.loc[0,'ErrSpd_Fix'] = 999
+                df.loc[0,'ErrSpd_Fix'] = str(max_error_spread)+'+'
+
+            ###SDC判断
+            if "||Ax-b||_oo/(eps*(||A||_oo*||x||_oo+||b||_oo)*N)=" in line:
+                df.loc[0,'bias'] = line.split('=')[1].split("......")[0].strip()
+            if "L*U equals M within tolerance" in line:
+                df.loc[0,'bias'] = line.split('(')[1].split(')')[0].strip()
 
         if debug_mode > 7:
             print("after extract_values_and_append_to_csv df Followed:\n",df.to_string(header=False, index=False))

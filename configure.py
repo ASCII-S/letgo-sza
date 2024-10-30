@@ -9,8 +9,8 @@ pin_base = "/home/tongshiyu/pin"
 instcount = "inscount.out"
 
 
-progname = 'hpl'
-numFI = 5000
+progname = 'backprop'
+numFI = 2000
 inject_op = 'all' ##用all表示不进行启发式注错
 #inject_op = '' 
 
@@ -23,8 +23,8 @@ if progname == "amg":                                   ## amg    ----------有�
 elif progname == "backprop":                            ## backprop
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/backprop/backprop"
     optionlist = ['65536']
-    pcstart = "400930"
-    pcend = "401ebc"
+    pcstart = "400968"
+    pcend = "401f1c"
 elif progname == "bfs": 
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/bfs/bfs"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/bfs/inputGen/graph64k.txt"
@@ -50,7 +50,7 @@ elif progname == 'lu':
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/lud/lud"
     optionlist = ['-s512 -v']
     pcstart = "400b40"
-    pcend = "401c0c"
+    pcend = "401bac"
 elif progname == "myocyte":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/myocyte/myocyte"
     optionlist = ['1000', '1', '0', '4']
@@ -73,6 +73,10 @@ elif progname == "srad":
 benchmark = progbin
 args = optionlist
 
+
+OpenMpOutPutList = ['backprop11']
+if progname in OpenMpOutPutList:
+    benchmark = "OUTPUT=1 " + benchmark
 
 result_ptah = os.path.join(letgo_base_home,"BenchmarkResult")
 log_path = os.path.join(result_ptah,progname,"log")

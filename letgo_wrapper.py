@@ -156,19 +156,26 @@ for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开�
         print(sig_time1)
 
         GDB_LAUNCH = "gdb " + configure.benchmark
-        sig = sighandler.SigHandler(totalcount,i,GDB_LAUNCH)	
+        sig = sighandler.SigHandler(totalcount,i)	
         sig.executeProgram(sig.process)
         
         sig_time2 = datetime.datetime.now()
         print("sig.executeProgram end.")
         print(sig_time2)
+    except KeyboardInterrupt:
+        print("Program interrupted by user. Exiting...")
+        exit_flag = True  # 设置退出标志
+
     except SystemExit as e:
-        print(f"SystemExit encountered during sig.executeProgram: (exit due to sighandle: timeout){e}")
+        print(f"SystemExit encountered during sig.executeProgram: (exit due to sighandle: timeout) {e}")
+
     except Exception as e:
         print(f"Error during sig.executeProgram: {e}")
         traceback.print_exc()
+
     finally:
-        # 确保无论如何都会执行的代码
+        if 'exit_flag' in locals() and exit_flag:
+            sys.exit(0)  # 退出程序
         print(f"Finished processing test {i}, moving to the next test.")
         continue
     print("sig time: ",sig_time2 - sig_time1)
