@@ -3,6 +3,8 @@ import faultinject
 import configure
 from faultinject import FaultInjector
 from concurrent.futures import ProcessPoolExecutor, as_completed
+import multiprocessing
+
 import random
 import subprocess
 import time
@@ -89,9 +91,9 @@ def getBreakpoint(totalcount):
     pc = "0"
     tarop_flag = 0
     randomnum = 0
-
+    findpc = 0
     para = 1## 用多个进程随机找注错位置
-    while(pc == ""or pc == "0" or ( reg == "" and regmem == "") or tarop_flag == 0):
+    while(pc == ""or pc == "0" or ( reg == "" and regmem == "") or (reg == '*invalid*' or regmem == '*invalid*') or tarop_flag == 0 ):
         if para == 0:
             ##pc不合法就一直随机找断点
             randomnum = random.randint(0,totalcount)
@@ -121,27 +123,32 @@ def getBreakpoint(totalcount):
                     #    next = line.split(":")[1]
         if para ==1:
             #regmem,reg,pc,tarop_flag,randomnum = self.searchInInstfile(1)
-
+            stop_event = multiprocessing.Event()
+            fi = faultinject.FaultInjector(totalcount)
             with ProcessPoolExecutor() as executor:
-                fi = faultinject.FaultInjector(totalcount)
                 future_to_seq = {executor.submit(fi.searchInInstfile, str(seq)): seq for seq in range(instructionstart,instructionend+1)}
                 
                 for future in as_completed(future_to_seq):
                     seq = future_to_seq[future]
+                    if stop_event.is_set():
+                        break
                     try:
-                        
                         regmem, reg, pc, tarop_flag, randomnum = future.result()
-                        if   (int(configure.pcstart,16) <= int(pc,10) <= int(configure.pcend,16)):
-                            print(int(pc))
+                        if reg == '*invalid*' or regmem == '*invalid*':
+                            continue
+                        if ((int(configure.pcstart,16) <= int(pc,10)) and (int(pc,10) <= int(configure.pcend,16))):
+                            print(f"Found valid PC: {int(pc)}")
+                            stop_event.set()  # 通知其他线程停止
+                            findpc = 1
                             break
-                        print([regmem, reg, pc, tarop_flag, randomnum])
-                        op = findins.decpc_to_op(int(pc,10))
+                        """op = findins.decpc_to_op(int(pc,10))
                         print([op,configure.inject_op])
                         if  op == configure.inject_op:
-                            break
+                            break"""
                         
                     except Exception as e:
                         print(f"Error executing searchInInstfile({seq}): {e}")
+                        stop_event.set()  # 如果发生错误，停止所有线程
                         break
 
         if reg == "" and regmem == "":
@@ -156,8 +163,9 @@ def getBreakpoint(totalcount):
 
         if reg.startswith("r") or regmem.startswith("r"):
             flag = 64
-        
-        wish_op = configure.inject_op
+        if findpc == 1:
+            break
+        """wish_op = configure.inject_op
         if wish_op == 'all':
             tarop_flag = 1
             continue
@@ -167,7 +175,7 @@ def getBreakpoint(totalcount):
             tarop_flag = 0
         else :
             print("\nBingo!\nWish opcode:\t",wish_op,"\nReceive opcode:\t",opcode)
-            tarop_flag = 1
+            tarop_flag = 1"""
         
     
     execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,str(randomnum),"--",configure.benchmark]
@@ -184,28 +192,54 @@ def getBreakpoint(totalcount):
         for line in lines:
             line = line.rstrip("\n")
             iteration = line    ##iteration表示的是在randomnum范围内,ins值和pc值相同的次数;也就是pc值在randomnum范围内的迭代次数
-    print([regmem,reg,pc, iteration,randomnum])
+    print("find valid args:\t",[regmem,reg,pc, iteration,randomnum])
     return [regmem,reg,pc, iteration,randomnum]
 
-def extract_easy_crash_example(csv_file):
+def extract_args_based_on_csv(csv_file):
     # 读取 CSV 文件
     df = pd.read_csv(csv_file)
 
+    # 用于存储独特的结果
+    unique_results = set()
+
     # 遍历 DataFrame，判断条件并保存
     for _, row in df.iterrows():
-        if row['result'] in [configure.C_MASKED, configure.C_SDC, configure.DOUBLE_CRASH]:
+        #if row['result'] in [configure.C_MASKED, configure.C_SDC, configure.DOUBLE_CRASH]:
+        if row['regmm'] == 'rip':
             # 判断 dynamicInstNum 是否为 null
             if pd.notnull(row['dynamicInstNum']):
                 # 提取所需的列
-                args = [
+                args = (
                     row['regmm'] if pd.notnull(row['regmm']) else '',  # 使用空值代替 nan
                     row['reg'] if pd.notnull(row['reg']) else '',      # 使用空值代替 nan
                     row['pc'],
                     row['iteration1'],
                     int(row['dynamicInstNum'])  # 保存为整数
-                ]
-                saveargs(args)
+                )
+                
+                # 使用元组确保结果唯一
+                unique_results.add(args)
 
+    # 保存独特的结果
+    for result in unique_results:
+        saveargs(result)
+
+
+def delete_files_based_on_csv(csv_file_path, log_path=configure.log_path):
+    # 读取 CSV 文件
+    df = pd.read_csv(csv_file_path)
+
+    # 提取 input_file 列，前提是 regmm 列为 'rip'
+    files_to_delete = df[df['regmm'] == 'rip']['input_file'].tolist()
+
+    # 遍历要删除的文件，检查并删除
+    for file_name in files_to_delete:
+        file_path = os.path.join(log_path, file_name)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print(f"Deleted file: {file_path}")
+        else:
+            print(f"File not found: {file_path}")
 
 
 #fi = faultinject.FaultInjector(int(totalcount))
@@ -218,11 +252,11 @@ def saveargs(args):
     
     # 指定文件名
     filename = os.path.join(instpool_folder,poolname)
-    print("args add to:\t",filename)
     # 以追加模式打开文件
     with open(filename, mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(args)
+    print("args add to:\t",filename)
 
 
 def selectOneIns(totalcount):
@@ -231,7 +265,7 @@ def selectOneIns(totalcount):
         return
     args = result[:-1]
     randomnum = result[-1]
-    print(args,randomnum)
+    print("sleectOneIns:\t",args,randomnum)
 
     saveargs(result)
 
@@ -246,6 +280,7 @@ def readArgsFromPool():
     # 检查文件是否存在
     if not os.path.exists(filepath):
         print(f"Pool not found: {filepath}")
+        print("do it by self")
         return args
 
     # 读取所有行
@@ -275,5 +310,7 @@ def Random_instPoolMaker():
 if __name__ == "__main__":
     print("PoolMaker!")
     Random_instPoolMaker()
-    #csv_file = "/home/tongshiyu/pin/source/tools/letgo/nosdcarchive/CSV/hpl.csv"
-    #extract_easy_crash_example(csv_file)
+
+    #csv_file = os.path.join(configure.csv_folder,configure.progname+'.csv')
+    #extract_args_based_on_csv(csv_file)
+    #delete_files_based_on_csv(csv_file)

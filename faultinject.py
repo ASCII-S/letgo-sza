@@ -91,7 +91,7 @@ class FaultInjector:
         randomnum = 0
 
         para = 1## 用多个进程随机找注错位置
-        while(pc == ""or pc == "0" or ( reg == "" and regmem == "") or tarop_flag == 0):
+        while(pc == ""or pc == "0" or ( reg == "" and regmem == "") or (reg == '*invalid*' or regmem == '*invalid*') or tarop_flag == 0):
             if para == 0:
                 ##pc不合法就一直随机找断点
                 randomnum = random.randint(0,self.totalInst)
@@ -134,6 +134,8 @@ class FaultInjector:
                                 continue  # 如果返回值为 None，跳过
                             
                             regmem, reg, pc, tarop_flag, randomnum = result
+                            if reg == '*invalid*' or regmem == '*invalid*':
+                                continue
                             if   (int(configure.pcstart,16) <= int(pc,10) <= int(configure.pcend,16)):
                                 print(int(pc))
                                 break
@@ -172,7 +174,7 @@ class FaultInjector:
         execlist = [configure.pin_home,"-t",os.path.join(configure.toolbase,iterationinst),iterationinst_config1,str(pc),iterationinst_config2,str(randomnum),"--",configure.benchmark]
         for item in configure.args:
             execlist.append(item)
-        #self.execute(execlist)
+        self.execute(execlist)
 
         if not os.path.isfile(iterationfile):
             print("No iteration file generated! Exit")

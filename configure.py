@@ -9,8 +9,8 @@ pin_base = "/home/tongshiyu/pin"
 instcount = "inscount.out"
 
 
-progname = 'backprop'
-numFI = 2000
+progname = "bfs"
+numFI = 1
 inject_op = 'all' ##用all表示不进行启发式注错
 #inject_op = '' 
 
@@ -20,6 +20,11 @@ if progname == "amg":                                   ## amg    ----------有�
     optionlist = ['-n','5','5','5']
     pcstart = "401cb8"
     pcend = "49877c"
+elif progname == "b+tree":                            ## backprop
+    progbin = "/home/tongshiyu/programs/rodinia-master/openmp/b+tree/b+tree"
+    optionlist = ['file' ,'/home/tongshiyu/programs/rodinia-master/data/b+tree/mil.txt' ,'command' ,'/home/tongshiyu/programs/rodinia-master/data/b+tree/command.txt']
+    pcstart = "400d28"
+    pcend = "40551c"
 elif progname == "backprop":                            ## backprop
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/backprop/backprop"
     optionlist = ['65536']
@@ -29,8 +34,24 @@ elif progname == "bfs":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/bfs/bfs"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/bfs/inputGen/graph64k.txt"
     optionlist = [datafile]
-    pcstart = "400650"
-    pcend = "400cdc"
+    pcstart = "400740"
+    pcend = "400cd0"
+elif progname == "heartwall": 
+    progbin = "/home/tongshiyu/programs/rodinia-master/openmp/heartwall/heartwall"
+    datafile = "/home/tongshiyu/programs/rodinia-master/data/heartwall/test.avi"
+    optionlist = [datafile,'20']
+    pcstart = "400740"
+    pcend = "400cd0"
+elif progname == "hotspot":
+    progbin = "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/hotspot"
+    optionlist = ['64','64','2','1',"/home/tongshiyu/programs/rodinia-master/data/hotspot/temp_64",'/home/tongshiyu/programs/rodinia-master/data/hotspot/power_64', 'output.txt']
+    pcstart = "4007e0"
+    pcend = "4018fc"
+elif progname == "hotspot3D":
+    progbin = "/home/tongshiyu/programs/rodinia-master/openmp/hotspot3D/3D"
+    optionlist = ['512','8','100',"/home/tongshiyu/programs/rodinia-master/data/hotspot3D/power_512x8",'/home/tongshiyu/programs/rodinia-master/data/hotspot3D/temp_512x8', 'output.txt']
+    pcstart = "400b08"
+    pcend = "401d8c"
 elif progname == 'hpl':
     progbin = "/home/tongshiyu/programs/hpl-2.3/testing/xhpl"
     optionlist = ['']
@@ -59,11 +80,6 @@ elif progname == "needle":                              ## Needle
     optionlist = ['2048', '10', '2']
     pcstart = "400c30"
     pcend = "401980"
-elif progname == "hotspot":
-    progbin = "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/hotspot"
-    optionlist = ['64','64','2','1',"/home/tongshiyu/programs/rodinia-master/data/hotspot/temp_64",'/home/tongshiyu/programs/rodinia-master/data/hotspot/power_64', './hotspot/outfile']
-    pcstart = "4006c0"
-    pcend = "400e8c"
 elif progname == "srad":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/srad_v1/srad"
     optionlist = ['15', '0.5', '285', '250', '1']
@@ -73,28 +89,46 @@ elif progname == "srad":
 benchmark = progbin
 args = optionlist
 
+# configuration of save outputs
+OpenMpOutPutList = ['b+tree','backprop', 'bfs', 'heartwall', 'hotspot', 'hotspot3D','kmeans', 'lavaMD', 'leukocyte', 'nn', 'particlefilter', 'streamcluster']
+SdcAppList = ['lu','hpl'].append(OpenMpOutPutList)
+if progname in ['b+tree','bfs','heartwall','hotspot','kmeans','lavaMD','leukocyte','nn','particlefilter','streamcluster']:
+    output_name = 'output.txt'
+elif progname in ['leukocyte']:
+    output_name = 'result.txt'
+elif progname == 'backprop':
+    output_name = 'output.dat'
+elif progname == 'lu':
+    lu_output_name = 'lu_matrix_512.txt'
+    m_output_path = 'm_matrix_512.txt'
 
-OpenMpOutPutList = ['backprop11']
-if progname in OpenMpOutPutList:
-    benchmark = "OUTPUT=1 " + benchmark
+# configuration of sdc tolerance
+tolerance = 1e-2
+lu_tolerance = 1e-4
+if progname == 'hotspot3D':
+    tolerance = 1e-2
+if progname == 'lu':
+    lu_tolerance = 1e-4
+cmp_str = "Compare within tolerance("+str(tolerance)+"):\t"
 
-result_ptah = os.path.join(letgo_base_home,"BenchmarkResult")
-log_path = os.path.join(result_ptah,progname,"log")
-sdcout_folder = os.path.join(result_ptah,progname,"sdcout")
-instpool_folder = os.path.join(result_ptah,progname)
+
+# configuration of folder
+result_path = os.path.join(letgo_base_home,"BenchmarkResult")
+#result_path = os.path.join(letgo_base_home,"nosdcarchive","BenchmarkResult")
+
+log_path = os.path.join(result_path,progname,"log")
+sdcout_folder = os.path.join(result_path,progname,"sdcout")
+instpool_folder = os.path.join(result_path,progname)
 
 analysis_folder = os.path.join(letgo_base_home,'analysis')
 csv_folder = os.path.join(analysis_folder,'CSV')
 asm_folder  = os.path.join(analysis_folder,'asm')
 pic_folder  = os.path.join(analysis_folder,'PIC')
 
-SdcAppList = ['lu','hpl']
-lu_tolerance = 1e-4
-
-
+# define results
 MASKED = 'Masked'
 SDC = 'SDC'
 C_MASKED = 'C-Masked'
 C_SDC = 'C-SDC'
 DOUBLE_CRASH = 'Double crash'
-CRASH2_PLUS = 'crash2+'
+CRASH_NOPC = 'crash'

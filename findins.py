@@ -28,7 +28,7 @@ def decpc_to_op(decpc):
         print("发生错误: ",e)
 
     return None  # 如果没有找到，返回 None
-    
+      
 
 def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope,df_Func):
     ##PC是已知的汇编地址,通过asm_file,将所有缺失df_Ins,df_Ope,df_Func信息的的行补充完成
@@ -130,6 +130,40 @@ def findinsbyasm(program):
         df_updated = df_updated.sort_values(by='result')
 
         df_updated.to_csv(benchmark_fix_csv, index=False,na_rep='null')
+
+
+def judge_address_in_asm(address,asm_file):
+    """
+    判断六位地址是否出现在 asm 文件中
+
+    Parameters:
+    address (str): 六位地址，通常是 16 进制格式，如 '123456'
+    asm_file (str): 汇编文件的路径
+
+    Returns:
+    bool: 如果地址出现在文件中，返回 True，否则返回 False
+    """
+    # 确保地址是六位的16进制格式，例如 '123456'
+    if len(address) != 6 :
+        #print(f"Invalid address format: {address}. It should be in the format '123456'.")
+        return False
+    
+    # 读取文件内容并检查地址是否出现
+    try:
+        with open(asm_file, 'r') as file:
+            file_content = file.read()
+            if address.lower() in file_content.lower():
+                #print(f"Address {address} found in {asm_file}.")
+                return True
+            else:
+                #print(f"Address {address} not found in {asm_file}.")
+                return False
+    except FileNotFoundError:
+        print(f"Error: The file {asm_file} was not found.")
+        return False
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False
 
 
 
