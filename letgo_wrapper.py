@@ -40,10 +40,14 @@ def execute(execlist,out,err):
 def silentremove(filename):
     try:
         os.remove(filename)
-        print("remove:\t",filename)
-    except OSError as e: # this would be "except OSError, e:" before Python 2.6
-        if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
-            raise # re-raise exception if a different error occured
+        print("remove:\t", filename)
+    except FileNotFoundError:
+        # 文件不存在时，忽略
+        pass
+    except OSError as e:
+        # 处理其他类型的 OSError 错误，重新抛出异常
+        if e.errno != errno.ENOENT:  # 如果是其他的错误，则重新抛出
+            raise
 
 
 def find_max_log_suffix(directory):
@@ -108,9 +112,9 @@ if __name__ == "__main__":
     parser.add_argument('-si', type=int, help='Set start log_count', default=0)
     args = parser.parse_args()
 
-    instcount = configure.toolbase + "/obj-intel64/instcount_official.so"
+    instcount = configure.toolbase + "/obj-intel64/instcount.so"
     print (instcount)
-    execlist = [configure.pin_home,"-t",instcount,"--",configure.benchmark]
+    execlist = [configure.pin_home,"-t",instcount,'-o',configure.pin_instcount,"--",configure.benchmark]
 
     for item in configure.args:
         execlist.append(item)
@@ -126,16 +130,28 @@ if __name__ == "__main__":
         sys.exit(1)
 
     totalcount = ""
-    with open(configure.instcount,"r") as f:
-        lines = f.readlines()
-        if len(lines) > 1:
-            print("Error while loading inst count.")
-            sys.exit(1)
-        count = lines[0]
-        count = count.rstrip("\n")
-        totalcount = count.split(" ")[1]
-        print("Instcount_official:\t",totalcount)
-
+    # with open(configure.instcount,"r") as f:
+    #     lines = f.readlines()
+    #     if len(lines) > 1:
+    #         print("Error while loading inst count.")
+    #         sys.exit(1)
+    #     count = lines[0]
+    #     count = count.rstrip("\n")
+    #     totalcount = count.split(" ")[1]
+    #     print("Instcount:\t",totalcount)
+    file_path = configure.instcount
+    try:
+        with open(file_path, 'r') as f:
+            first_line = f.readline()  # 读取第一行
+            if ':' in first_line:
+                totalcount = first_line.split(':')[1].strip()  # 提取冒号后的数字并去除空白字符
+                print(f"Instcount:\t{totalcount}")
+            else:
+                print("No colon found in the first line.")
+    except FileNotFoundError:
+        print(f"File {file_path} not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
     log_count = 0
 
@@ -151,24 +167,30 @@ if __name__ == "__main__":
     # 如果 log_count 不为 0，则计算最大日志后缀
     if log_count != 0:
         log_count = find_max_log_suffix(configure.log_path) + 1
+    
+    if configure.num_start_from >  log_count:
+        log_count = configure.num_start_from
+        print("due to configure.num_start_from")
+        print("log start from:\t",'log_'+str(log_count))
 
     if args.si and args.si > log_count:
-        print("log start from:\t",'log_'+str(args.si))
         log_count = args.si
+        print("log start from:\t",'log_'+str(args.si))
 
+    print(f"log_count: {log_count}, numFI: {configure.numFI}")
     for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开始写记录
         sys.stdout = sys.__stdout__
         print("\n----------------------------Test "+str(i)+"----------------------------")
         #clean up for this round
         silentremove(faultinject.instructionfile)
         silentremove(faultinject.nextpcfile)
+        silentremove(configure.activate)
         try:
             print("sig.executeProgram start......")
-            print(os.path.join(configure.log_path,'log_'+str(i)))
+            print("log:\t",os.path.join(configure.log_path,'log_'+str(i)))
             sig_time1 = datetime.datetime.now()
             print(sig_time1)
 
-            GDB_LAUNCH = "gdb " + configure.benchmark
             sig = sighandler.SigHandler(totalcount,i)	
             sig.executeProgram(sig.process)
             
@@ -188,6 +210,7 @@ if __name__ == "__main__":
 
         finally:
             if 'exit_flag' in locals() and exit_flag:
+                print(f"exit_flag: {exit_flag}")
                 sys.exit(0)  # 退出程序
             print(f"Finished processing test {i}, moving to the next test.")
             continue

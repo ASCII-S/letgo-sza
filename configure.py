@@ -2,15 +2,17 @@ import os
 pin_home = "/home/tongshiyu/pin/pin"
 letgo_base_home = "/home/tongshiyu/pin/source/tools/letgo"
 toolbase = "/home/tongshiyu/pin/source/tools/pinfi"
+filib = toolbase + "/obj-intel64/faultinjection.so"
 pin_tool_config = "/home/tongshiyu/pin/source/tools/pinfi/config_pintool.h"
 Rodinia_base = "/home/tongshiyu/programs/rodinia-master"
 #toolbase = "/home/tongshiyu/pin/source/tools/pb_interceptor-master"
 pin_base = "/home/tongshiyu/pin"
-instcount = "inscount.out"
+instcount = "pin.instcount.txt"
 
 
 progname = "bfs"
-numFI = 1
+numFI = 1000
+num_start_from = 0
 inject_op = 'all' ##用all表示不进行启发式注错
 #inject_op = '' 
 
@@ -116,6 +118,7 @@ cmp_str = "Compare within tolerance("+str(tolerance)+"):\t"
 result_path = os.path.join(letgo_base_home,"BenchmarkResult")
 #result_path = os.path.join(letgo_base_home,"nosdcarchive","BenchmarkResult")
 
+prog_folder = os.path.join(result_path,progname)
 log_path = os.path.join(result_path,progname,"log")
 sdcout_folder = os.path.join(result_path,progname,"sdcout")
 instpool_folder = os.path.join(result_path,progname)
@@ -132,3 +135,7 @@ C_MASKED = 'C-Masked'
 C_SDC = 'C-SDC'
 DOUBLE_CRASH = 'Double crash'
 CRASH_NOPC = 'crash'
+
+# about faultinjection.cpp
+pin_instcount = "./pin.instcount.txt"
+activate = "./activate"
