@@ -584,7 +584,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 df.loc[0,'ErrSpd_Fix'] = str(max_error_spread)+'+'
 
             ###SDC判断
-            special_bias_app_list = ["HPCCG","hpl"]
+            special_bias_app_list = ["HPCCG","hpl","miniFE","miniMD"]
             if configure.progname not in special_bias_app_list and configure.cmp_str in line:
                 df.loc[0,'bias'] = line.split('(')[1].split(')')[0].strip()
             #hpl
@@ -593,13 +593,20 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
             #HPCCG
             if "Final residual:" in line:
                 df.loc[0,'bias'] = line.split(':')[1].strip()
-
+            #miniFE
+            if "Final Resid Norm" in line:
+                df.loc[0,'bias'] = line.split(':')[1].strip()
+            #miniMD
+    #判断完一条log后的总结
     if not pd.isna(df.loc[0,'Sig1pc']) and asm_file is not None and not findins.judge_address_in_asm(str(df.loc[0,'Sig1pc']).replace('0x', ''), asm_file) :
         # 如果地址不在汇编文件中
         #print("crash:",df.loc[0,'input_file'],'\t',df.loc[0,'Sig1pc'])
         df.loc[0, 'Sig1Ins'] = 'null'
         df.loc[0, 'result'] = ANIA
-    
+
+    # if configure.progname in special_bias_app_list:
+    #     if configure.progname == "HPCCG":
+            
     # 构造输出文件路径
     output_file = os.path.join(output_dir, outputname)
 
