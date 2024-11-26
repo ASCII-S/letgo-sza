@@ -607,10 +607,19 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
     if configure.progname in special_bias_app_list:
         if configure.progname == "miniFE":
             golden_bias = 4.45306e-06
-            if abs(df.loc[0,'bias'] - golden_bias) > 10.0e-06
+            #默认最严格的sdc判定，如果误差小，就将sdc进化成masked
+            if abs(df.loc[0,'bias'] - golden_bias) < 10.0e-06:
+                if df.loc[0,'result'] == 'SDC':
+                     df.loc[0,'result'] = 'Masked'
+                if df.loc[0,'result'] == 'C-SDC':
+                     df.loc[0,'result'] = 'C-Masked'
         if configure.progname == "HPCCG":
             golden_bias = 2.21357e-28
-            if abs(df.loc[0,'bias'] - golden_bias) > 10.0e-28
+            if abs(df.loc[0,'bias'] - golden_bias) > 10.0e-28:
+                if df.loc[0,'result'] == 'SDC':
+                     df.loc[0,'result'] = 'Masked'
+                if df.loc[0,'result'] == 'C-SDC':
+                     df.loc[0,'result'] = 'C-Masked'
             
     # 构造输出文件路径
     output_file = os.path.join(output_dir, outputname)
