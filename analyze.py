@@ -604,8 +604,13 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
         df.loc[0, 'Sig1Ins'] = 'null'
         df.loc[0, 'result'] = ANIA
 
-    # if configure.progname in special_bias_app_list:
-    #     if configure.progname == "HPCCG":
+    if configure.progname in special_bias_app_list:
+        if configure.progname == "miniFE":
+            golden_bias = 4.45306e-06
+            if abs(df.loc[0,'bias'] - golden_bias) > 10.0e-06
+        if configure.progname == "HPCCG":
+            golden_bias = 2.21357e-28
+            if abs(df.loc[0,'bias'] - golden_bias) > 10.0e-28
             
     # 构造输出文件路径
     output_file = os.path.join(output_dir, outputname)
