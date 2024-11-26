@@ -585,7 +585,7 @@ class SigHandler:
                 print(PRT_ERR_LEN_INJ_SIG,stepi_num)
             if seq_casuse_signal == 1:
                 print(PRT_ERR_LEN_FIX_SIG,stepi_num)
-        else:#附近没有出错
+        else:  #附近没有出错
             if seq_casuse_signal == 0:
                 print(PTR_ERR_INJ_MAX)
             if seq_casuse_signal == 1:
@@ -657,7 +657,7 @@ class SigHandler:
                 return
             
             print(args)
-            nextpc = args[0]    ##ins的下一条指令
+            nextpc = args[0]    ##ins的下一条指令的pc值
             regwlist = args[1]  ##ins的所有写寄存器的列表
             stack = args[2]     ##ins是栈操作则和base相同,否则为nostack
             flag = args[3]      ## stackw: 1, stackr: 2 , nostack: 3
@@ -1000,7 +1000,42 @@ class SigHandler:
         print("Now Time:\t" , (datetime.datetime.now()))
 
 
+    def inject_by_breakpoint_and_recover(self,process):
+        self.inject_inst_by_breakpoint(process)
 
+
+        self.handle_after_injection(process)
+
+    def inject_by_pinfi_and_recover(self,process):
+        self.process_remote_target = self.inject_inst_by_faultinjection(process)
+        self.handle_after_injection(process)
+
+        print("app output:")
+        while True:
+            try:
+                # 等待进程输出，直到超时或进程结束
+                self.process_remote_target.expect(pexpect.EOF, timeout=300)  # 增加超时确保进程结束
+                
+                # 获取并打印进程输出
+                output = self.process_remote_target.before.decode('utf-8')
+                if output:
+                    print(output)
+                break  # 退出循环，进程已结束
+            except pexpect.exceptions.TIMEOUT as e:
+                # 如果超时，打印当前所有输出内容并继续等待
+                output = self.process_remote_target.before.decode('utf-8')
+                print("Timeout reached, current output:")
+                print(output)
+                continue  # 继续等待输出，直到 EOF 结束
+            except pexpect.exceptions.ExceptionPexpect as e:
+                # 捕获其他 pexpect 异常
+                print("Error:", e)
+                break
+        print("end output.")
+        
+        print("injection info:")
+        self.print_file_to_log(configure.activate)
+        print("end injection info.")
 
     def executeProgram(self,process):
         global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT, GDB_CONTINUE, GDB_FAKE
@@ -1038,32 +1073,7 @@ class SigHandler:
                 process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 print(process.before.decode('utf-8'))  
 
-        self.process_remote_target = self.inject_inst_by_faultinjection(process)
-        self.handle_after_injection(process)
-
-        print("app output:")
-        while True:
-            try:
-                # 等待进程输出，直到超时或进程结束
-                self.process_remote_target.expect(pexpect.EOF, timeout=300)  # 增加超时确保进程结束
-                
-                # 获取并打印进程输出
-                output = self.process_remote_target.before.decode('utf-8')
-                if output:
-                    print(output)
-                break  # 退出循环，进程已结束
-            except pexpect.exceptions.TIMEOUT as e:
-                # 如果超时，打印当前所有输出内容并继续等待
-                output = self.process_remote_target.before.decode('utf-8')
-                print("Timeout reached, current output:")
-                print(output)
-                continue  # 继续等待输出，直到 EOF 结束
-            except pexpect.exceptions.ExceptionPexpect as e:
-                # 捕获其他 pexpect 异常
-                print("Error:", e)
-                break
-        print("end output.")
-
-        print("injection info:")
-        self.print_file_to_log(configure.activate)
-        print("end injection info.")
+        if configure.injectmode == 'pinfi':
+            self.inject_by_pinfi_and_recover(process)
+        elif configure.injectmode == 'breakpoint':
+            self.inject_by_breakpoint_and_recover(process)

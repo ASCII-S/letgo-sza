@@ -584,11 +584,15 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 df.loc[0,'ErrSpd_Fix'] = str(max_error_spread)+'+'
 
             ###SDC判断
+            special_bias_app_list = ["HPCCG","hpl"]
+            if configure.progname not in special_bias_app_list and configure.cmp_str in line:
+                df.loc[0,'bias'] = line.split('(')[1].split(')')[0].strip()
+            #hpl
             if "||Ax-b||_oo/(eps*(||A||_oo*||x||_oo+||b||_oo)*N)=" in line:
                 df.loc[0,'bias'] = line.split('=')[1].split("......")[0].strip()
-            if configure.cmp_str in line:
-                df.loc[0,'bias'] = line.split('(')[1].split(')')[0].strip()
-                
+            #HPCCG
+            if "Final residual:" in line:
+                df.loc[0,'bias'] = line.split(':')[1].strip()
 
     if not pd.isna(df.loc[0,'Sig1pc']) and asm_file is not None and not findins.judge_address_in_asm(str(df.loc[0,'Sig1pc']).replace('0x', ''), asm_file) :
         # 如果地址不在汇编文件中

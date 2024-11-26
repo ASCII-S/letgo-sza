@@ -232,7 +232,7 @@ if __name__ == "__main__":
     if configure.num_end_at < end :
         end = configure.num_end_at
     print(f"index start: {start}, index end: {end}")
-    for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开始写记录
+    for i in range(start,end):    ##从序号log_count开始写记录
         sys.stdout = sys.__stdout__
         print("\n----------------------------Test "+str(i)+"----------------------------")
         #clean up for this round

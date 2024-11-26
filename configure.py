@@ -17,13 +17,23 @@ prognames_supply = [
     # mantevo
     "HPCCG", "miniFE", "miniMD", "miniAMR"
 ]
+#应用名取自prognames_supply
+progname = "HPCCG"
 
-progname = "backprop"
+#实验次数
 numFI = 5000
 
+#log起始index
 num_start_from = 0
-num_end_at = 5000
-inject_op = 'all' ##用all表示不进行启发式注错
+#log终止index
+num_end_at = 5000   
+
+#注错模式
+injectmode = 'pinfi'
+#injectmode = 'breakpoint'
+
+#废案
+inject_op = 'all' ##用all表示不进行启发式注错,已废弃
 #inject_op = '' 
 
 
