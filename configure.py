@@ -9,10 +9,20 @@ Rodinia_base = "/home/tongshiyu/programs/rodinia-master"
 pin_base = "/home/tongshiyu/pin"
 instcount = "pin.instcount.txt"
 
+prognames_supply = [
+    # rodinia
+    "amg", "b+tree", "backprop", "bfs", "heartwall", "hotspot", "hotspot3D", 
+    "hpl", "kmeans", "knn", "lu", "lavaMD", "leukocyte", "myocyte", "needle", 
+    "srad", "nn", "particlefilter", "streamcluster", 
+    # mantevo
+    "HPCCG", "miniFE", "miniMD", "miniAMR"
+]
 
-progname = "bfs"
-numFI = 1000
+progname = "backprop"
+numFI = 5000
+
 num_start_from = 0
+num_end_at = 5000
 inject_op = 'all' ##用all表示不进行启发式注错
 #inject_op = '' 
 
@@ -25,13 +35,13 @@ if progname == "amg":                                   ## amg    ----------有�
 elif progname == "b+tree":                            ## backprop
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/b+tree/b+tree"
     optionlist = ['file' ,'/home/tongshiyu/programs/rodinia-master/data/b+tree/mil.txt' ,'command' ,'/home/tongshiyu/programs/rodinia-master/data/b+tree/command.txt']
-    pcstart = "400d28"
-    pcend = "40551c"
+    pcstart = "400f90"
+    pcend = "405510"
 elif progname == "backprop":                            ## backprop
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/backprop/backprop"
     optionlist = ['65536']
-    pcstart = "400968"
-    pcend = "401f1c"
+    pcstart = "400ad0"
+    pcend = "4024d0"
 elif progname == "bfs": 
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/bfs/bfs"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/bfs/inputGen/graph64k.txt"
@@ -42,38 +52,49 @@ elif progname == "heartwall":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/heartwall/heartwall"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/heartwall/test.avi"
     optionlist = [datafile,'20']
-    pcstart = "400740"
-    pcend = "400cd0"
+    pcstart = "400f00"
+    pcend = "407440"
 elif progname == "hotspot":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/hotspot"
     optionlist = ['64','64','2','1',"/home/tongshiyu/programs/rodinia-master/data/hotspot/temp_64",'/home/tongshiyu/programs/rodinia-master/data/hotspot/power_64', 'output.txt']
-    pcstart = "4007e0"
-    pcend = "4018fc"
+    pcstart = "400920"
+    pcend = "401fd0"
 elif progname == "hotspot3D":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/hotspot3D/3D"
     optionlist = ['512','8','100',"/home/tongshiyu/programs/rodinia-master/data/hotspot3D/power_512x8",'/home/tongshiyu/programs/rodinia-master/data/hotspot3D/temp_512x8', 'output.txt']
-    pcstart = "400b08"
-    pcend = "401d8c"
+    pcstart = "400ce0"
+    pcend = "401d80"
 elif progname == 'hpl':
     progbin = "/home/tongshiyu/programs/hpl-2.3/testing/xhpl"
     optionlist = ['']
-    pcstart = "401060"
-    pcend = "41d6ec"
+    pcstart = "4013d0"
+    pcend = "41fbd0"
 elif progname == "kmeans":                              ## Kmeans
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/kmeans/kmeans"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/kmeans/inputGen/1000_34.txt"
     optionlist = ['-i', datafile]
-    pcstart = "400b58"
-    pcend = "401b7c"
+    pcstart = "400d50"
+    pcend = "401b70"
 elif progname == "knn":                                 ## KNN
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn"
     datafile = ("/home/tongshiyu/programs/rodinia-master/openmp/nn/cane10k.db")
     optionlist = [datafile, '5', '30', '90']
 elif progname == 'lu':
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/lud/lud"
-    optionlist = ['-s512 -v']
-    pcstart = "400b40"
-    pcend = "401bac"
+    optionlist = ['-s512']
+    pcstart = "400df0"
+    pcend = "401d30"
+elif progname == 'lavaMD':
+    progbin = "/home/tongshiyu/programs/rodinia-master/openmp/lavaMD/lavaMD"
+    optionlist = ['-boxes1d', '10']
+    pcstart = "400a40"
+    pcend = "401890"
+elif progname == 'leukocyte':
+    progbin = "/home/tongshiyu/programs/rodinia-master/openmp/leukocyte/leukocyte"
+    datafile = "/home/tongshiyu/programs/rodinia-master/data/leukocyte/testfile.avi"
+    optionlist = ['5', '4', datafile]
+    pcstart = "401540"
+    pcend = "41fc90"
 elif progname == "myocyte":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/myocyte/myocyte"
     optionlist = ['1000', '1', '0', '4']
@@ -87,12 +108,56 @@ elif progname == "srad":
     optionlist = ['15', '0.5', '285', '250', '1']
     pcstart = "400910"
     pcend = "401ddc"
+elif progname == "nn":
+    progbin = "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn"
+    datafile = "/home/tongshiyu/programs/rodinia-master/openmp/nn/filelist.txt"
+    optionlist = [datafile,'5', '30', '90']
+    pcstart = "400aa0"
+    pcend = "401390"
+elif progname == "particlefilter":
+    progbin = "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/particle_filter"
+    optionlist = ['-x', '64', '-y', '64', '-z', '5', '-np', '1000']
+    pcstart = "400960"
+    pcend = "402c00"
+elif progname == "streamcluster":
+    progbin = "/home/tongshiyu/programs/rodinia-master/openmp/streamcluster/streamcluster"
+    optionlist = ["10", "20", "256", "4096", "4096", "100", "none", "output.txt", "1"]
+    pcstart = "4011e0"
+    pcend = "403e30"
+elif progname == "HPCCG":                               ## HPCCG
+    progbin = "/home/tongshiyu/programs/mantevo/HPCCG/test_HPCCG"
+    optionlist = ['50', '50', '50']
+    pcstart = "4021a0"
+    pcend = "40b550"
+elif progname == "miniAMR":                               ## minife
+    progbin = "/home/tongshiyu/programs/mantevo/miniAMR/ref/miniAMR.x"
+    optionlist = ["--npx 1 --npy 1 --npz 1", "--report_diffusion","--checksum_freq", "10"]
+    pcstart = "401110"
+    pcend = "43a2c0"
+elif progname == "miniFE":                               ## minife
+    progbin = "/home/tongshiyu/programs/mantevo/miniFE/openmp/basic/miniFE.x"
+    optionlist = ['nx=30','verify_solution=1']
+    pcstart = "402ba0"
+    pcend = "41de90"
+elif progname == "miniMD":                               ## minife
+    progbin = "/home/tongshiyu/programs/mantevo/miniMD/ref/miniMD"
+    optionlist = []
+    pcstart = "401930"
+    pcend = "416650"
 
 benchmark = progbin
 args = optionlist
 
+# mpirun
+MPI_SET = 0
+mpi_cmd = ["mpirun","-np","1"]
+MPI_APP = ["HPCCG","miniAMR","miniFE","miniMD"]
+if progname in MPI_APP:
+    MPI_SET = 1
+
+
 # configuration of save outputs
-OpenMpOutPutList = ['b+tree','backprop', 'bfs', 'heartwall', 'hotspot', 'hotspot3D','kmeans', 'lavaMD', 'leukocyte', 'nn', 'particlefilter', 'streamcluster']
+OpenMpOutPutList = ['b+tree','backprop', 'bfs', 'heartwall', 'hotspot', 'hotspot3D','kmeans', 'lavaMD', 'leukocyte', 'lu', 'nn', 'particlefilter', 'streamcluster']
 SdcAppList = ['lu','hpl'].append(OpenMpOutPutList)
 if progname in ['b+tree','bfs','heartwall','hotspot','kmeans','lavaMD','leukocyte','nn','particlefilter','streamcluster']:
     output_name = 'output.txt'
@@ -101,17 +166,20 @@ elif progname in ['leukocyte']:
 elif progname == 'backprop':
     output_name = 'output.dat'
 elif progname == 'lu':
+    output_name = 'lu_matrix_512.txt'
     lu_output_name = 'lu_matrix_512.txt'
     m_output_path = 'm_matrix_512.txt'
+elif progname in ['miniMD','miniFE','HPCCG']:
+    output_name = 'none'
 
 # configuration of sdc tolerance
-tolerance = 1e-2
+tolerance = 0.0
 lu_tolerance = 1e-4
 if progname == 'hotspot3D':
     tolerance = 1e-2
 if progname == 'lu':
     lu_tolerance = 1e-4
-cmp_str = "Compare within tolerance("+str(tolerance)+"):\t"
+cmp_str = "Compare within tolerance("+str(tolerance)+"):"
 
 
 # configuration of folder
@@ -133,7 +201,7 @@ MASKED = 'Masked'
 SDC = 'SDC'
 C_MASKED = 'C-Masked'
 C_SDC = 'C-SDC'
-DOUBLE_CRASH = 'Double crash'
+DOUBLE_CRASH = 'Recrash'
 CRASH_NOPC = 'crash'
 
 # about faultinjection.cpp

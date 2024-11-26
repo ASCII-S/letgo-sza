@@ -1063,4 +1063,7 @@ class SigHandler:
                 print("Error:", e)
                 break
         print("end output.")
+
+        print("injection info:")
         self.print_file_to_log(configure.activate)
+        print("end injection info.")

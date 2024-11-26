@@ -37,6 +37,51 @@ def execute(execlist,out,err):
         return "timed-out"
 
 
+def run_command(command):
+    """
+    运行命令行并返回输出结果。
+
+    参数:
+        command (list): 要执行的命令行，以列表形式传入，例如 ["python3.8", "../analyze.py"]。
+
+    返回:
+        dict: 包含标准输出、标准错误和返回码的字典。
+    """
+    try:
+        # 执行命令
+        result = subprocess.run(
+            command,                     # 命令及参数
+            check=True,                  # 如果命令返回非零值，抛出 CalledProcessError
+            text=True,                   # 输出解码为字符串
+            capture_output=True          # 捕获标准输出和标准错误
+        )
+        
+        # 返回成功结果
+        return {
+            "stdout": result.stdout.strip(),
+            "stderr": result.stderr.strip(),
+            "returncode": result.returncode,
+        }
+
+    except subprocess.CalledProcessError as e:
+        # 捕获命令失败的异常
+        return {
+            "stdout": e.stdout.strip() if e.stdout else "",
+            "stderr": e.stderr.strip() if e.stderr else "",
+            "returncode": e.returncode,
+            "error": f"Command failed with return code {e.returncode}",
+        }
+
+    except Exception as e:
+        # 捕获其他异常
+        return {
+            "stdout": "",
+            "stderr": "",
+            "returncode": -1,
+            "error": f"An unexpected error occurred: {e}",
+        }
+
+
 def silentremove(filename):
     try:
         os.remove(filename)
@@ -114,7 +159,12 @@ if __name__ == "__main__":
 
     instcount = configure.toolbase + "/obj-intel64/instcount.so"
     print (instcount)
-    execlist = [configure.pin_home,"-t",instcount,'-o',configure.pin_instcount,"--",configure.benchmark]
+    execlist = []
+    if configure.MPI_SET == 1:
+        execlist.extend(configure.mpi_cmd)
+    
+    pin_benchmark = [configure.pin_home,"-t",instcount,'-o',configure.pin_instcount,"--",configure.benchmark]
+    execlist.extend(pin_benchmark)
 
     for item in configure.args:
         execlist.append(item)
@@ -176,8 +226,12 @@ if __name__ == "__main__":
     if args.si and args.si > log_count:
         log_count = args.si
         print("log start from:\t",'log_'+str(args.si))
-
-    print(f"log_count: {log_count}, numFI: {configure.numFI}")
+    
+    start = log_count
+    end = log_count + configure.numFI
+    if configure.num_end_at < end :
+        end = configure.num_end_at
+    print(f"index start: {start}, index end: {end}")
     for i in range(log_count,log_count+configure.numFI):    ##从序号log_count开始写记录
         sys.stdout = sys.__stdout__
         print("\n----------------------------Test "+str(i)+"----------------------------")
@@ -190,7 +244,6 @@ if __name__ == "__main__":
             print("log:\t",os.path.join(configure.log_path,'log_'+str(i)))
             sig_time1 = datetime.datetime.now()
             print(sig_time1)
-
             sig = sighandler.SigHandler(totalcount,i)	
             sig.executeProgram(sig.process)
             
@@ -215,6 +268,17 @@ if __name__ == "__main__":
             print(f"Finished processing test {i}, moving to the next test.")
             continue
         print("sig time: ",sig_time2 - sig_time1)
+    
+    # 实验完成自动分析
+    sys.stdout = sys.__stdout__
+    command = ["python3.8",os.path.join(configure.letgo_base_home,"sdcjudger.py")]
+    result = run_command(command)
+    print(result.get("stdout","No sdcout"))
+
+    command = ["python3.8",os.path.join(configure.letgo_base_home,"analyze.py"),"-bname",configure.progname]
+    result = run_command(command)
+    print(result.get("stdout","No analyze output"))
+
 
 
 

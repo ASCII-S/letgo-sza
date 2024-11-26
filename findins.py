@@ -66,8 +66,6 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope,df_Fun
         if len(hex_sig1pc) != 6 or not re.match(r'^[0-9a-fA-F]{6}$', hex_sig1pc):
             continue  # 如果不符合六位十六进制地址的格式，跳过当前循环
 
-        if debug_mode >= 6:
-            print("\nhex_sig1pc:\t",hex_sig1pc)
         # 双指针遍历 asm 文件
         while asm_idx < asm_len:
             asm_line = asm_lines[asm_idx].strip()
@@ -88,18 +86,22 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope,df_Fun
             if asm_address == hex_sig1pc:
                 # 提取并保存指令部分（: 后面的内容）
                 instruction = asm_line[30:]
-                if df.at[idx, df_Ins] == 'null':
-                    df.at[idx, df_Ins] = instruction.strip('"')  # 存储到 DataFrame 中
-                if df.at[idx, df_Ope] == 'null':
-                    df.at[idx, df_Ope] = instruction.split(' ')[0]  # 存储到 DataFrame 中
-                if df.at[idx, df_Func] == 'null':
+                # 判断 'df_Ins' 列是否为 NaN，如果是则存储到 DataFrame 中
+                if pd.isna(df.at[idx, df_Ins]) or df.at[idx, df_Ope] == 'null':
+                    df.at[idx, df_Ins] = instruction.strip('"')
+
+                # 判断 'df_Ope' 列是否为 'null'，如果是则存储到 DataFrame 中
+                if pd.isna(df.at[idx, df_Ope]) or df.at[idx, df_Ope] == 'null':
+                    df.at[idx, df_Ope] = instruction.split(' ')[0]
+
+                # 判断 'df_Func' 列是否为 'null'，如果是则存储到 DataFrame 中
+                if pd.isna(df.at[idx, df_Func]) or df.at[idx, df_Func] == 'null':
                     df.at[idx, df_Func] = func
                 break
             elif asm_address > hex_sig1pc:
                 # 如果 asm 地址已经超过 sig1pc，退出内层循环
                 idx += 1
                 break
-
             asm_idx += 1  # 移动 asm 指针到下一行
     #print(df)
     return df

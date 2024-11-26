@@ -21,7 +21,7 @@ delbug = 0
 ## to_csv =1 will collect all information to csv under log_path,but cost much more time
 to_csv = 1
 ## findins = 1 will auto find Sig1ins and Sig2ins according to Sig*pc and asm  
-findmorebypc = 0
+findmorebypc = 1
 ## the more debug_mode increase ,the more info been printed
 debug_mode = 5
 ## show file example find by string like "No reg, Exit"
@@ -34,6 +34,7 @@ parser.add_argument('-flag', type=str, help='flag means the number of Sig receiv
 parser.add_argument('-sdc_flag', type=str, help='sdc_flag means the number of SDC')
 
 parser.add_argument('-bname', type=str, help='bname means benchmark name')
+parser.add_argument('-analyze_all', type=str, help='analyze all application one time')
 parser.add_argument('-p', type=str, help="picture type")
 parser.add_argument('-t', type=str, help="Table type")
 args = parser.parse_args()
@@ -52,7 +53,7 @@ flag = 0
 unfinishedlist = []
 output = []
 
-log_dir = configure.log_path  ##数据源目录
+log_dir = os.path.join(configure.result_path,progname,"log")  ##数据源目录
 print("log_dir in:\t",log_dir)
 if not (os.path.exists(log_dir) and os.path.isdir(log_dir)):
     print("{} does not exist or is not a directory".format(log_dir))
@@ -60,10 +61,6 @@ if not (os.path.exists(log_dir) and os.path.isdir(log_dir)):
 
 csv_dir = configure.csv_folder                  ##将log_dir的海量数据收集整理到csv_dir中
 pic_dir = configure.pic_folder
-
-"""#选定csv文件分析
-csv_dir = os.path.join(configure.letgo_base_home,"nosdcarchive/CSV")
-pic_dir = os.path.join(configure.letgo_base_home,"nosdcarchive/PIC")"""
 
 
 # 直接从 configure 中导入所需的变量
@@ -74,6 +71,10 @@ C_MASKED = configure.C_MASKED
 C_SDC = configure.C_SDC
 DOUBLE_CRASH = configure.DOUBLE_CRASH
 CRASH_NOPC = configure.CRASH_NOPC
+# CAM = 'CntAccMem'
+# ANIA = 'AdrsNotInAsm'
+CAM = CRASH_NOPC
+ANIA = CRASH_NOPC
 
 max_error_spread = sighandler.MAX_ERROR_SPREAD
 
@@ -198,7 +199,7 @@ def search_string_in_log():
 
 def read_logs(progname):
     global file_count, crash_1, crash_2, crash_2p, finish, flag, detected, correct, sdc, unfinishedlist, output
-
+    log_dir = os.path.join(configure.result_path,progname,"log") 
     if to_csv == 1:
         csv_file_path = os.path.join(log_dir, csv_dir, progname + '.csv')
         # 检查文件是否存在，如果存在则删除
@@ -214,13 +215,15 @@ def read_logs(progname):
         key=lambda x: int(re.search(r'(\d+)', x).group())
     )
 
-
+    
+    print("deal with log folfer:\t",log_dir)
     for f in log_files:
 
         file_count += 1
         f = os.path.join(log_dir, f)
         flag = 0
         sdc_flag = -1
+        after_letgoin = 0
         with open(f, "r", encoding='utf-8', errors='ignore') as log:
             unfinished = 0
             lines = log.readlines()
@@ -238,11 +241,17 @@ def read_logs(progname):
                         os.remove(f)  # 删除文件
                         print("delete:\t", f)
                         break
-                if "Program received signal" in line:
-                    flag += 1
+                if "Program received signal" in line and not after_letgoin and flag == 0:
+                    flag = 1
+                if "Letgo in!" in line :
+                    after_letgoin = 1
+                if "Program received signal" in line and after_letgoin and flag == 1:
+                    flag = 2
+                if "application generate no output" in line:
+                    flag = 2
                 if "No nextpc file is generated!" in line or "Crash place getting no PC" in line:
                     sdc_flag = 0
-                    flag += 1
+                    flag = 2
                 if "1 tests completed and " in line:  # hpl
                     sdc_flag = 0
                     if "failed residual checks" in line:
@@ -279,40 +288,70 @@ def read_logs(progname):
                 crash_2p.append(f)
             if flag == 0:
                 finish.append(f)
-
         if to_csv == 1:
             extract_values_and_append_to_csv(f, log_dir, progname + '.csv', flag, sdc_flag)
 
-"""
-    print("crash1:\t",len(crash_1)) ##只收到一次越界错误segmentfault
-    print("crash2:\t",len(crash_2)) ##收到两次越界错误
-    print("no crash finish:\t",len(finish))  ##一次错误都没有,直接结束
-    ############
-    #print("sdc:\t",len(sdc))
-    #print("detected:\t",len(detected))
-    print("file count:",file_count)
-    print("unfinishedlist:",len(unfinishedlist))
-    print("valid countL",file_count-len(unfinishedlist))
 
-    n = 5
-    print("\ncrash1:\t",crash_1[:n])
-    find_and_print_sig_time(os.path.join(crash_1[0]))
-    print("crash2:\t",crash_2[:n])
+def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope', SigFunc='Sig1Func', address=None, asm_file=None, df=None, file=None, insline_context = None):
+    """
+    从 GDB 输出中提取指令信息并更新 DataFrame。
+    """
+    if df is None or file is None:
+        print("Error: DataFrame or line is missing.")
+        return
+    
     try:
-        print("crash2+:\t",crash_2p[:n])
-        print("crash2+len:\t",len(crash_2p))
-    except:
-        print("no crash2+")
-    if len(crash_2)>1:
-        find_and_print_sig_time(os.path.join(crash_2[0]))
-    #print("sdc:\t",sdc[:n])
-    #print(detected[:n])
-    print("no crash finish:\t",finish[:n]) 
-    find_and_print_sig_time(os.path.join(finish[0]))
-    #print("unfinishedlist:",unfinishedlist[:n])
-    #find_and_print_sig_time(os.path.join(unfinishedlist[0]))
-    #print(list(set(crash_1).difference((set(crash_1) & set(correct))))[:n])
-"""
+        # 提取指令行
+        line = insline_context
+        insline = "=> "+line.split("=>")[-1].strip("(gdb)").strip()
+        # 更新 Sigpc
+        df.loc[0, Sigpc] = insline.split('=>')[-1].split(':')[0].split('<')[0].strip()
+        if address == 'null':
+            address = df.loc[0, Sigpc]
+        # 处理 'Cannot' 错误情况
+        if Sig=='Sig1':
+            if 'Cannot' in insline :
+                df.loc[0, SigIns] = 'null'
+                df.loc[0, 'result'] = CAM
+                return
+            if asm_file is not None and not findins.judge_address_in_asm(address.replace('0x', ''), asm_file) :
+                # 如果地址不在汇编文件中
+                #print("crash:",df.loc[0,'input_file'],'\t',address)
+                df.loc[0, SigIns] = 'null'
+                df.loc[0, 'result'] = ANIA
+                return
+            
+        # 提取函数名
+        if len(insline.split('<')) > 1:
+            df.loc[0, SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0]
+        else:
+            df.loc[0, SigFunc] = 'null'
+
+        # 提取指令
+        if len(insline.split(':')) > 1:
+            df.loc[0, SigIns] = insline.split(':')[1].strip()
+            if insline.split(':')[1].strip()=='':
+                nextline = next(file,None).strip()
+                df.loc[0, SigIns] = nextline
+        else:
+            df.loc[0, SigIns] = insline.split(':')[-1].replace('"', '').strip()
+        # 提取操作
+        if 'rex' in df.loc[0, SigIns]:
+            if len(df.loc[0, SigIns].split(' ')) > 1:
+                df.loc[0, SigOpe] = df.loc[0, SigIns].split(' ')[1]
+            else:
+                df.loc[0, SigOpe] = df.loc[0, SigIns]
+        else:
+            df.loc[0, SigOpe] = df.loc[0, SigIns].split(' ')[0]
+
+        # if df.loc[0,'result'] == 'crash':
+        #     print(df.loc[0,'input_file'])
+        #     print("Line:", line)
+        #     print("insLine:", insline)
+    except Exception as e:
+        print(f"Error processing signal information for {Sig}: {e}")
+        print(df.loc[0, 'input_file'],"\tLine:", line)
+
 
 def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_flag):
     if debug_mode >=6:
@@ -323,7 +362,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
         os.makedirs(output_dir)  # 如果目录不存在则创建
 
     # 创建一个空的 DataFrame
-    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
+    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
 
 
     if flag == 0:
@@ -331,16 +370,20 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
         if sdc_flag == 1:
             df.loc[0, 'result'] = SDC
     elif flag == 1:
-        df.loc[0, 'result'] = C_MASKED
+        if sdc_flag == 0:
+            df.loc[0, 'result'] = C_MASKED
         if sdc_flag == 1:
             df.loc[0, 'result'] = C_SDC
+        if sdc_flag == -1:
+            df.loc[0, 'result'] = 'C-unknown'
     elif flag == 2:
         df.loc[0, 'result'] = DOUBLE_CRASH
     else:
-        df.loc[0, 'result'] = CRASH_NOPC
+        df.loc[0, 'result'] = 'crash2+'
         
     # 获取文件名
     file_name = os.path.basename(input_file)
+    asm_file = os.path.join(configure.asm_folder,progname+'.asm')
     df.loc[0,'input_file'] = file_name
 
     # 读取文件并提取所需内容
@@ -348,6 +391,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
         values = ['null'] * 4
         SIGcount = 0
         Sig1byletgo_Flag = 0
+        after_letgoin = 0
 
         for line in file:
             if "-randinst" in line:##最后一个随机数才是真实使用的随机数
@@ -394,7 +438,11 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                     #os.remove(input_file)
                     print(f"文件 '{input_file}' 需要删除。")
                 continue
-
+            if "fi inject instance:" in line:
+                df.loc[0,'dynamicInstNum'] = line.split(':')[-1].strip()
+            if "Activated:" in line:
+                df.loc[0,'hexpc'] = line.split(' ')[-1].strip()
+                df.loc[0,'injreg'] = line.split('in')[0].strip().split(' ')[-1].strip()
             if "display the inject inst start" in line:
                 next_3_line = next_i_line_content(file,3,"=>")
                 try:
@@ -406,7 +454,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 continue
             
             #首次遇到SIG
-            if "received signal" in line and SIGcount == 0 :#and df.loc[0,'result'] != MASKED:  
+            if "Program received signal" in line and SIGcount == 0 and after_letgoin==0:
                 Sig = 'Sig1'
                 Sigpc = 'Sig1pc'
                 SigIns = 'Sig1Ins'
@@ -419,48 +467,36 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                     df.loc[0,Sig] = tmp.strip()
                     insline = next_i_line_content(file,1,'0x')
                     address = 'null'
-                    asm_file = os.path.join(configure.asm_folder,configure.progname+'.asm')
                     if '0x' in insline and 'in' in insline:
                         df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].lstrip('0x').lstrip('0')
                         address = df.loc[0,Sigpc].lstrip("0x")
                         df.loc[0,SigFunc] = insline.strip().split(' ')[2].strip().split(' ')[0].strip()
-                        
                     insline = next_i_line_content(file,4,'=>')
-                    if '=>' in insline:
-                        df.loc[0,Sigpc] = insline.split('=>')[-1].split(':')[0].split('<')[0].strip()
-                        if address == 'null':
-                            address = df.loc[0,Sigpc]
-                        if 'Cannot' in insline:
-                            df.loc[0,SigIns] = 'Cannot access memory'
-                            df.loc[0, 'result'] = 'CntAccMem'
-                        elif  not findins.judge_address_in_asm(address,asm_file):
-                            #print(address)
-                            df.loc[0,SigIns] = 'null'
-                            df.loc[0, 'result'] = 'AdrsNotInAsm'
-                        else:
-                            if len(insline.split(':')) > 1:
-                                df.loc[0,SigIns] = insline.split(':')[1].strip()
-                            else:
-                                df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip()
-
-                            if 'rex' in df.loc[0,SigIns]:
-                                if len(df.loc[0,SigIns].split(' ')) > 1:
-                                    df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
-                                else:
-                                    df.loc[0,SigOpe] = df.loc[0,SigIns]
-                            else:
-                                df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[0]
-
-                            if len(insline.split('<')) > 1:
-                                df.loc[0,SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0]
-                            else:
-                                df.loc[0,SigFunc] = 'null'
+                    if "=>" in insline:
+                        get_ins_info(Sig, Sigpc, SigIns, SigOpe, SigFunc, address, asm_file, df, file, insline)
                 except Exception as e:
                     print("get info at signal1 fail",input_file)
                     print(e)
                 SIGcount = 1
                 continue
+                
+            if "=>" in line and SIGcount == 1 and after_letgoin==0 and not df.loc[0,'Sig1pc']:
+                Sig = 'Sig1'
+                Sigpc = 'Sig1pc'
+                SigIns = 'Sig1Ins'
+                SigOpe = 'Sig1Ope'
+                SigFunc = 'Sig1Func'
+                address = 'null'
+                insline = line
+                
+                get_ins_info(Sig, Sigpc, SigIns, SigOpe, SigFunc, address, asm_file, df, file)
 
+                continue
+
+            
+            if 'Letgo in!' in line:
+                after_letgoin = 1
+                continue
             if Sig1byletgo_Flag == 1 and 'Letgo in!' in line:
                 tmp = next_i_line_content(file,3,"=")
                 tmp = tmp.split('0x')[-1][:6]
@@ -475,8 +511,26 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                         print("Sig1pc fetched by letgoin:\t",tmp)
                         print("Letgo in! next3line with no valid Sig1pc \t",input_file)
                     continue
-                
 
+            if "parse the pc value" in line and pd.isna(df.loc[0,'Sig1pc']) :
+                try:
+                    print_pc = next_i_line_content(file,2,"=")
+                    df.loc[0,'Sig1pc'] = '0x' + print_pc.split('0x')[1].split(' ')[0]
+                except:
+                    print("no sig1pc in:\t",df.loc[0,'input_file'])
+
+            if "multiple options" in line:
+                df.loc[0,'Heuristic'] = "h_0"
+                continue
+            if "is stackr: have set reg with address calculation" in line or "h_1" in line:
+                df.loc[0,'Heuristic'] = "h_1"
+                continue
+            if "not stackr,so set fake:" in line or "h_2" in line:
+                df.loc[0,'Heuristic'] = "h_2"
+                continue
+            if "Set the" in line or "h_3" in line:
+                df.loc[0,'Heuristic'] = "h_3"
+                continue
 
             if "Inj2Sig" in line.strip():
                 #print(line)
@@ -487,7 +541,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 continue
 
             #再次遇到SIG
-            if "received signal" in line and SIGcount == 1 :#and df.loc[0,'result'] == DOUBLE_CRASH:  
+            if "Program received signal" in line and SIGcount == 1 and after_letgoin==1:#and df.loc[0,'result'] == DOUBLE_CRASH:  
                 Sig = 'Sig2'
                 Sigpc = 'Sig2pc'
                 SigIns = 'Sig2Ins'
@@ -499,46 +553,30 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                     df.loc[0,Sig] = tmp.strip()
                     insline = next_i_line_content(file,1,'0x')
                     address = 'null'
-                    asm_file = os.path.join(configure.asm_folder,configure.progname+'.asm')
+                    asm_file = os.path.join(configure.asm_folder,progname+'.asm')
                     if '0x' in insline and 'in' in insline:
                         df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].lstrip('0x').lstrip('0')
                         address = df.loc[0,Sigpc].lstrip("0x")
                         df.loc[0,SigFunc] = insline.strip().split(' ')[2].strip().split(' ')[0].strip()
                         
-                    insline = next_i_line_content(file,4,'=>')
-                    if '=>' in insline:
-                        df.loc[0,Sigpc] = insline.split('=>')[-1].split(':')[0].split('<')[0].strip()
-                        if address == 'null':
-                            address = df.loc[0,Sigpc]
-                        if 'Cannot' in insline:
-                            df.loc[0,SigIns] = 'Cannot access memory'
-                            df.loc[0, 'result'] = 'CntAccMem'
-                        elif  not findins.judge_address_in_asm(address,asm_file):
-                            #print(address)
-                            df.loc[0,SigIns] = 'null'
-                            df.loc[0, 'result'] = 'AdrsNotInAsm'
-                        else:
-                            if len(insline.split(':')) > 1:
-                                df.loc[0,SigIns] = insline.split(':')[1].strip()
-                            else:
-                                df.loc[0,SigIns] = insline.split(':')[-1].replace('"','').strip()
-
-                            if 'rex' in df.loc[0,SigIns]:
-                                if len(df.loc[0,SigIns].split(' ')) > 1:
-                                    df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[1]
-                                else:
-                                    df.loc[0,SigOpe] = df.loc[0,SigIns]
-                            else:
-                                df.loc[0,SigOpe] = df.loc[0,SigIns].split(' ')[0]
-
-                            if df.loc[0,SigFunc] == 'null' and len(insline.split('<')) > 1:
-                                df.loc[0,SigFunc] = insline.split('<')[1].split('>')[0].split('+')[0]
-                            else:
-                                df.loc[0,SigFunc] = 'null'
                 except Exception as e:
                     print("get info at signal2 fail",input_file)
                     print(e)
+                SIGcount = 2
                 continue
+
+            if "=>" in line and SIGcount == 2 and after_letgoin==1 and not df.loc[0,'Sig2pc']:
+                insline = line.split("=>")[-1].strip("(gdb)").strip()
+                Sig = 'Sig2'
+                Sigpc = 'Sig2pc'
+                SigIns = 'Sig2Ins'
+                SigOpe = 'Sig2Ope'
+                SigFunc = 'Sig2Func'
+
+                get_ins_info(Sig, Sigpc, SigIns, SigOpe, SigFunc, address, asm_file, df, file)
+
+                continue
+
 
             if ("Valid Fix2Sig" in line ):
                 df.loc[0,'ErrSpd_Fix'] = int(line.split(':')[-1])
@@ -550,10 +588,14 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 df.loc[0,'bias'] = line.split('=')[1].split("......")[0].strip()
             if configure.cmp_str in line:
                 df.loc[0,'bias'] = line.split('(')[1].split(')')[0].strip()
+                
 
-        if debug_mode > 7:
-            print("after extract_values_and_append_to_csv df Followed:\n",df.to_string(header=False, index=False))
-
+    if not pd.isna(df.loc[0,'Sig1pc']) and asm_file is not None and not findins.judge_address_in_asm(str(df.loc[0,'Sig1pc']).replace('0x', ''), asm_file) :
+        # 如果地址不在汇编文件中
+        #print("crash:",df.loc[0,'input_file'],'\t',df.loc[0,'Sig1pc'])
+        df.loc[0, 'Sig1Ins'] = 'null'
+        df.loc[0, 'result'] = ANIA
+    
     # 构造输出文件路径
     output_file = os.path.join(output_dir, outputname)
 
@@ -603,7 +645,7 @@ def quantify_smooth_col(df,col,key,col_out):
 
 def pic1XappYaveragecrash(csv_dir, output_dir):
     # 列出文件夹中所有以 .csv 结尾的文件
-
+    print("-----------------p1-----------------")
     csv_files = [file for file in os.listdir(csv_dir) if file.endswith('.csv')]
 
     file_names = []
@@ -622,8 +664,8 @@ def pic1XappYaveragecrash(csv_dir, output_dir):
                 print(f"File {file_name} does not contain 'result' column. Skipping...")
                 continue
             #Y
-            df1 = quantify_smooth_col(df,'result',[DOUBLE_CRASH,C_MASKED,C_SDC],'Before Recovery')
-            df2 = quantify_smooth_col(df,'result',[DOUBLE_CRASH],'After Recovery')
+            df1 = quantify_smooth_col(df,'result',[DOUBLE_CRASH,CRASH_NOPC,C_MASKED,C_SDC],'Before Recovery')
+            df2 = quantify_smooth_col(df,'result',[DOUBLE_CRASH,CRASH_NOPC],'After Recovery')
 
 
             # 计算平均值
@@ -681,23 +723,30 @@ def pic1XappYaveragecrash(csv_dir, output_dir):
     output_path = os.path.join(output_dir,'XappYaveragecrash')
     plt.tight_layout()
     plt.savefig(output_path, dpi=600)
-    print("pic save in:\t", output_path)
+    print("pic save in:\t", output_path+'.png')
     plt.close()  # 关闭图形以释放内存
 
 def pic4XappYresultundercrash(csv_dir, output_dir):
     # 列出文件夹中所有以 .csv 结尾的文件
-
+    print("-----------------p4-----------------")
     csv_files = [file for file in os.listdir(csv_dir) if file.endswith('.csv')]
-
+    target_elements = [C_MASKED,C_SDC,DOUBLE_CRASH,'crash']
+    target_colors = ['green', 'Gold',  'OrangeRed', 'purple']
+    """
+    计算指定文件中 'result' 列中目标元素的个数及其占比，并保存结果到 DataFrame。
+    
+    :param csv_dir: 包含CSV文件的目录路径
+    :param csv_files: 需要处理的CSV文件列表
+    :param target_elements: 需要统计的目标元素列表
+    :return: 结果的 DataFrame
+    """
+    # 存储结果
     file_names = []
-    DOUBLE_CRASH_ratios = []
-    C_MASKED_ratios = []
-    C_SDC_ratios = []
+    element_ratios = {element: [] for element in target_elements}
 
     for file_name in csv_files:
         file_path = os.path.join(csv_dir, file_name)
-        
-        
+
         try:
             # 读取 CSV 文件
             df = pd.read_csv(file_path)
@@ -705,76 +754,76 @@ def pic4XappYresultundercrash(csv_dir, output_dir):
             if 'result' not in df.columns:
                 print(f"File {file_name} does not contain 'result' column. Skipping...")
                 continue
-            #Y
-            df = quantify_smooth_col(df,'result',[DOUBLE_CRASH,C_MASKED,C_SDC],'Crash')
-            df = quantify_smooth_col(df,'result',[DOUBLE_CRASH],'DOUBLE_CRASH')
-            df = quantify_smooth_col(df,'result',[C_MASKED],'C_MASKED')
-            df = quantify_smooth_col(df,'result',[C_SDC],'C_SDC')
 
-            # 计算每列的比例
-            DOUBLE_CRASH_ratio = df['DOUBLE_CRASH'].sum() / df['Crash'].sum() * 100
-            C_MASKED_ratio = df['C_MASKED'].sum() / df['Crash'].sum() * 100
-            C_SDC_ratio = df['C_SDC'].sum() / df['Crash'].sum() * 100
+            # 统计每种类型的个数
+            crash_count = df['result'].value_counts()
+            total_crashes = sum(crash_count[element] for element in target_elements if element in crash_count)
 
-            # 存储结果
+            # 计算百分比
+            for element in target_elements:
+                element_count = crash_count.get(element, 0)
+                ratio = (element_count / total_crashes) * 100 if total_crashes > 0 else 0
+                element_ratios[element].append(ratio)
+
+            # 存储文件名
             file_names.append(file_name.strip('.csv'))
-            DOUBLE_CRASH_ratios.append(DOUBLE_CRASH_ratio)
-            C_MASKED_ratios.append(C_MASKED_ratio)
-            C_SDC_ratios.append(C_SDC_ratio)
 
             print(f"Processed file: {file_name}")
-        except:
-            print("error in file:\t",file_name)
-        # 保存结果到 CSV 文件
+        except Exception as e:
+            print(f"Error in file: {file_name}. Exception: {e}")
 
-    result_df = pd.DataFrame({
-        'File Name': file_names,
-        'C_MASKED%': C_MASKED_ratios,
-        'C_SDC%': C_SDC_ratios,
-        'DOUBLE_CRASH%': DOUBLE_CRASH_ratios
-    })
+    # 组织结果到 DataFrame
+    result_data = {'File Name': file_names}
+    for element, ratios in element_ratios.items():
+        result_data[f'{element}%'] = ratios
 
-    # 输出结果 CSV 文件路径
-    csv_output_path = os.path.join(output_dir, 'pic4XappYresultundercrash.csv')
-    result_df.to_csv(csv_output_path, index=False)
-    print(f"Summary saved to: {csv_output_path}")
-
-    # 绘制柱状图
+    result_df = pd.DataFrame(result_data)
+    result_df.to_csv(os.path.join(output_dir,"pic4XappYresultundercrash.csv"), index=False)
+    """
+    根据 DataFrame 中的元素比例绘制堆积柱状图，并保存图表。
+    
+    :param result_df: 包含比例数据的 DataFrame
+    :param target_elements: 需要绘制的目标元素列表
+    :param output_dir: 保存输出图片的目录路径
+    """
+    # 提取数据
+    file_names = result_df['File Name']
     x = range(len(file_names))  # 横坐标位置
 
-    plt.figure(figsize=(10, 5))
-    bar_width = 0.35  # 柱宽度
+    # 准备堆积数据
+    bottoms = [0] * len(file_names)  # 初始化堆积基线
+    plt.figure(figsize=(12, 6))
 
-    # 绘制堆积柱状图，顺序为：C_MASKED_ratios, C_SDC_ratios, DOUBLE_CRASH_ratios
-    plt.bar(x, C_MASKED_ratios, label='C_MASKED/Crash', color='green')
-    plt.bar(x, C_SDC_ratios, bottom=C_MASKED_ratios, label='C_SDC/Crash', color='orange')
-    plt.bar(x, DOUBLE_CRASH_ratios, bottom=[i + j for i, j in zip(C_MASKED_ratios, C_SDC_ratios)], label='DOUBLE_CRASH/Crash', color='red')
+    target_elements = [C_MASKED,C_SDC,DOUBLE_CRASH,'crash']
+    # 绘制堆积柱状图
+    for element, color in zip(target_elements, target_colors):
+        element_ratios = result_df[f'{element}%']
+        plt.bar(x, element_ratios, bottom=bottoms, label=f'{element}', color=color)
+        # 更新堆积基线
+        bottoms = [b + e for b, e in zip(bottoms, element_ratios)]
 
     # 设置纵轴和横轴范围
     plt.ylim(0, 100)  # 纵轴范围固定在0到100
     plt.yticks(range(0, 101, 20), [f'{i}%' for i in range(0, 101, 20)])  # 纵坐标每隔20打一个标注，带百分号
-
     plt.xticks(x, file_names, rotation=45, ha='right')  # 横坐标为文件名
-    #plt.xlabel('File Name')
     plt.ylabel('%')
-    plt.title('Crash Ratios: DOUBLE_CRASH, C_MASKED, C_SDC')
+    plt.title('Result Ratios')
     plt.legend()
 
-    
     # 保存图形到指定路径
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
         print(f"Created directory: {output_dir}")
-    output_path = os.path.join(output_dir,'pic4XappYresultundercrash')
+    output_path = os.path.join(output_dir, 'pic4XappYresultundercrash.png')
     plt.tight_layout()
     plt.savefig(output_path, dpi=600)
-    print("pic save in:\t", output_path)
+    print(f"Picture saved to: {output_path}")
     plt.close()  # 关闭图形以释放内存
 
 
 def pic2XdynamicexcYcrash(csv_dir, output_dir):
     # 列出文件夹中所有以 .csv 结尾的文件
-
+    print("-----------------p2-----------------")
     csv_files = [file for file in os.listdir(csv_dir) if file.endswith('.csv')]
     output_dir = os.path.join(output_dir,'dynamic_crash')
     for file_name in csv_files:
@@ -833,7 +882,7 @@ def pic2XdynamicexcYcrash(csv_dir, output_dir):
 
 def pic3_XdynamicExc_YcontinueIncrash(csv_dir, output_dir):
     # 列出文件夹中所有以 .csv 结尾的文件
-
+    print("-----------------p3-----------------")
     csv_files = [file for file in os.listdir(csv_dir) if file.endswith('.csv')]
     output_dir = os.path.join(output_dir,'dynamic_continueIncrash')
 
@@ -995,7 +1044,7 @@ def Tab1FuncCrash(csv_dir, func, output_dir):
 
             # 检查是否包含必要的列
             if func not in df.columns or 'result' not in df.columns:
-                print(f"File {file_name} does not contain necessary columns. Skipping...")
+                print(f"File {file_name} does not contain necessary columns:\t {str(func)}. Skipping...")
                 continue
 
             col1 = 'Percentage of Each Category in Total'
@@ -1054,7 +1103,7 @@ def Tab1FuncCrash(csv_dir, func, output_dir):
         except Exception as e:
             print(f"Error processing file {file_name}: {e}")
 
-def plot_stacked_bar_chart(filename, data, func, col2, col3, col4, col1, output_file_path):
+def plot_stacked_bar_chart1(filename, data, func, col2, col3, col4, col1, output_file_path):
     # 设置样式
     sns.set(style='white')
     plt.figure(figsize=(12, 6))
@@ -1091,10 +1140,189 @@ def plot_stacked_bar_chart(filename, data, func, col2, col3, col4, col1, output_
     plt.close()
     print(f"Saved stacked bar chart for {output_file_path}")
 
+def count_result_elements(csv_dir, output_dir, app='all'):
+    """
+    统计csv目录中result列的不同元素个数并保存到指定输出目录，输出格式包含app信息。
+    
+    :param csv_dir: 包含CSV文件的目录
+    :param output_dir: 输出文件保存的目录
+    :param app: 指定的CSV文件名（不带路径），如果为'all'则处理所有文件
+    """
+    try:
+        # 创建输出目录（如果不存在）
+        os.makedirs(output_dir, exist_ok=True)
 
+        # 确定需要处理的文件列表
+        if app == 'all':
+            all_files = [os.path.join(csv_dir, f) for f in os.listdir(csv_dir) if f.endswith('.csv')]
+        else:
+            file_path = os.path.join(csv_dir, app+'.csv')
+            if os.path.isfile(file_path):
+                all_files = [file_path]
+            else:
+                raise FileNotFoundError(f"File {app} not found in {csv_dir}")
+
+        # 初始化结果存储
+        results = []
+
+        for file in all_files:
+            try:
+                data = pd.read_csv(file)
+                if 'result' in data.columns:
+                    file_name = os.path.basename(file)
+                    result_counts = data['result'].value_counts()
+                    result_dict = {'app': file_name}
+                    result_dict['total'] = int(result_counts.sum())
+                    result_dict.update(result_counts.to_dict())
+                    results.append(result_dict)
+            except Exception as e:
+                print(f"Error reading {file}: {e}")
+
+        # 转换为DataFrame，填充缺失值为0
+        result_df = pd.DataFrame(results).fillna(0)
+        # 确保所有值为整数（除app列外）
+        for col in result_df.columns:
+            if col != 'app':
+                result_df[col] = result_df[col].astype(int)
+
+
+        # 保存到CSV文件
+        output_file = os.path.join(output_dir, "result_counts.csv")
+        result_df.to_csv(output_file, index=False)
+
+        # 打印结果
+        print(result_df)
+
+        return result_df
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
+def plot_stacked_bar_chart(filename, data, func, target_elements, target_colors, output_file_path):
+    """
+    绘制堆积柱状图，显示每个目标元素的占比，并保存为图片。
+    
+    :param filename: 当前文件名，用于标题
+    :param data: 包含目标列的 DataFrame
+    :param func: 分组列名称
+    :param target_elements: 目标元素列表
+    :param target_colors: 每个目标元素的对应颜色列表
+    :param output_file_path: 输出文件路径
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    # 设置样式
+    plt.figure(figsize=(12, 6))
+
+    # 堆积图参数
+    bar_width = 0.4
+    indices = np.arange(len(data))
+
+    # 初始化堆积基线
+    bottoms = np.zeros(len(data))
+
+    # 绘制堆积图
+    for element, color in zip(target_elements, target_colors):
+        heights = data[f'{element}%']
+        plt.bar(indices, heights, bottom=bottoms, color=color, label=element)
+        bottoms += heights
+
+    # 设置标题和标签
+    plt.ylabel('Percentage (%)', fontsize=14, fontweight='bold')
+    plt.title(f'Repairability of {filename}', fontsize=16, fontweight='bold')
+    plt.xticks(indices, data[func], rotation=45, ha='right', fontsize=12)
+
+    # 设置图例
+    plt.legend(fontsize=12, loc='upper left', bbox_to_anchor=(1, 1))
+
+    # 美化图形
+    plt.tight_layout()
+
+    # 保存图形
+    chart_file_path = output_file_path.replace('.csv', '.png')
+    plt.savefig(chart_file_path, dpi=300, bbox_inches='tight')  # 高分辨率输出
+    plt.close()
+    print(f"Saved stacked bar chart for {chart_file_path}")
 
 
 def Tab_col_Recovery(csv_dir, grouping_column, output_dir):
+    """
+    计算每个 group 的 target_elements 在 result 列中的百分比，并绘制堆积图。
+    
+    :param csv_dir: 包含 CSV 文件的目录路径
+    :param grouping_column: 分组的列
+    :param target_elements: 要统计的目标元素列表
+    :param output_dir: 输出目录
+    """
+    target_elements = [C_MASKED,C_SDC,DOUBLE_CRASH,'crash']
+    target_colors = ['green', 'Gold',  'OrangeRed', 'purple']
+    # 确保输出目录存在
+    output_dir = os.path.join(output_dir, f'Tab_{grouping_column}_Recovery')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"Created output directory: {output_dir}")
+
+    # 列出所有 CSV 文件
+    csv_files = [file for file in os.listdir(csv_dir) if file.endswith('.csv')]
+
+    for file_name in csv_files:
+        file_path = os.path.join(csv_dir, file_name)
+
+        try:
+            # 读取 CSV 文件为 DataFrame
+            df = pd.read_csv(file_path)
+
+            # 检查是否包含必要的列
+            if grouping_column not in df.columns or 'result' not in df.columns:
+                print(f"File {file_name} does not contain necessary columns. Skipping...")
+                continue
+
+            # 剔除 result 列中不在目标元素列表中的行
+            df = df[df['result'].isin(target_elements)]
+
+            # 初始化结果表格
+            col_percentage = 'Percentage of Each Category in Total'
+            result_table_columns = [grouping_column, col_percentage] + [f'{elem}%' for elem in target_elements]
+            result_table = pd.DataFrame(columns=result_table_columns)
+
+            # 根据分组进行统计
+            for value in df[grouping_column].unique():
+                if isinstance(value, float):
+                    continue
+
+                group = df[df[grouping_column] == value]
+                total_count = group.shape[0]
+
+                # 计算每个目标元素的百分比
+                percentages = {}
+                for element in target_elements:
+                    element_count = group[group['result'] == element].shape[0]
+                    percentages[f'{element}%'] = (element_count / total_count * 100) if total_count > 0 else 0
+
+                # 计算分组在整个 DataFrame 中的百分比
+                total_count_non_na = df[grouping_column].notna().sum()
+                percentage = (total_count / total_count_non_na * 100) if total_count_non_na > 0 else 0
+
+                # 添加结果到结果表
+                new_row = {grouping_column: value, col_percentage: round(percentage, 2)}
+                new_row.update({key: round(value, 2) for key, value in percentages.items()})
+                result_table = pd.concat([result_table, pd.DataFrame([new_row])], ignore_index=True)
+
+            # 排序
+            result_table = result_table.sort_values(by=col_percentage, ascending=False)
+
+            # 保存结果表格到输出目录
+            output_file_path = os.path.join(output_dir, f"Recovery_{file_name.replace('.csv', '')}.csv")
+            result_table.to_csv(output_file_path, index=False)
+            print(f"Processed and saved summary for file: {file_name}")
+
+            plot_stacked_bar_chart(file_name.replace('.csv', ''), result_table, grouping_column, target_elements, target_colors, output_file_path)
+        except Exception as e:
+            print(f"Error processing file {file_name}: {e}")
+
+def Tab_col_Recovery2(csv_dir, grouping_column, output_dir):
     # 确保输出目录存在
     output_dir = os.path.join(output_dir, 'Tab_'+str(grouping_column)+'_Recovery')
     if not os.path.exists(output_dir):
@@ -1113,7 +1341,7 @@ def Tab_col_Recovery(csv_dir, grouping_column, output_dir):
 
             # 检查是否包含必要的列
             if grouping_column not in df.columns or 'result' not in df.columns:
-                print(f"File {file_name} does not contain necessary columns. Skipping...")
+                print(f"File {file_name} does not contain necessary columns{str(grouping_column)}. Skipping...")
                 continue
 
             # 剔除 result 列中为 C_MASKED 或 C_SDC 的行
@@ -1175,10 +1403,17 @@ def Tab_col_Recovery(csv_dir, grouping_column, output_dir):
 
 def all(progname):
     print("Read logs and generate csv")
-    read_logs(progname)
-    #search_string_in_log()
+
+    print(f"Processing program: {progname}")
+    read_logs(progname)  # 读取日志并生成 CSV
+    
+    # 检查是否需要进行更多的查找
     if findmorebypc == 1:
-        findins.findinsbyasm(progname)
+        try:
+            findins.findinsbyasm(progname)
+        except:
+            print("error findins.findinsbyasm(progname)")
+
 
 def main():
     if args.p or args.t:
@@ -1196,14 +1431,18 @@ def main():
             Tab_col_Recovery(csv_dir,'Sig1',pic_dir)
         elif args.t == '3':
             Tab_col_Recovery(csv_dir, 'injreg', pic_dir)
-        elif args.t:
+        elif args.t == 'result':
+            count_result_elements(csv_dir, pic_dir, all)
+        elif args.t and not args.t == 'all':
             Tab_col_Recovery(csv_dir, args.t, pic_dir)
         if args.p == 'all':
             pic1XappYaveragecrash(csv_dir,pic_dir)
             pic2XdynamicexcYcrash(csv_dir,pic_dir)
-            pic3_XdynamicExc_YcontinueIncrash(csv_dir,pic_dir)
+            #pic3_XdynamicExc_YcontinueIncrash(csv_dir,pic_dir)
             pic4XappYresultundercrash(csv_dir,pic_dir)
         if args.t == 'all':
+            count_result_elements(csv_dir, pic_dir, app='all')
+            Tab_col_Recovery(csv_dir,'Heuristic',pic_dir)
             Tab_col_Recovery(csv_dir,'Sig1Func',pic_dir)
             Tab_col_Recovery(csv_dir,'Sig1',pic_dir)
             Tab_col_Recovery(csv_dir, 'injreg', pic_dir)
@@ -1212,13 +1451,33 @@ def main():
 
     if args.file and args.flag:##调试单个log
         extract_values_and_append_to_csv(os.path.join(log_dir,str(args.file)),log_dir,args.file+'.csv',args.flag, args.sdc_flag)
-        if debug_mode >=6 :
-            print("Finish Csv:\t",args.file)
-    else:
-        # 直接运行的情况
-        all(progname)
-        if debug_mode >=6 :
-            print("Running without file argument.")
+        return
+
+    if args.bname:
+        all(args.bname)
+        return
+
+    if args.analyze_all:
+        directory = configure.result_path
+        try:
+            # 获取目录中所有子文件夹名
+            prognames = [name for name in os.listdir(directory) if os.path.isdir(os.path.join(directory, name))]
+            
+            # 批量调用 all 函数
+            for progname in prognames:
+                try:
+                    print (progname)
+                    all(progname)
+                except:
+                    print("--------------------------------fail--------------------------------")
+                    continue
+        except Exception as e:
+            print(f"An error occurred during batch processing: {e}")
+            sys.exit(1)
+        return
+        
+    # 直接运行configure的情况
+    all(configure.progname)
 
 
 
