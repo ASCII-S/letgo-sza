@@ -18,7 +18,7 @@ prognames_supply = [
     "HPCCG", "miniFE", "miniMD", "miniAMR"
 ]
 #应用名取自prognames_supply
-progname = "HPCCG"
+progname = "bfs"
 
 #实验次数
 numFI = 5000
@@ -56,8 +56,8 @@ elif progname == "bfs":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/bfs/bfs"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/bfs/inputGen/graph64k.txt"
     optionlist = [datafile]
-    pcstart = "400740"
-    pcend = "400cd0"
+    pcstart = "400720"
+    pcend = "400e80"
 elif progname == "heartwall": 
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/heartwall/heartwall"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/heartwall/test.avi"
@@ -194,6 +194,7 @@ cmp_str = "Compare within tolerance("+str(tolerance)+"):"
 
 # configuration of folder
 result_path = os.path.join(letgo_base_home,"BenchmarkResult")
+targeted_result_path = os.path.join(letgo_base_home,"TargetedBenchmarkResult")
 #result_path = os.path.join(letgo_base_home,"nosdcarchive","BenchmarkResult")
 
 prog_folder = os.path.join(result_path,progname)

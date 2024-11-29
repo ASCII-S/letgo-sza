@@ -686,6 +686,7 @@ class SigHandler:
                 if is_fake == 1:    ##处理写寄存器regw,is_fake是手动开关
                     for regw in regwlist:
                         if flag == 2:   ##处理栈读相关的而寄存器, 这里是把regw设置成合适的值
+                            print("h_1")
                             final_b = 0 ##base 
                             final_i = 0 ##index
                             final_d = 0 ##displacement
@@ -757,7 +758,6 @@ class SigHandler:
                                 final_s = int(scale)
                                 ##用base,displacement,index,scale综合确定修改后的地址值
                                 address = final_b + final_d + final_i * final_s   # 基地址、内存偏移量、基地址偏移、内存因子
-                                print("h_1")
                                 print("address: {0}, final_b: {1}, final_d: {2}, final_i: {3}, final_s: {4}".format(
                                     hex(address),  # 将address转换为十六进制
                                     hex(final_b),  # 将final_b转换为十六进制
@@ -822,7 +822,7 @@ class SigHandler:
                             if "xmm" in regw:
                                 regw = regw+".uint128"
                             print("h_2")
-                            process.sendline(GDB_SET_REG + " $" + regw + "=" + GDB_FAKE)   #？？？
+                            process.sendline(GDB_SET_REG + " $" + regw + "=" + GDB_FAKE)   
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
                                 print("ERROR when setting the reg value")
@@ -915,8 +915,11 @@ class SigHandler:
 
                                 size = int(size,16)
                                 print("size:\t",size)
-                                if abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size:##检测是否栈溢出
-                                    process.sendline(GDB_SET_REG + " $" + stack + "=" + content_rxp)
+                                # if abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size:##检测是否栈溢出
+                                #     process.sendline(GDB_SET_REG + " $" + stack + "=" + content_rxp)
+                                if (abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size) or (size_rxp-size_stack>0):##检测是否栈溢出
+                                    setback = str(size_rxp+size)
+                                    process.sendline(GDB_SET_REG + " $" + stack + "=" + setback)
                                     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                     if i == 0:
                                         print(("ERROR when resetting the " + stack))

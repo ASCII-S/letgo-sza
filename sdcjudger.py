@@ -144,7 +144,8 @@ def Add_SDC_result_to_alllog_common(log_path=configure.log_path, sdcout_folder=c
                 # 创建判断对象并进行比较
                 try:
                     if configure.progname == 'bfs':
-                        bfs_compare_outputs(this_output, golden_output)
+                        strong_compare_outputs(this_output,golden_output)
+                        #bfs_compare_outputs(this_output, golden_output)
                     elif configure.progname == 'hotspot':
                         hotspot_compare_outputs(this_output, golden_output, tolerance)
                     elif configure.progname == 'miniMD':
@@ -416,7 +417,8 @@ def miniFE_compare_outputs(this_output_path, golden_output_path, tolerance):
                 break
 
         if golden_resid_norm is None:
-            print(f"{cmp_str}False ('Final Resid Norm' not found in golden_output)")
+            print("bias not found in golden_output")
+            sys.exit(1)
             return 1
 
         # Compare the residual norms
