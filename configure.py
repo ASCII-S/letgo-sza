@@ -26,7 +26,7 @@ numFI = 5000
 #log起始index
 num_start_from = 0
 #log终止index
-num_end_at = 5000   
+num_end_at = 5000
 
 #注错模式
 injectmode = 'pinfi'
@@ -35,7 +35,6 @@ injectmode = 'pinfi'
 #废案
 inject_op = 'all' ##用all表示不进行启发式注错,已废弃
 #inject_op = '' 
-
 
 if progname == "amg":                                   ## amg    ----------有效实验太少
     progbin = "/home/tongshiyu/programs/LLNL/AMG-master/test/amg"
