@@ -75,7 +75,7 @@ def find_max_log_suffix(directory):
         return None
 
 
-def Add_SDC_result_to_alllog_LU(log_path=configure.log_path, sdcout_folder=configure.sdcout_folder, tolerance=configure.lu_tolerance):
+def Add_SDC_result_to_alllog_LU(log_path=configure.log_folder, sdcout_folder=configure.sdcout_folder, tolerance=configure.lu_tolerance):
     len = find_max_log_suffix(log_path)
     for index in range(len):
         log_index_file = os.path.join(log_path, f'log_{index}')
@@ -102,7 +102,7 @@ def Add_SDC_result_to_alllog_LU(log_path=configure.log_path, sdcout_folder=confi
         print('log_'+str(index)+'\n')
 
 
-def Add_SDC_result_to_alllog_common(log_path=configure.log_path, sdcout_folder=configure.sdcout_folder, tolerance=configure.tolerance):
+def Add_SDC_result_to_alllog_common(log_path=configure.log_folder, sdcout_folder=configure.sdcout_folder, tolerance=configure.tolerance):
     len = find_max_log_suffix(log_path)
 
     in_path = configure.progname + '/' + configure.output_name
@@ -118,6 +118,11 @@ def Add_SDC_result_to_alllog_common(log_path=configure.log_path, sdcout_folder=c
         golden_output = "/home/tongshiyu/programs/mantevo/HPCCG/output.txt"
     if configure.progname == 'nn':
         golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/nn/output.txt"
+    if configure.progname == 'kmeans':
+        golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/kmeans/output.txt"
+    if configure.progname == 'particlefilter':
+        golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/output.txt"
+
     
     for index in range(len+1):
         
@@ -143,9 +148,8 @@ def Add_SDC_result_to_alllog_common(log_path=configure.log_path, sdcout_folder=c
             #with contextlib.redirect_stdout(sys.__stdout__):
                 # 创建判断对象并进行比较
                 try:
-                    if configure.progname == 'bfs':
+                    if configure.progname in ['bfs','backprop','nn',"kmeans","particlefilter"]:
                         strong_compare_outputs(this_output,golden_output)
-                        #bfs_compare_outputs(this_output, golden_output)
                     elif configure.progname == 'hotspot':
                         hotspot_compare_outputs(this_output, golden_output, tolerance)
                     elif configure.progname == 'miniMD':
@@ -154,8 +158,6 @@ def Add_SDC_result_to_alllog_common(log_path=configure.log_path, sdcout_folder=c
                         miniFE_compare_outputs(this_output, golden_output, tolerance)
                     elif configure.progname == 'HPCCG':
                         HPCCG_compare_outputs(this_output, golden_output, tolerance)
-                    elif configure.progname in ['backprop','nn']:
-                        strong_compare_outputs(this_output, golden_output)
                     else:
                         common_compare_outputs(this_output, golden_output, tolerance)
                 except Exception as e:
@@ -533,7 +535,7 @@ def SDC_saver(index,progname=configure.progname,sdcout_dir=configure.sdcout_fold
 
 if __name__ == "__main__":
 
-    #process_log_and_sdcout(configure.log_path, configure.sdcout_folder)
+    #process_log_and_sdcout(configure.log_folder, configure.sdcout_folder)
     ##单独验证lu的某一条log
     if (configure.progname == 'lu'):
         Add_SDC_result_to_alllog_LU()

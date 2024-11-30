@@ -18,19 +18,32 @@ prognames_supply = [
     "HPCCG", "miniFE", "miniMD", "miniAMR"
 ]
 #应用名取自prognames_supply
-progname = "bfs"
+progname = "backprop"
+
+#随机注错还是对目标类型注错
+inject_random_or_targeted = "random"
+inject_random_or_targeted = "targeted"
+
+#对目标类型注错,详细参数
+select_type = "mov"     #call_retq,stack,mov,integer,float,cmp
+dynamic_analyze = 0         #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
+
+#注错工具
+inject_tool = 'pinfi'          
+#inject_tool = 'breakpoint'
 
 #实验次数
-numFI = 5000
+numFI = 10
 
 #log起始index
 num_start_from = 0
 #log终止index
 num_end_at = 5000
 
-#注错模式
-injectmode = 'pinfi'
-#injectmode = 'breakpoint'
+
+if inject_random_or_targeted == "targeted":
+    inject_tool = 'breakpoint'
+
 
 #废案
 inject_op = 'all' ##用all表示不进行启发式注错,已废弃
@@ -82,8 +95,8 @@ elif progname == "kmeans":                              ## Kmeans
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/kmeans/kmeans"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/kmeans/inputGen/1000_34.txt"
     optionlist = ['-i', datafile]
-    pcstart = "400d50"
-    pcend = "401b70"
+    pcstart = "400d20"
+    pcend = "402110"
 elif progname == "knn":                                 ## KNN
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn"
     datafile = ("/home/tongshiyu/programs/rodinia-master/openmp/nn/cane10k.db")
@@ -126,8 +139,8 @@ elif progname == "nn":
 elif progname == "particlefilter":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/particle_filter"
     optionlist = ['-x', '64', '-y', '64', '-z', '5', '-np', '1000']
-    pcstart = "400960"
-    pcend = "402c00"
+    pcstart = "4009c0"
+    pcend = "4030a0"
 elif progname == "streamcluster":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/streamcluster/streamcluster"
     optionlist = ["10", "20", "256", "4096", "4096", "100", "none", "output.txt", "1"]
@@ -192,19 +205,42 @@ cmp_str = "Compare within tolerance("+str(tolerance)+"):"
 
 
 # configuration of folder
-result_path = os.path.join(letgo_base_home,"BenchmarkResult")
-targeted_result_path = os.path.join(letgo_base_home,"TargetedBenchmarkResult")
-#result_path = os.path.join(letgo_base_home,"nosdcarchive","BenchmarkResult")
+folders_to_create = []
+if inject_random_or_targeted == "random":
+    result_path = os.path.join(letgo_base_home,"BenchmarkResult")
+    #result_path = os.path.join(letgo_base_home,"nosdcarchive","BenchmarkResult")
 
-prog_folder = os.path.join(result_path,progname)
-log_path = os.path.join(result_path,progname,"log")
-sdcout_folder = os.path.join(result_path,progname,"sdcout")
-instpool_folder = os.path.join(result_path,progname)
+    prog_folder = os.path.join(result_path,progname)
+    log_folder = os.path.join(result_path,progname,"log")
+    sdcout_folder = os.path.join(result_path,progname,"sdcout")
+    instpool_folder = os.path.join(result_path,progname)
 
-analysis_folder = os.path.join(letgo_base_home,'analysis')
-csv_folder = os.path.join(analysis_folder,'CSV')
-asm_folder  = os.path.join(analysis_folder,'asm')
-pic_folder  = os.path.join(analysis_folder,'PIC')
+    analysis_folder = os.path.join(letgo_base_home,'analysis')
+    csv_folder = os.path.join(analysis_folder,'CSV')
+    asm_folder  = os.path.join(analysis_folder,'asm')
+    pic_folder  = os.path.join(analysis_folder,'PIC')
+
+if not inject_random_or_targeted == "random":
+    result_path = os.path.join(letgo_base_home,"TargetedBenchmarkResult")
+    prog_folder = os.path.join(result_path,progname)
+    ins_class_folder = os.path.join(prog_folder,select_type)
+    folders_to_create.append(ins_class_folder)
+
+    log_folder = os.path.join(ins_class_folder,"log")
+    sdcout_folder = os.path.join(ins_class_folder,"sdcout")
+    instpool_folder = os.path.join(ins_class_folder)
+    catalog_csv_file = os.path.join(instpool_folder,select_type+"_catalog"+".csv")
+    pool_csv_file = os.path.join(instpool_folder, select_type + "_pool" + ".csv")
+
+
+    analysis_folder = os.path.join(letgo_base_home,'TargetedAnalysis')
+    csv_folder = os.path.join(analysis_folder,'CSV')
+    asm_folder  = os.path.join(analysis_folder,'asm')
+    pic_folder  = os.path.join(analysis_folder,'PIC')
+
+folders_to_create.extend([result_path,prog_folder,log_folder,sdcout_folder,instpool_folder,analysis_folder,csv_folder,asm_folder,pic_folder])
+for folder in folders_to_create:
+    os.makedirs(folder, exist_ok=True)
 
 # define results
 MASKED = 'Masked'

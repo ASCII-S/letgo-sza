@@ -50,7 +50,7 @@ is_fake = 1
 is_rewind = 1
 
 ##log_path = "./self.log"
-log_path = configure.log_path
+log_path = configure.log_folder
 if not os.path.exists(log_path):
     os.makedirs(log_path)
     
@@ -97,16 +97,32 @@ class SigHandler:
         ##
         print('Start set a breakpoint...')
         fi = faultinject.FaultInjector(self.insts)
-        try:
-            result = InstPoolMaker.readArgsFromPool()
-            # 检查 result 的长度是否为 5
-            if len(result) != 5:
-                raise ValueError("Wrong return values! Exit!")  # 抛出异常跳转到 except 块
-            args = result[0:4]
-            randomnum = result[-1]
-            print("-randinst", randomnum)
-        except:
-            args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
+        if configure.inject_random_or_targeted == "random":
+            try:
+                ##首先尝试从随机指令池中提取指令
+                result = InstPoolMaker.readArgsFromPool()
+                # 检查 result 的长度是否为 5
+                if len(result) != 5:
+                    raise ValueError("Wrong return values! Exit!")  # 抛出异常跳转到 except 块
+                args = result[0:4]
+                randomnum = result[-1]
+                print("-randinst", randomnum)
+            except:
+                ##指令池空，则直接随机找指令
+                args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
+
+
+
+
+
+        if configure.inject_random_or_targeted == "targeted":
+            result = InstPoolMaker.readArgsFromPool(configure.pool_csv_file)
+            #兼容原来的输出
+            args = result[0:3]
+            random_number = random.randint(0, 256)
+            args.append(str(random_number))
+            print(args)
+
 
         ##参数中包含的是在动态指令randomnum处的指令和寄存器信息.pc是该动态指令的ins值,regmm或reg是ins中随机挑选的寄存器
         ##iteration表示的是在randomnum范围内,ins值和pc值相同的次数;也就是pc值在randomnum范围内的迭代次数
@@ -116,11 +132,6 @@ class SigHandler:
             process.close()
             sys.stdout = sys.__stdout__
             return
-        try:
-            shutil.rmtree("graphics_output")
-            print("remove output file 2")
-        except:
-            print("Oops, no x.vec file found. Ignoring. 2")
 
         regmm = args[0].rstrip("\n")    ##
         reg = args[1].rstrip("\n")
@@ -342,36 +353,38 @@ class SigHandler:
                         except:
                             print("inject_inst:\t",inject_inst)
                             sys.exit()
-                        if 'j' not in inject_op:
-                            process.sendline(GDB_NEXT)
-                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                            if i == 0:
-                                print("ERROR when single step")
-                                print(process.before.decode('utf-8'), process.after)
-                                print(str(process))
-                                self.log.close()
-                                process.close()
-                                sys.stdout = sys.__stdout__
-                                return
-                            if i == 1:
-                                print("Single step")
-                                output = process.before.decode('utf-8')
-                                if 'received signal' in output:
-                                    print("Crash after single step, considered working!")
+
+                        ##对内存相关额寄存器注错后还原寄存器的值
+                        # if 'j' not in inject_op:
+                        #     process.sendline(GDB_NEXT)
+                        #     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                        #     if i == 0:
+                        #         print("ERROR when single step")
+                        #         print(process.before.decode('utf-8'), process.after)
+                        #         print(str(process))
+                        #         self.log.close()
+                        #         process.close()
+                        #         sys.stdout = sys.__stdout__
+                        #         return
+                        #     if i == 1:
+                        #         print("Single step")
+                        #         output = process.before.decode('utf-8')
+                        #         if 'received signal' in output:
+                        #             print("Crash after single step, considered working!")
 
 
-                            process.sendline(GDB_SET_REG + " $" + regmm + "=" + ori_reg)
-                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                            if i == 0:
-                                print("ERROR when setting the regmm back after single step")
-                                print(process.before.decode('utf-8'), process.after)
-                                print(str(process))
-                                self.log.close()
-                                process.close()
-                                sys.stdout = sys.__stdout__
-                                return
-                            if i == 1:
-                                print("Change the value back")
+                        #     process.sendline(GDB_SET_REG + " $" + regmm + "=" + ori_reg)
+                        #     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                        #     if i == 0:
+                        #         print("ERROR when setting the regmm back after single step")
+                        #         print(process.before.decode('utf-8'), process.after)
+                        #         print(str(process))
+                        #         self.log.close()
+                        #         process.close()
+                        #         sys.stdout = sys.__stdout__
+                        #         return
+                        #     if i == 1:
+                        #         print("Change the value back")
                         
     # del breakpoints
                 """print("GDB is now interactive. You can type GDB commands.")
@@ -1006,6 +1019,7 @@ class SigHandler:
     def inject_by_breakpoint_and_recover(self,process):
         self.inject_inst_by_breakpoint(process)
 
+        rcv_sig,output= self.error_spread(process,0)
 
         self.handle_after_injection(process)
 
@@ -1076,7 +1090,7 @@ class SigHandler:
                 process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 print(process.before.decode('utf-8'))  
 
-        if configure.injectmode == 'pinfi':
+        if configure.inject_tool == 'pinfi':
             self.inject_by_pinfi_and_recover(process)
-        elif configure.injectmode == 'breakpoint':
+        elif configure.inject_tool == 'breakpoint':
             self.inject_by_breakpoint_and_recover(process)

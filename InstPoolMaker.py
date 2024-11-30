@@ -5,6 +5,7 @@ from faultinject import FaultInjector
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import multiprocessing
 
+import sys
 import random
 import subprocess
 import time
@@ -23,6 +24,10 @@ randinst_config = "-randinst"
 iterationinst = "obj-intel64/determineInst.so"
 iterationinst_config1 = "-pc"
 iterationinst_config2 = "-randinst"
+saveInsTypelib  = configure.toolbase + "/obj-intel64/saveInstcategory.so"
+saveInsTypelib_config1 = "-ins_type"
+saveInsTypelib_config2 = "-csv_name"
+saveInsTypelib_config3 = "-dynamic_analyze"
 nextinst = "obj-intel64/findnextinst.so"
 nextinst_config1 = "-pc"
 instructionfile = "instruction"
@@ -39,6 +44,7 @@ instructionend = 4
 
 totalcount = 0
 timeout = 500
+
 def execute(execlist):
 
         """
@@ -80,6 +86,7 @@ def fetchTotalCount():
     return totalcount
 
 def getBreakpoint(totalcount):
+    #用库函数并行的随机找要注错的断点
     ## get
     """
 
@@ -225,7 +232,7 @@ def extract_args_based_on_csv(csv_file):
         saveargs(result)
 
 
-def delete_files_based_on_csv(csv_file_path, log_path=configure.log_path):
+def delete_files_based_on_csv(csv_file_path, log_path=configure.log_folder):
     # 读取 CSV 文件
     df = pd.read_csv(csv_file_path)
 
@@ -257,7 +264,7 @@ def saveargs(args):
         writer = csv.writer(file)
         writer.writerow(args)
     print("args add to:\t",filename)
-
+    
 
 def selectOneIns(totalcount):
     result = getBreakpoint(totalcount)
@@ -269,10 +276,52 @@ def selectOneIns(totalcount):
 
     saveargs(result)
 
+def Random_instPoolMaker():
+    totalcount = int(fetchTotalCount())
+    need = NEED
+    while need>0:
+        need -=1
+        selectOneIns(totalcount)
 
-def readArgsFromPool():
-    # 构建文件路径
-    filepath = os.path.join(configure.instpool_folder, poolname)
+
+def generate_catalog(catalog_csv_file = configure.catalog_csv_file):
+    execlist = [configure.pin_home,"-t",saveInsTypelib,saveInsTypelib_config1,configure.select_type,saveInsTypelib_config2,catalog_csv_file,saveInsTypelib_config3,str(configure.dynamic_analyze),"--",configure.benchmark]
+    for item in configure.args:
+        execlist.append(item)
+    execute(execlist)
+    return catalog_csv_file
+
+def generate_Pool_from_catalog(catalog_csv_file = configure.catalog_csv_file, num_samples=1000):
+    """
+    从catalog_csv_file中随机选择num_samples行数据，并将每行的前三个参数保存到pool_csv_file。
+
+    :param catalog_csv_file: 输入的csv文件路径
+    :param num_samples: 随机选择的样本数量，默认为1000
+    """
+    # 读取 catalog_csv_file 的内容
+    with open(catalog_csv_file, 'r') as infile:
+        lines = infile.readlines()
+
+    # 输出文件路径
+    pool_csv_file = configure.pool_csv_file
+
+    # 打开 pool_csv_file 进行写入
+    with open(pool_csv_file, 'w') as outfile:
+        # 随机选择 num_samples 行并处理
+        for _ in range(num_samples):
+            random_line = random.choice(lines)  # 随机选择一行
+
+            # 提取前三个参数
+            columns = random_line.strip().split(',')  # 假设每行的数据由逗号分隔
+            selected_params = columns[:2]  # 获取前三个参数
+            selected_params.append(str(int(columns[2],16)))
+            # 将结果写入文件
+            outfile.write(','.join(selected_params) + '\n')
+
+    print(f"已通过catalog创建{num_samples} 条注错位置，保存到 {pool_csv_file}")
+    return pool_csv_file
+
+def readArgsFromPool(filepath = os.path.join(configure.instpool_folder, poolname)):
     
     # 用于存储最后一行数据
     args = []
@@ -300,17 +349,13 @@ def readArgsFromPool():
     return args
 
 
-def Random_instPoolMaker():
-    totalcount = int(fetchTotalCount())
-    need = NEED
-    while need>0:
-        need -=1
-        selectOneIns(totalcount)
 
 if __name__ == "__main__":
     print("PoolMaker!")
-    Random_instPoolMaker()
-
+    #Random_instPoolMaker()
+    path = generate_catalog()
+    path = generate_Pool_from_catalog(path)
+    print(readArgsFromPool(path))
     #csv_file = os.path.join(configure.csv_folder,configure.progname+'.csv')
     #extract_args_based_on_csv(csv_file)
     #delete_files_based_on_csv(csv_file)

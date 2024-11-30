@@ -53,13 +53,15 @@ flag = 0
 unfinishedlist = []
 output = []
 
-log_dir = os.path.join(configure.result_path,progname,"log")  ##数据源目录
-print("log_dir in:\t",log_dir)
-if not (os.path.exists(log_dir) and os.path.isdir(log_dir)):
-    print("{} does not exist or is not a directory".format(log_dir))
+log_folder = os.path.join(configure.result_path,progname,"log")  ##数据源目录
+if configure.inject_random_or_targeted == "targeted":
+    log_folder = os.path.join(configure.result_path,configure.progname,configure.select_type,"log")
+print("log_folder in:\t",log_folder)
+if not (os.path.exists(log_folder) and os.path.isdir(log_folder)):
+    print("{} does not exist or is not a directory".format(log_folder))
     exit(0)
 
-csv_dir = configure.csv_folder                  ##将log_dir的海量数据收集整理到csv_dir中
+csv_dir = configure.csv_folder                  ##将log_folder的海量数据收集整理到csv_dir中
 pic_dir = configure.pic_folder
 
 
@@ -105,9 +107,9 @@ def next_i_line_content(file, i, target):
     # 如果没有找到目标，返回所有行的连接
     return '\n'.join(lines) if lines else 'null'  # 如果没有读取到任何行，返回'null'
 
-def move_file_to_dir(f, log_dir, folder_name):
+def move_file_to_dir(f, log_folder, folder_name):
     # 创建目标文件夹路径
-    target_dir = os.path.join(log_dir, folder_name)
+    target_dir = os.path.join(log_folder, folder_name)
 
     # 检查目标文件夹是否存在，如果不存在则创建
     if not os.path.exists(target_dir):
@@ -146,7 +148,7 @@ def search_string_in_log():
     ]
 
     # 定义文件夹路径
-    folder_path = log_dir # 修改为你实际的文件夹路径
+    folder_path = log_folder # 修改为你实际的文件夹路径
 
     # 用于存储结果的字典
     results = {key: [] for key in search_strings}
@@ -199,9 +201,13 @@ def search_string_in_log():
 
 def read_logs(progname):
     global file_count, crash_1, crash_2, crash_2p, finish, flag, detected, correct, sdc, unfinishedlist, output
-    log_dir = os.path.join(configure.result_path,progname,"log") 
+    #for -bname 
+    log_folder = os.path.join(configure.result_path,progname,"log")  ##数据源目录
+    if configure.inject_random_or_targeted == "targeted":
+        log_folder = os.path.join(configure.result_path,configure.progname,configure.select_type,"log")
+        
     if to_csv == 1:
-        csv_file_path = os.path.join(log_dir, csv_dir, progname + '.csv')
+        csv_file_path = os.path.join(log_folder, csv_dir, progname + '.csv')
         # 检查文件是否存在，如果存在则删除
         if os.path.exists(csv_file_path):
             os.remove(csv_file_path)
@@ -211,16 +217,16 @@ def read_logs(progname):
 
     # 只选择以 "log_" 开头的文件并按名称排序
     log_files = sorted(
-        [f for f in os.listdir(log_dir) if f.startswith("log_") and int(re.search(r'(\d+)', f).group()) < 99999],
+        [f for f in os.listdir(log_folder) if f.startswith("log_") and int(re.search(r'(\d+)', f).group()) < 99999],
         key=lambda x: int(re.search(r'(\d+)', x).group())
     )
 
     
-    print("deal with log folfer:\t",log_dir)
+    print("deal with log folfer:\t",log_folder)
     for f in log_files:
 
         file_count += 1
-        f = os.path.join(log_dir, f)
+        f = os.path.join(log_folder, f)
         flag = 0
         sdc_flag = -1
         after_letgoin = 0
@@ -275,7 +281,7 @@ def read_logs(progname):
             if unfinished == 1:
                 unfinishedlist.append(f)
                 if clsfy == 1:
-                    move_file_to_dir(f, log_dir, "unfinish")
+                    move_file_to_dir(f, log_folder, "unfinish")
                 #continue
             if bugin == 1:
                 continue
@@ -289,7 +295,7 @@ def read_logs(progname):
             if flag == 0:
                 finish.append(f)
         if to_csv == 1:
-            extract_values_and_append_to_csv(f, log_dir, progname + '.csv', flag, sdc_flag)
+            extract_values_and_append_to_csv(f, log_folder, progname + '.csv', flag, sdc_flag)
 
 
 def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope', SigFunc='Sig1Func', address=None, asm_file=None, df=None, file=None, insline_context = None):
@@ -353,11 +359,11 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
         print(df.loc[0, 'input_file'],"\tLine:", line)
 
 
-def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_flag):
+def extract_values_and_append_to_csv(input_file, log_folder, outputname, flag, sdc_flag):
     if debug_mode >=6:
         print("\nnow do extract_values_and_append_to_csv")
     # 创建 CSV 文件保存的目录
-    output_dir = os.path.join(log_dir,csv_dir)
+    output_dir = os.path.join(log_folder,csv_dir)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)  # 如果目录不存在则创建
 
@@ -793,7 +799,7 @@ def pic4XappYresultundercrash(csv_dir, output_dir):
                 element_ratios[element].append(ratio)
 
             # 存储文件名
-            file_names.append(file_name.strip('.csv'))
+            file_names.append(file_name.replace(".csv",""))
 
             print(f"Processed file: {file_name}")
         except Exception as e:
@@ -1477,7 +1483,7 @@ def main():
         return
 
     if args.file and args.flag:##调试单个log
-        extract_values_and_append_to_csv(os.path.join(log_dir,str(args.file)),log_dir,args.file+'.csv',args.flag, args.sdc_flag)
+        extract_values_and_append_to_csv(os.path.join(log_folder,str(args.file)),log_folder,args.file+'.csv',args.flag, args.sdc_flag)
         return
 
     if args.bname:
