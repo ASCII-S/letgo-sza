@@ -167,9 +167,15 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"An error occurred: {e}")
 
+
+  
     if configure.inject_random_or_targeted == "targeted":
-        catalog_path = InstPoolMaker.generate_catalog()
-        pool_path = InstPoolMaker.generate_Pool_from_catalog(catalog_path,configure.numFI)
+        if not os.path.exists(configure.pool_csv_file) or os.path.getsize(configure.pool_csv_file)==0:
+            print("Generating pool...")
+            catalog_path = InstPoolMaker.generate_catalog(catalog_csv_file = configure.catalog_csv_file)
+            pool_path = InstPoolMaker.generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=configure.num_samples)
+        else:
+            print("Pool already exists, skip generating pool from catalog...")
 
 
     log_count = 0
@@ -240,14 +246,14 @@ if __name__ == "__main__":
         print("sig time: ",sig_time2 - sig_time1)
     
     # 实验完成自动分析
-    sys.stdout = sys.__stdout__
-    command = ["python3.8",os.path.join(configure.letgo_base_home,"sdcjudger.py")]
-    result = run_command(command)
-    print(result.get("stdout","No sdcout"))
+    # sys.stdout = sys.__stdout__
+    # command = ["python3.8",os.path.join(configure.letgo_base_home,"sdcjudger.py")]
+    # result = run_command(command)
+    # print(result.get("stdout","No sdcout"))
 
-    command = ["python3.8",os.path.join(configure.letgo_base_home,"analyze.py"),"-bname",configure.progname]
-    result = run_command(command)
-    print(result.get("stdout","No analyze output"))
+    # command = ["python3.8",os.path.join(configure.letgo_base_home,"analyze.py"),"-bname",configure.progname]
+    # result = run_command(command)
+    # print(result.get("stdout","No analyze output"))
 
 
 
