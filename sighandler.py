@@ -19,7 +19,9 @@ GDB_LAUNCH = "gdb " + configure.benchmark
 GDB_HANDLE_BUS = "handle SIGBUS nopass"
 GDB_HANDLE_SEGV = "handle SIGSEGV nopass"
 GDB_HANDLE_ABT = "handle SIGABRT nopass"
+GDB_HANDLE_FPE = "handle SIGFPE nopass"
 GDB_HANDLE_ALL = "handle all stop print"
+
 GDB_PRINT_PC = "print $pc"
 GDB_CONTINUE = "continue"
 GDB_NEXT = "stepi"
@@ -43,8 +45,8 @@ PRT_ERR_LEN_MAX = "Safe " + str(MAX_ERROR_SPREAD)
 PTR_ERR_INJ_MAX = "After Inject:" + PRT_ERR_LEN_MAX
 PTR_ERR_FIX_MAX = "After Fixed:" + PRT_ERR_LEN_MAX
 
-##debug_mode
-debug_mode = 5
+#debug file
+debugfile = configure.debugfile
 
 is_fake = 1
 is_rewind = 1
@@ -61,6 +63,9 @@ def is_hexnumber(s):
     except ValueError:
         return False
 
+def is_number(value):
+    return value.isdigit()  # 如果是整数返回 True
+
 class SigHandler:
     def __init__(self, insts, trial):
         self.insts = int(insts)
@@ -72,15 +77,26 @@ class SigHandler:
         sys.stderr = self.log
 
         
+
         self.sig_start_time = datetime.datetime.now()
         self.sig_end_time = datetime.datetime.now()
         self.letgo_start_time = datetime.datetime.now()
         
         self.process_remote_target = None
+        if debugfile == 1:
+            remote_target_logname = 'remote_target.txt'
+            self.logfile2 = open(remote_target_logname, 'wb')
+
         launch = GDB_LAUNCH
         if configure.MPI_SET == 1:
             launch = " ".join(configure.mpi_cmd) + " " + launch
         self.process = pexpect.spawn(launch)
+        if debugfile == 1:
+            #self.process.logfile = sys.stdout.buffer
+            process_logname = 'process.txt'
+            self.logfile = open(process_logname, 'wb')
+            self.process.logfile = self.logfile
+
         print("do pexpect.spawn: gdb  has launched!")
         print(GDB_LAUNCH)
 
@@ -111,16 +127,13 @@ class SigHandler:
                 ##指令池空，则直接随机找指令
                 args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
 
-
-
-
-
         if configure.inject_random_or_targeted == "targeted":
             result = InstPoolMaker.readArgsFromPool(configure.pool_csv_file)
             #兼容原来的输出
-            args = result[0:3]
-            random_number = random.randint(0, 256)
-            args.append(str(random_number))
+            args = result[0:4]
+            randomnum = result[-1]
+            # random_number = random.randint(0, 128)
+            # args.append(str(random_number))
             print(args)
 
 
@@ -131,6 +144,7 @@ class SigHandler:
             self.log.close()
             process.close()
             sys.stdout = sys.__stdout__
+            sys.exit(1)
             return
 
         regmm = args[0].rstrip("\n")    ##
@@ -156,7 +170,7 @@ class SigHandler:
             print((process.before.decode('utf-8')))
             print('Successfully set the breakpoint')
 
-    # run application
+    # run application to target breakpoint
         ##
 
 
@@ -174,7 +188,7 @@ class SigHandler:
             output = process.before.decode('utf-8')
             print('----------------------Start output----------------------\n',output,'\n----------------------End output----------------------')
             if "Breakpoint" not in output:
-                print("no such Breakpoint!")
+                print("no such Breakpoint:\t",hexpc)
                 self.log.close()
                 process.terminate()
                 process.close()
@@ -187,19 +201,44 @@ class SigHandler:
                 if iteration > 1024:
                     iteration = iteration%1024 #random.randint(0, 1024)
                 print('rechoose iteration in range (0,1024):\t',iteration)
+                # while iteration > 0:
+                #     process.sendline(GDB_CONTINUE)
+                #     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                #     if i == 0:
+                #         print('ERROR while continuing the program')
+                #         print((process.before.decode('utf-8'), process.after))
+                #         print((str(process)))
+                #         self.log.close()
+                #         process.close()
+                #         sys.stdout = sys.__stdout__
+                #         return
+                #     if i == 1:
+                #         iteration -= 1
                 while iteration > 0:
-                    process.sendline(GDB_CONTINUE)
-                    i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                    if i == 0:
-                        print('ERROR while continuing the program')
-                        print((process.before.decode('utf-8'), process.after))
-                        print((str(process)))
-                        self.log.close()
+                    try:
+                        process.sendline(GDB_CONTINUE)
+                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT, pexpect.EOF], timeout=2)  # 增加了 pexpect.EOF 来检测进程结束
+                        
+                        if i == 0:
+                            print('ERROR while continuing the program')
+                            print((process.before.decode('utf-8'), process.after))
+                            print((str(process)))
+                            self.log.close()
+                            process.close()
+                            sys.stdout = sys.__stdout__
+                            return
+                        
+                        if i == 1:
+                            iteration -= 1
+
+                        if i == 2:  # 如果是 pexpect.EOF，说明进程已退出
+                            print("Process has exited (iteration over runtime).")
+                            return
+                    except pexpect.ExceptionPexpect as e:
+                        print(f"pexpect error: {e}")
                         process.close()
                         sys.stdout = sys.__stdout__
                         return
-                    if i == 1:
-                        iteration -= 1
 
     # print out the current instruction for more info
                 ###
@@ -221,13 +260,13 @@ class SigHandler:
                     return
                 if i == 1:
                     output = process.before.decode('utf-8')
-                    print("\nbefore inject inst:--------------------------------------\t\n:",output,"before inject inst end:--------------------------------------\n")
+                    #print("\nbefore inject inst:--------------------------------------\t\n:",output,"before inject inst end:--------------------------------------\n")
 
     # No.iteration breakpoint
                 process.sendline("set $saved_pc = $pc")
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 process.sendline("x/i $saved_pc")
-                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT,pexpect.EOF])
                 if i == 0:
                     print("ERROR when displaying the inst")
                     print((process.before.decode('utf-8'), process.after))
@@ -239,6 +278,9 @@ class SigHandler:
                 if i == 1:
                     inject_inst = process.before.decode('utf-8')
                     print("display the inject inst start:\n",inject_inst,"display the inject inst end.")
+                if i == 2:
+                    print("process end")
+                    return
 
     # inject reg
                 if regmm == "":  # it means that it is a normal instruction and we need to inject the fault to the dest reg
@@ -391,7 +433,6 @@ class SigHandler:
                 process.interact()  # 交互模式，允许用户直接控制 GDB"""
 
                 process.sendline(GDB_DELETE_BP)
-                process.sendline('y')
                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                 if i == 0:
                     print("ERROR when deleting breakpoints")
@@ -429,18 +470,22 @@ class SigHandler:
 
         print("launch process_remote_target:\t",' '.join(execlist))
         self.process_remote_target = pexpect.spawn(' '.join(execlist))
-        output = self.print_process(self.process_remote_target)
+        if debugfile == 1:
+            #self.process_remote_target.logfile =  sys.stdout.buffer
+            self.process_remote_target.logfile = self.logfile2
 
         try:
-            port = output.split(':')[-1].strip()
+            self.process_remote_target.expect('target remote :')
+            self.process_remote_target.expect('\r\n')
+            port = self.process_remote_target.before.decode('utf-8').strip()
             print("Extracted port:", port)
 
             gdb_command = f"target remote :{port}"
             print("process cmd:",gdb_command)
 
             process.sendline(gdb_command)
-            i = process.expect([pexpect.TIMEOUT, "(gdb)"])
-            print(process.before.decode('utf-8'))
+            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+            print("respone to 'target remote :' :\n",process.before.decode('utf-8'))
 
             #print((process.before.decode('utf-8')))
         except:
@@ -492,19 +537,33 @@ class SigHandler:
         except Exception as e:
             print("Unexpected error:", e)
 
-    def print_process(self,process):
+    def print_process(self, process, max_timeout_retries=10):
+        """
+        持续读取并打印进程输出，直到进程结束或达到最大超时次数。
+
+        :param process: pexpect 进程对象
+        :param max_timeout_retries: 最大超时重试次数
+        :return: 进程的全部输出
+        """
         alloutput = ''
-        # 捕获并打印输出
+        timeout_retries = 0  # 超时重试计数
+
         while True:
             try:
-                output = process.read_nonblocking(size=1024, timeout=1).decode('utf-8')  # 每次读取 1024 字节
+                output = process.read_nonblocking(size=1024, timeout=1)  # 每次读取 1024 字节
+                if isinstance(output, bytes):
+                    output = output.decode('utf-8')  # 如果是bytes，进行解码
                 if output:
-                    #print(output)
                     alloutput = alloutput + ' ' + output.strip()
+                    timeout_retries = 0  # 重置超时计数器
             except pexpect.TIMEOUT:
-                break  # 如果没有输出，则继续循环
+                timeout_retries += 1  # 超时重试次数加1
+                if timeout_retries >= max_timeout_retries:
+                    #print("进程无输出，超时次数达到上限。")
+                    break  # 达到最大重试次数时退出
             except pexpect.EOF:
-                break  # 如果进程结束，则退出循环
+                break  # 进程结束时退出
+
         return alloutput.strip()
 
 
@@ -555,13 +614,12 @@ class SigHandler:
                 if i == 0:
                     print("Error: Timeout after x/i $pc.",seq_casuse_signal)
                     break
-                pc_output = process.before.decode('utf-8').strip()
+                pc_output = process.before.decode('utf-8').replace('\r','').replace('\n','').strip()
                 if "The program is not being run." in pc_output:
                     print("program stop!")
                     self.print_process(process)
                     return 0,'no crash'
                 print(re.sub(r'[\n()]', '', pc_output))  # 打印当前的 PC 状态
-
 
             except pexpect.EOF:
                 print("GDB process ended.")
@@ -575,19 +633,18 @@ class SigHandler:
         
         if rcv_sig == 0:##附近没有出错,就继续运行直到出错或者结束
             process.sendline(GDB_CONTINUE)
-            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+            i = process.expect([GDB_PROMOPT,pexpect.TIMEOUT],timeout = 180)
             coutput = process.before.decode('utf-8')
             if "received signal" in coutput:
                 rcv_sig = 1
                 print(re.sub(r'[\n()]', '', coutput))
             else:       #完美masked
-                print(output)
-            output = coutput
+                print(coutput)
         if rcv_sig == 1:##此处gdb已经由于signal的存在而暂停,无论远近,采取同一个方法打印
             process.sendline(GDB_DISPLAY)
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
             output = process.before.decode('utf-8')
-        print("print $pc:\t",output)
+            print("print $pc:\t",output)
         buffer = self.print_process(process)
         if not buffer.strip() == '':
             print("clear buffer:",self.print_process(process),"end clear.")
@@ -614,27 +671,25 @@ class SigHandler:
         process.expect([pexpect.TIMEOUT, "(gdb)"])
         sigout = process.before.decode('utf-8')
         if "received signal" in sigout:
+            print(sigout)
             process.sendline("x/i $pc")
             process.expect([pexpect.TIMEOUT, "(gdb)"])
             print(process.before.decode('utf-8').replace("\n", "").replace("\r", ""))
-            process.sendline("backtrace")
-            process.expect([pexpect.TIMEOUT, "(gdb)"])
-            gdbout = process.before.decode('utf-8')
-            print("\nat sig backtrace:\t",(gdbout))
-            if "return" in gdbout:
-                process.sendline("return")
-                print(process.expect([pexpect.TIMEOUT, "(gdb)"]))
-            print("backrace end")
-        #出错前手动调试
-        #sys.__stdout__.write("interact")
-        #process.interact()
+            # process.sendline("backtrace")
+            # process.expect([pexpect.TIMEOUT, "(gdb)"])
+            # gdbout = process.before.decode('utf-8')
+            # print("\nat sig backtrace:\t",(gdbout))
+            # if "return" in gdbout:
+            #     process.sendline("return")
+            #     print(process.expect([pexpect.TIMEOUT, "(gdb)"]))
+            # print("backrace end")
 
     def letgo_frame(self,process):
         ######  call this when encoutering SIG and gdb pause
         ###  LetGo framework steps in
         #####
         output = self.print_process(process)
-        if not output.strip():
+        if output.strip():
             print("clear before:",output)
         print('\nLetgo in!')
         self.letgo_start_time = datetime.datetime.now()
@@ -850,7 +905,7 @@ class SigHandler:
 
                 # try to set the rbp and rsp to reasonable values
                 ##print('set rbp and rsp to reasonable values')  怎么判断
-                if is_rewind == 1 and flag == 1:    ##flag1表示栈的写入,这里flag和上面multiple options中的if冲突,也就是只有else执行时才执行此处;is_rewind是手动开关
+                if is_rewind == 1 and (flag == 1 or flag == 2):    ##flag1表示栈的写入,这里flag和上面multiple options中的if冲突,也就是只有else执行时才执行此处;is_rewind是手动开关
                     print("h_3")
                     print('stackw, set rbp and rsp to reasonable values')
                     stackinfo = ["rbp", "rsp"]
@@ -858,7 +913,8 @@ class SigHandler:
                         size = fi.get_stack_size()  ##size保存的是ins所在函数初始为局部变量分配的空间大小,典型的函数栈帧设置的一部分
                         if size != "":
                             stackinfo.remove(stack)
-                            rxp = stackinfo[0]
+                            rxp = stackinfo[0]#rxp=rsp
+                            print("stack size != null, rxp=", rxp)
                             ##解析$rxp内容
                             process.sendline(GDB_PRINT_REG + " $" + rxp)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -950,34 +1006,29 @@ class SigHandler:
                         print("Cannot get the size of the current stack frame")
                 
     def handle_after_injection(self,process):
-
+        print("process continue...")
         process.sendline(GDB_CONTINUE)
-        while process.isalive():
-            try:
-                # 尝试匹配 (gdb) 提示符
-                i = process.expect([pexpect.TIMEOUT, "(gdb)"], timeout=2)  # 每次等待 2 秒
-                
-                if i == 1:  # 匹配到 (gdb)，说明程序暂停或结束
-                    print("Program has stopped at GDB prompt.")
-                    break
-            except pexpect.EOF:
-                print("Process exited.")
-                break
-            except pexpect.TIMEOUT:
-                print("Program is still running...")
-                # 可插入额外逻辑，例如检查日志或状态
-            time.sleep(1)  # 间隔检查，避免过多占用资源
 
-        print("process pause or stop.")
-        after_continue = process.before.decode('utf-8')
+        index = self.process.expect([GDB_PROMOPT, pexpect.EOF, pexpect.TIMEOUT], timeout=240)
+        if index == 0:
+            print("Received GDB prompt,process pause or stop.")
+        elif index == 1:
+            print("Received EOF")
+        elif index == 2:
+            print("Timeout occurred")
+
+        after_continue = self.process.before.decode()
+        #print(after_continue)
+        
         if "received signal" in after_continue:
-            print("after_continue:\t",after_continue)
-
+            #print("after_continue:\t",after_continue)
+            rcv_sig = 0 #假设通过修复不会再收到信号
             self.info_at_signal(process)
             self.letgo_start_time = datetime.datetime.now()
             exit_code = self.letgo_frame(process)
             if exit_code == 1:
                 rcv_sig =1
+
             ##此处开始计算介入letgo_frame后的错误传播
             rcv_sig,output= self.error_spread(process,1)
             if rcv_sig == 0:
@@ -989,16 +1040,10 @@ class SigHandler:
                 self.info_at_signal(process)
                 process.sendline("kill")
                 process.expect([pexpect.TIMEOUT, "(gdb)"])
-                process.sendline("y")
-                process.expect([pexpect.TIMEOUT, "(gdb)"])
-
-           
-            
-
-                        
-        else:
+        else:   # 注错后没有收到信号
+            if after_continue.strip():
+                print("after_continue:\t",after_continue)
             print("\nNo triggering crashes")
-            print("Application output\n")
 
             output = self.print_process(process)
             if output.strip():
@@ -1006,9 +1051,10 @@ class SigHandler:
                 print(output)
                 print("end buffer clear")
 
-        sdcjudger.SDC_saver(index = str(self.trial))
-        self.sig_end_time = datetime.datetime.now()
+        
         try:
+            sdcjudger.SDC_saver(index = str(self.trial))
+            self.sig_end_time = datetime.datetime.now()
             print("Letgo time: ",self.sig_end_time - self.letgo_start_time)
         except:
             pass
@@ -1019,7 +1065,7 @@ class SigHandler:
     def inject_by_breakpoint_and_recover(self,process):
         self.inject_inst_by_breakpoint(process)
 
-        rcv_sig,output= self.error_spread(process,0)
+        #rcv_sig,output= self.error_spread(process,0)
 
         self.handle_after_injection(process)
 
@@ -1028,26 +1074,12 @@ class SigHandler:
         self.handle_after_injection(process)
 
         print("app output:")
-        while True:
-            try:
-                # 等待进程输出，直到超时或进程结束
-                self.process_remote_target.expect(pexpect.EOF, timeout=300)  # 增加超时确保进程结束
-                
-                # 获取并打印进程输出
-                output = self.process_remote_target.before.decode('utf-8')
-                if output:
-                    print(output)
-                break  # 退出循环，进程已结束
-            except pexpect.exceptions.TIMEOUT as e:
-                # 如果超时，打印当前所有输出内容并继续等待
-                output = self.process_remote_target.before.decode('utf-8')
-                print("Timeout reached, current output:")
-                print(output)
-                continue  # 继续等待输出，直到 EOF 结束
-            except pexpect.exceptions.ExceptionPexpect as e:
-                # 捕获其他 pexpect 异常
-                print("Error:", e)
-                break
+        # 等待进程输出，直到超时或进程结束
+        result = self.process_remote_target.expect([pexpect.EOF, pexpect.TIMEOUT], timeout=300)  # 捕获EOF或超时
+        # 获取并打印进程输出
+        output = self.process_remote_target.before.decode('utf-8').strip()
+        if output:
+            print(output)
         print("end output.")
         
         print("injection info:")
@@ -1070,17 +1102,28 @@ class SigHandler:
             return
         if i == 1:
             temp = process.before.decode('utf-8')  ## just to flush the before buffer
+
             process.sendline(GDB_HANDLE_BUS)
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
             print((process.before.decode('utf-8')))
+
             process.sendline(GDB_HANDLE_SEGV)
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
             print((process.before.decode('utf-8')))
+
             process.sendline(GDB_HANDLE_ABT)
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
             print((process.before.decode('utf-8')))
 
+            process.sendline(GDB_HANDLE_FPE)
+            process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+            print((process.before.decode('utf-8')))
+
             process.sendline("set print demangle on")
+            process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+            print((process.before.decode('utf-8')))
+
+            process.sendline("set confirm off")
             process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
             print((process.before.decode('utf-8')))
 

@@ -291,7 +291,8 @@ def generate_catalog(catalog_csv_file = configure.catalog_csv_file):
     execute(execlist)
     return catalog_csv_file
 
-def generate_Pool_from_catalog(catalog_csv_file = configure.catalog_csv_file, num_samples=1000):
+
+def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=1000):
     """
     从catalog_csv_file中随机选择num_samples行数据，并将每行的前三个参数保存到pool_csv_file。
 
@@ -302,8 +303,6 @@ def generate_Pool_from_catalog(catalog_csv_file = configure.catalog_csv_file, nu
     with open(catalog_csv_file, 'r') as infile:
         lines = infile.readlines()
 
-    # 输出文件路径
-    pool_csv_file = configure.pool_csv_file
 
     # 打开 pool_csv_file 进行写入
     with open(pool_csv_file, 'w') as outfile:
@@ -315,10 +314,48 @@ def generate_Pool_from_catalog(catalog_csv_file = configure.catalog_csv_file, nu
             columns = random_line.strip().split(',')  # 假设每行的数据由逗号分隔
             selected_params = columns[:2]  # 获取前三个参数
             selected_params.append(str(int(columns[2],16)))
+
+            random_number = str(random.randint(0, 64))
+            selected_params.append(random_number)
             # 将结果写入文件
             outfile.write(','.join(selected_params) + '\n')
 
     print(f"已通过catalog创建{num_samples} 条注错位置，保存到 {pool_csv_file}")
+    return pool_csv_file
+
+def generate_Pool_from_catalog1(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=2000):
+    """
+    从catalog_csv_file中随机选择50行（如果行数大于50），并将每行的前三个参数和一个附加的参数（1到20）写入到pool_csv_file中。
+    如果catalog_csv_file的行数小于50，则处理所有行。
+
+    :param catalog_csv_file: 输入的csv文件路径
+    :param num_samples: 随机选择的样本数量，默认为1000
+    """
+    # 读取 catalog_csv_file 的所有行
+    with open(catalog_csv_file, 'r') as infile:
+        lines = infile.readlines()
+
+    # 如果行数大于50，随机选择50行；如果小于50，则使用所有行
+    if len(lines) > 50:
+        lines = random.sample(lines, 50)
+    
+
+    nums_one_inst = int(num_samples/len(lines))
+    # 打开 pool_csv_file 进行写入
+    with open(pool_csv_file, 'w') as outfile:
+        # 遍历每一行
+        for line in lines:
+            # 提取前三个参数
+            columns = line.strip().split(',')  # 假设每行的数据由逗号分隔
+            selected_params = columns[:2]  # 获取前两个参数
+            selected_params.append(str(int(columns[2], 16)))  # 将第三个参数转换为十进制
+
+            # 为每一行创建20个副本，每个副本附加一个新的参数（从1到20）
+            for i in range(1, nums_one_inst):
+                new_line = selected_params + [str(i)]  # 添加从1到20的数值
+                outfile.write(','.join(new_line) + '\n')
+
+    print(f"已通过catalog创建{len(lines) * 20} 条注错位置，保存到 {pool_csv_file}")
     return pool_csv_file
 
 def readArgsFromPool(filepath = os.path.join(configure.instpool_folder, poolname)):

@@ -17,7 +17,7 @@ import seaborn as sns
 ## clsfy == 1 to move unfinished record to folder "unfinish"
 clsfy = 0
 ## delbug = 1 to delete file that encounters Traceback
-delbug = 0
+delbug = 1
 ## to_csv =1 will collect all information to csv under log_path,but cost much more time
 to_csv = 1
 ## findins = 1 will auto find Sig1ins and Sig2ins according to Sig*pc and asm  
@@ -27,6 +27,8 @@ debug_mode = 5
 ## show file example find by string like "No reg, Exit"
 show_ss_example = 0
 
+
+
 ##定义parser
 parser = argparse.ArgumentParser(description="Analyze log files.")
 parser.add_argument('-file', type=str, help='Log file to process,benchmark according to configure.py')
@@ -34,36 +36,60 @@ parser.add_argument('-flag', type=str, help='flag means the number of Sig receiv
 parser.add_argument('-sdc_flag', type=str, help='sdc_flag means the number of SDC')
 
 parser.add_argument('-bname', type=str, help='bname means benchmark name')
+parser.add_argument('-i', type=str, help='specify param: inject_random_or_targeted(random,targeted)')
+parser.add_argument('-s', type=str, help='specify param: select_type(call_retq,stack,mov,integer,float,cmp)')
 parser.add_argument('-analyze_all', type=str, help='analyze all application one time')
 parser.add_argument('-p', type=str, help="picture type")
 parser.add_argument('-t', type=str, help="Table type")
 args = parser.parse_args()
+argslen = len(vars(args))
 
-progname = configure.progname
-if args.bname:
-    progname = args.bname
-
+progname = configure.progname if not args.bname else args.bname
+inject_random_or_targeted = configure.inject_random_or_targeted if not args.i else args.i
+select_type = configure.select_type if not args.s else args.s
+analysis_folder = configure.analysis_folder 
 
 file_count = 0
-crash_1 = []
-crash_2 = []
-crash_2p = []
-finish = []
-flag = 0
-unfinishedlist = []
-output = []
 
-log_folder = os.path.join(configure.result_path,progname,"log")  ##数据源目录
-if configure.inject_random_or_targeted == "targeted":
-    log_folder = os.path.join(configure.result_path,configure.progname,configure.select_type,"log")
+#不指定参数,默认从configure中获得参数
+one_batch_folder = configure.one_batch_folder 
+analysis_folder_name = configure.analysis_folder_name
+result_analyze_csv_name = configure.result_analyze_csv_name
+
+#手动输入参数,根据输入参数以configure的规则构建需要的参数
+if argslen:    
+    if inject_random_or_targeted == "random":
+        Result_folder_name = "BenchmarkResult"
+        analysis_folder_name = "analysis"
+        result_analyze_csv_name = progname +'.csv'
+        one_batch_folder = os.path.join(configure.letgo_base_home,Result_folder_name,progname)
+    if inject_random_or_targeted == "targeted":
+        Result_folder_name = "TargetedBenchmarkResult"
+        analysis_folder_name = "TargetedAnalysis"
+        result_analyze_csv_name = progname + '_' + select_type +'.csv'
+        one_batch_folder = os.path.join(configure.letgo_base_home,Result_folder_name,progname,select_type)
+
+analysis_folder = os.path.join(configure.letgo_base_home,analysis_folder_name)
+analysis_csv_folder = os.path.join(analysis_folder,'CSV')
+analysis_csv_file = os.path.join(analysis_csv_folder,result_analyze_csv_name)
+asm_folder  = os.path.join(analysis_folder,'asm')
+pic_folder  = os.path.join(analysis_folder,'PIC')
+
+log_folder = os.path.join(one_batch_folder,"log")  ##数据源目录
+
 print("log_folder in:\t",log_folder)
 if not (os.path.exists(log_folder) and os.path.isdir(log_folder)):
     print("{} does not exist or is not a directory".format(log_folder))
     exit(0)
 
-csv_dir = configure.csv_folder                  ##将log_folder的海量数据收集整理到csv_dir中
-pic_dir = configure.pic_folder
 
+finish = []
+crash_1 = []
+crash_2 = []
+crash_2p = []
+unfinishedlist = []
+#ignore masked and sdc
+ignore_no_crash = 1 if inject_random_or_targeted == "random" else 1
 
 # 直接从 configure 中导入所需的变量
 SdcAppList = configure.SdcAppList
@@ -199,21 +225,19 @@ def search_string_in_log():
                 top_n -=1
 
 
-def read_logs(progname):
+def read_logs(progname, log_folder, output_dir, outputname):
     global file_count, crash_1, crash_2, crash_2p, finish, flag, detected, correct, sdc, unfinishedlist, output
-    #for -bname 
-    log_folder = os.path.join(configure.result_path,progname,"log")  ##数据源目录
-    if configure.inject_random_or_targeted == "targeted":
-        log_folder = os.path.join(configure.result_path,configure.progname,configure.select_type,"log")
+    
         
+    print("read log in folder:\t",log_folder)
     if to_csv == 1:
-        csv_file_path = os.path.join(log_folder, csv_dir, progname + '.csv')
+        csv_file_path = analysis_csv_file
         # 检查文件是否存在，如果存在则删除
         if os.path.exists(csv_file_path):
             os.remove(csv_file_path)
-            print("Deleted old", csv_file_path)
+            print("Deleted old csv:\t", csv_file_path)
         else:
-            print(progname + '.csv', "does not exist.")
+            print("Csv not exist:\t",csv_file_path)
 
     # 只选择以 "log_" 开头的文件并按名称排序
     log_files = sorted(
@@ -222,7 +246,6 @@ def read_logs(progname):
     )
 
     
-    print("deal with log folfer:\t",log_folder)
     for f in log_files:
 
         file_count += 1
@@ -240,13 +263,14 @@ def read_logs(progname):
 
             bugin = 0
             for line in lines:
-                if "Traceback" in line:
+                if "Traceback" in line or "no such Breakpoint" in line or "SystemExit" in line or "exit_flag: True" in line:
                     print("Bug in:\t", f)
                     bugin = 1
                     if delbug == 1:
                         os.remove(f)  # 删除文件
                         print("delete:\t", f)
                         break
+                    break
                 if "Program received signal" in line and not after_letgoin and flag == 0:
                     flag = 1
                 if "Letgo in!" in line :
@@ -294,9 +318,11 @@ def read_logs(progname):
                 crash_2p.append(f)
             if flag == 0:
                 finish.append(f)
+        if ignore_no_crash == 1 and flag == 0:
+            continue
         if to_csv == 1:
-            extract_values_and_append_to_csv(f, log_folder, progname + '.csv', flag, sdc_flag)
-
+            # 创建 CSV 文件保存的目录
+            extract_values_and_append_to_csv(log_folder, f,  output_dir, outputname, flag, sdc_flag)
 
 def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope', SigFunc='Sig1Func', address=None, asm_file=None, df=None, file=None, insline_context = None):
     """
@@ -359,13 +385,8 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
         print(df.loc[0, 'input_file'],"\tLine:", line)
 
 
-def extract_values_and_append_to_csv(input_file, log_folder, outputname, flag, sdc_flag):
-    if debug_mode >=6:
-        print("\nnow do extract_values_and_append_to_csv")
-    # 创建 CSV 文件保存的目录
-    output_dir = os.path.join(log_folder,csv_dir)
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)  # 如果目录不存在则创建
+def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputname, flag, sdc_flag):
+ 
 
     # 创建一个空的 DataFrame
     df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
@@ -389,7 +410,7 @@ def extract_values_and_append_to_csv(input_file, log_folder, outputname, flag, s
         
     # 获取文件名
     file_name = os.path.basename(input_file)
-    asm_file = os.path.join(configure.asm_folder,progname+'.asm')
+    asm_file = os.path.join(asm_folder,progname+'.asm')
     df.loc[0,'input_file'] = file_name
 
     # 读取文件并提取所需内容
@@ -559,7 +580,7 @@ def extract_values_and_append_to_csv(input_file, log_folder, outputname, flag, s
                     df.loc[0,Sig] = tmp.strip()
                     insline = next_i_line_content(file,1,'0x')
                     address = 'null'
-                    asm_file = os.path.join(configure.asm_folder,progname+'.asm')
+                    asm_file = os.path.join(asm_folder,progname+'.asm')
                     if '0x' in insline and 'in' in insline:
                         df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].lstrip('0x').lstrip('0')
                         address = df.loc[0,Sigpc].lstrip("0x")
@@ -591,7 +612,7 @@ def extract_values_and_append_to_csv(input_file, log_folder, outputname, flag, s
 
             ###SDC判断
             special_bias_app_list = ["HPCCG","hpl","miniFE","miniMD"]
-            if configure.progname not in special_bias_app_list and configure.cmp_str in line:
+            if progname not in special_bias_app_list and configure.cmp_str in line:
                 df.loc[0,'bias'] = line.split('(')[1].split(')')[0].strip()
             #hpl
             if "||Ax-b||_oo/(eps*(||A||_oo*||x||_oo+||b||_oo)*N)=" in line:
@@ -610,8 +631,8 @@ def extract_values_and_append_to_csv(input_file, log_folder, outputname, flag, s
         df.loc[0, 'Sig1Ins'] = 'null'
         df.loc[0, 'result'] = ANIA
 
-    if configure.progname in special_bias_app_list:
-        if configure.progname == "miniFE":
+    if progname in special_bias_app_list:
+        if progname == "miniFE":
             golden_bias = 4.45306e-06
             bias = df.loc[0,'bias']
             #默认最严格的sdc判定，如果误差小，就将sdc进化成masked
@@ -620,18 +641,19 @@ def extract_values_and_append_to_csv(input_file, log_folder, outputname, flag, s
                      df.loc[0,'result'] = 'Masked'
                 if df.loc[0,'result'] == 'C-SDC':
                      df.loc[0,'result'] = 'C-Masked'
-        if configure.progname == "HPCCG":
+        if progname == "HPCCG":
             golden_bias = 2.21357e-28
             bias = df.loc[0,'bias']
-            if abs(float(bias) - golden_bias) > 10.0e-28:
+            if abs(float(bias) - golden_bias) < 10.0e-28:
                 if df.loc[0,'result'] == 'SDC':
                      df.loc[0,'result'] = 'Masked'
                 if df.loc[0,'result'] == 'C-SDC':
                      df.loc[0,'result'] = 'C-Masked'
-            
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)  # 如果目录不存在则创建
     # 构造输出文件路径
     output_file = os.path.join(output_dir, outputname)
-
     # 以追加的形式写入到CSV文件
     df.to_csv(output_file, mode='a+', header=not os.path.exists(output_file), index=False, na_rep='null')
 
@@ -1434,22 +1456,26 @@ def Tab_col_Recovery2(csv_dir, grouping_column, output_dir):
             print(f"Error processing file {file_name}: {e}")
 
 
-def all(progname):
+def analyze_one_batch(progname, log_folder, analysis_csv_folder, result_analyze_csv_name, asm_folder):
     print("Read logs and generate csv")
 
     print(f"Processing program: {progname}")
-    read_logs(progname)  # 读取日志并生成 CSV
-    
+    read_logs(progname, log_folder, analysis_csv_folder, result_analyze_csv_name)
+
     # 检查是否需要进行更多的查找
     if findmorebypc == 1:
         try:
-            findins.findinsbyasm(progname)
-        except:
-            print("error findins.findinsbyasm(progname)")
+            asm_file = os.path.join(asm_folder,progname+'.asm')
+            findins.findinsbyasm(progname,asm_file,analysis_csv_file)
+        except Exception as e:
+            print("error findins.findinsbyasm(progname):\t",e)
 
 
 def main():
+    global progname,inject_random_or_targeted,select_type
     if args.p or args.t:
+        csv_dir = analysis_csv_folder
+        pic_dir = pic_folder
         if args.p == '1':
             pic1XappYaveragecrash(csv_dir,pic_dir)
         elif args.p == '2':
@@ -1480,18 +1506,16 @@ def main():
             Tab_col_Recovery(csv_dir,'Sig1',pic_dir)
             Tab_col_Recovery(csv_dir, 'injreg', pic_dir)
             Tab_col_Recovery(csv_dir, 'Sig1Ope', pic_dir)
+            Tab_col_Recovery(csv_dir, 'ErrSpd_Fix', pic_dir)
+            
         return
 
     if args.file and args.flag:##调试单个log
         extract_values_and_append_to_csv(os.path.join(log_folder,str(args.file)),log_folder,args.file+'.csv',args.flag, args.sdc_flag)
         return
 
-    if args.bname:
-        all(args.bname)
-        return
-
     if args.analyze_all:
-        directory = configure.result_path
+        directory = os.path.join(configure.letgo_base_home,Result_folder_name)
         try:
             # 获取目录中所有子文件夹名
             prognames = [name for name in os.listdir(directory) if os.path.isdir(os.path.join(directory, name))]
@@ -1500,7 +1524,8 @@ def main():
             for progname in prognames:
                 try:
                     print (progname)
-                    all(progname)
+                    continue
+                    analyze_one_batch(progname, log_folder, analysis_csv_folder, result_analyze_csv_name, asm_folder)
                 except:
                     print("--------------------------------fail--------------------------------")
                     continue
@@ -1510,7 +1535,7 @@ def main():
         return
         
     # 直接运行configure的情况
-    all(configure.progname)
+    analyze_one_batch(progname, log_folder, analysis_csv_folder, result_analyze_csv_name, asm_folder)
 
 
 

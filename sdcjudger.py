@@ -83,7 +83,7 @@ def Add_SDC_result_to_alllog_LU(log_path=configure.log_folder, sdcout_folder=con
         golden_output = os.path.join(configure.Rodinia_base,"/openmp/lud", 'm_matrix_512.txt')
         
         # 检查文件是否存在
-        if not os.path.exists(this_output) or not os.path.exists(golden_output):
+        if not os.path.exists(this_output) or not os.path.exists(golden_output) or not os.path.exists(log_index_file):
             continue
         
         # 判断是否已经对该log_index进行了判断
@@ -102,25 +102,25 @@ def Add_SDC_result_to_alllog_LU(log_path=configure.log_folder, sdcout_folder=con
         print('log_'+str(index)+'\n')
 
 
-def Add_SDC_result_to_alllog_common(log_path=configure.log_folder, sdcout_folder=configure.sdcout_folder, tolerance=configure.tolerance):
+def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name = configure.output_name, log_path=configure.log_folder, sdcout_folder=configure.sdcout_folder, tolerance=configure.tolerance):
     len = find_max_log_suffix(log_path)
 
-    in_path = configure.progname + '/' + configure.output_name
+    in_path = progname + '/' + output_name
 
     golden_output = os.path.join(configure.Rodinia_base, "results", in_path)
-    if configure.progname == 'hotspot':
+    if progname == 'hotspot':
         golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/output.txt"
-    if configure.progname == 'miniMD':
+    if progname == 'miniMD':
         golden_output = "/home/tongshiyu/programs/mantevo/miniMD/ref/output.txt"
-    if configure.progname == 'miniFE':
+    if progname == 'miniFE':
         golden_output = "/home/tongshiyu/programs/mantevo/miniFE/openmp/basic/output.txt"
-    if configure.progname == 'HPCCG':
+    if progname == 'HPCCG':
         golden_output = "/home/tongshiyu/programs/mantevo/HPCCG/output.txt"
-    if configure.progname == 'nn':
+    if progname == 'nn':
         golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/nn/output.txt"
-    if configure.progname == 'kmeans':
+    if progname == 'kmeans':
         golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/kmeans/output.txt"
-    if configure.progname == 'particlefilter':
+    if progname == 'particlefilter':
         golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/output.txt"
 
     
@@ -134,6 +134,7 @@ def Add_SDC_result_to_alllog_common(log_path=configure.log_folder, sdcout_folder
         if not os.path.exists(this_output) or not os.path.exists(golden_output) or not os.path.exists(log_index_file):
             if not configure.output_name == 'none':
                 continue
+            continue
         
         # 判断是否已经对该log_index进行了判断
         with open(log_index_file, 'r') as f:
@@ -148,15 +149,15 @@ def Add_SDC_result_to_alllog_common(log_path=configure.log_folder, sdcout_folder
             #with contextlib.redirect_stdout(sys.__stdout__):
                 # 创建判断对象并进行比较
                 try:
-                    if configure.progname in ['bfs','backprop','nn',"kmeans","particlefilter"]:
+                    if progname in ['bfs','backprop','nn',"kmeans","particlefilter"]:
                         strong_compare_outputs(this_output,golden_output)
-                    elif configure.progname == 'hotspot':
+                    elif progname == 'hotspot':
                         hotspot_compare_outputs(this_output, golden_output, tolerance)
-                    elif configure.progname == 'miniMD':
+                    elif progname == 'miniMD':
                         miniMD_compare_outputs(this_output, golden_output, tolerance)
-                    elif configure.progname == 'miniFE':
+                    elif progname == 'miniFE':
                         miniFE_compare_outputs(this_output, golden_output, tolerance)
-                    elif configure.progname == 'HPCCG':
+                    elif progname == 'HPCCG':
                         HPCCG_compare_outputs(this_output, golden_output, tolerance)
                     else:
                         common_compare_outputs(this_output, golden_output, tolerance)
@@ -169,7 +170,7 @@ def Add_SDC_result_to_alllog_common(log_path=configure.log_folder, sdcout_folder
                 # sys.exit(1) 
         if fail == 1:
             print("fail in:\t"+'log_'+str(index)+'\n')
-    print(configure.progname,":\tadd sdc result from log_0 to ",'log_'+str(index)+'\n')
+    print(progname,":\tadd sdc result from log_0 to ",'log_'+str(index)+'\n')
 
 def Init():
     progname = configure.progname
@@ -484,7 +485,7 @@ def HPCCG_compare_outputs(this_output_path, golden_output_path, tolerance):
             return 1
 
         # Compare the residuals
-        if abs(this_residual - golden_residual) > tolerance:
+        if abs(this_residual - golden_residual) >= tolerance:
             print(f"{cmp_str}False")
             return 1
 
@@ -503,7 +504,7 @@ def common_compare_outputs(this_output, golden_output, tolerance=configure.toler
 
     # 检查数据的形状是否相同
     if this_data.shape != golden_data.shape:
-        print("Files have different shapes, cannot compare.")
+        print(configure.cmp_str+"False")
         return 1
 
     # 计算差异

@@ -18,33 +18,33 @@ prognames_supply = [
     "HPCCG", "miniFE", "miniMD", "miniAMR"
 ]
 #应用名取自prognames_supply
-progname = "backprop"
+progname = "HPCCG"
 
 #随机注错还是对目标类型注错
 inject_random_or_targeted = "random"
 inject_random_or_targeted = "targeted"
 
 #对目标类型注错,详细参数
-select_type = "mov"     #call_retq,stack,mov,integer,float,cmp
-dynamic_analyze = 0         #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
-
-#注错工具
-inject_tool = 'pinfi'          
-#inject_tool = 'breakpoint'
+select_type = "float"     #call_retq,stack,mov,integer,float,cmp,div
+num_samples = 3000      #有选择指令的数量
+dynamic_analyze =  0  #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
 
 #实验次数
-numFI = 10
+numFI = 3000
 
 #log起始index
 num_start_from = 0
 #log终止index
 num_end_at = 5000
 
-
+#注错工具
 if inject_random_or_targeted == "targeted":
     inject_tool = 'breakpoint'
+if inject_random_or_targeted == "random":
+    inject_tool = 'pinfi'
 
-
+#debugfile,用来生成sighandle中调试步骤,process.txt
+debugfile = 1
 #废案
 inject_op = 'all' ##用all表示不进行启发式注错,已废弃
 #inject_op = '' 
@@ -191,8 +191,10 @@ elif progname == 'lu':
     output_name = 'lu_matrix_512.txt'
     lu_output_name = 'lu_matrix_512.txt'
     m_output_path = 'm_matrix_512.txt'
-elif progname in ['miniMD','miniFE','HPCCG']:
+elif progname in ['miniMD','miniFE','HPCCG','hpl']:
     output_name = 'none'
+else:
+    output_name = ''
 
 # configuration of sdc tolerance
 tolerance = 0.0
@@ -205,42 +207,40 @@ cmp_str = "Compare within tolerance("+str(tolerance)+"):"
 
 
 # configuration of folder
-folders_to_create = []
 if inject_random_or_targeted == "random":
-    result_path = os.path.join(letgo_base_home,"BenchmarkResult")
-    #result_path = os.path.join(letgo_base_home,"nosdcarchive","BenchmarkResult")
-
-    prog_folder = os.path.join(result_path,progname)
-    log_folder = os.path.join(result_path,progname,"log")
-    sdcout_folder = os.path.join(result_path,progname,"sdcout")
-    instpool_folder = os.path.join(result_path,progname)
-
-    analysis_folder = os.path.join(letgo_base_home,'analysis')
-    csv_folder = os.path.join(analysis_folder,'CSV')
-    asm_folder  = os.path.join(analysis_folder,'asm')
-    pic_folder  = os.path.join(analysis_folder,'PIC')
-
+    Result_folder_name = "BenchmarkResult"
+    analysis_folder_name = "analysis"
+    insInjection_pool_csv_name = progname + ".csv"
+    result_analyze_csv_name = progname +'.csv'
+    one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname)
+    catalog_csv_file = ''
 if not inject_random_or_targeted == "random":
-    result_path = os.path.join(letgo_base_home,"TargetedBenchmarkResult")
-    prog_folder = os.path.join(result_path,progname)
-    ins_class_folder = os.path.join(prog_folder,select_type)
-    folders_to_create.append(ins_class_folder)
+    Result_folder_name = "TargetedBenchmarkResult"
+    analysis_folder_name = "TargetedAnalysis"
+    catalog_csv_name = select_type+"_catalog"+".csv"
+    insInjection_pool_csv_name = select_type + "_pool" + ".csv"
+    result_analyze_csv_name = progname + '_' + select_type +'.csv'
+    one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname,select_type)
+    catalog_csv_file = os.path.join(one_batch_folder,catalog_csv_name)
+#程序运行数据文件夹
+log_folder = os.path.join(one_batch_folder,"log")
+sdcout_folder = os.path.join(one_batch_folder,"sdcout")
+instpool_folder = os.path.join(one_batch_folder)
+#程序运行结果分析文件夹
+analysis_folder = os.path.join(letgo_base_home,analysis_folder_name)
+csv_folder = os.path.join(analysis_folder,'CSV')
+asm_folder  = os.path.join(analysis_folder,'asm')
+pic_folder  = os.path.join(analysis_folder,'PIC')
+#文件占位符
+pool_csv_file = os.path.join(one_batch_folder, insInjection_pool_csv_name)
+csv_file = os.path.join(csv_folder,result_analyze_csv_name)
 
-    log_folder = os.path.join(ins_class_folder,"log")
-    sdcout_folder = os.path.join(ins_class_folder,"sdcout")
-    instpool_folder = os.path.join(ins_class_folder)
-    catalog_csv_file = os.path.join(instpool_folder,select_type+"_catalog"+".csv")
-    pool_csv_file = os.path.join(instpool_folder, select_type + "_pool" + ".csv")
-
-
-    analysis_folder = os.path.join(letgo_base_home,'TargetedAnalysis')
-    csv_folder = os.path.join(analysis_folder,'CSV')
-    asm_folder  = os.path.join(analysis_folder,'asm')
-    pic_folder  = os.path.join(analysis_folder,'PIC')
-
-folders_to_create.extend([result_path,prog_folder,log_folder,sdcout_folder,instpool_folder,analysis_folder,csv_folder,asm_folder,pic_folder])
+folders_to_create = []
+folders_to_create.extend([one_batch_folder,log_folder,sdcout_folder,instpool_folder,one_batch_folder,analysis_folder,csv_folder,asm_folder,pic_folder])
 for folder in folders_to_create:
     os.makedirs(folder, exist_ok=True)
+
+
 
 # define results
 MASKED = 'Masked'
@@ -248,8 +248,8 @@ SDC = 'SDC'
 C_MASKED = 'C-Masked'
 C_SDC = 'C-SDC'
 DOUBLE_CRASH = 'Recrash'
-CRASH_NOPC = 'crash'
+CRASH_NOPC = 'Recrash'
 
-# about faultinjection.cpp
+# tmp file about faultinjection.cpp
 pin_instcount = "./pin.instcount.txt"
 activate = "./activate"
