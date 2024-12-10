@@ -26,8 +26,18 @@ iterationinst_config1 = "-pc"
 iterationinst_config2 = "-randinst"
 saveInsTypelib  = configure.toolbase + "/obj-intel64/saveInstcategory.so"
 saveInsTypelib_config1 = "-ins_type"
-saveInsTypelib_config2 = "-csv_name"
+saveInsTypelib_config2 = "-address_count_file"
 saveInsTypelib_config3 = "-dynamic_analyze"
+saveInsTypelib_config4 = "-inst_type_table_file"
+saveInsTypelib_config5 = "-only_memory"
+
+distributionInstCatalib  = configure.toolbase + "/obj-intel64/distributionInstCata.so"
+distributionInstCatalib_config1 = "-inst_type_table_file"
+distributionInstCatalib_mnemonic_count_file = "-mnemonic_count_file"
+distributionInstCatalib_dynamic_analyze = "-dynamic_analyze"
+distributionInstCatalib_config4 = "-des_register_count_file"
+distributionInstCatalib_config5 = "-src_register_count_file"
+
 nextinst = "obj-intel64/findnextinst.so"
 nextinst_config1 = "-pc"
 instructionfile = "instruction"
@@ -284,15 +294,74 @@ def Random_instPoolMaker():
         selectOneIns(totalcount)
 
 
-def generate_catalog(catalog_csv_file = configure.catalog_csv_file):
-    execlist = [configure.pin_home,"-t",saveInsTypelib,saveInsTypelib_config1,configure.select_type,saveInsTypelib_config2,catalog_csv_file,saveInsTypelib_config3,str(configure.dynamic_analyze),"--",configure.benchmark]
+def generate_mnemonic_count_file(mnemonic_count_file = configure.mnemonic_count_file):
+    execlist = [configure.pin_home,"-t",distributionInstCatalib,\
+                distributionInstCatalib_mnemonic_count_file,os.path.join(configure.letgo_base_home,configure.progname,mnemonic_count_file),\
+                distributionInstCatalib_dynamic_analyze,"0",\
+                "--",configure.benchmark]
     for item in configure.args:
         execlist.append(item)
+    #print(''.join(execlist))
+    execute(execlist)
+    return mnemonic_count_file
+
+
+def generate_catalog(catalog_csv_file = configure.catalog_csv_file):
+    execlist = [configure.pin_home,"-t",saveInsTypelib,saveInsTypelib_config1,configure.select_type,saveInsTypelib_config2,catalog_csv_file,saveInsTypelib_config3,str(configure.dynamic_analyze),saveInsTypelib_config5 ,str(configure.only_memory), "--",configure.benchmark]
+    for item in configure.args:
+        execlist.append(item)
+    print(''.join(execlist))
     execute(execlist)
     return catalog_csv_file
 
+def generate_Pool_from_catalog1(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=1000):
+    # 该算法考虑了catalog中一行的占比进行随机
+    """
+    从catalog_csv_file中随机选择num_samples行数据，并将每行的前三个参数保存到pool_csv_file。
+    选择行的概率基于每行的出现次数。
 
-def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=1000):
+    :param catalog_csv_file: 输入的csv文件路径
+    :param pool_csv_file: 输出的csv文件路径
+    :param num_samples: 随机选择的样本数量，默认为1000
+    """
+    # 读取 catalog_csv_file 的内容并解析为行和出现次数
+    lines = []
+    weights = []
+    
+    with open(catalog_csv_file, 'r') as infile:
+        reader = csv.reader(infile)
+        for row in reader:
+            if row:  # 忽略空行
+                count = int(row[4])  # 取出出现次数
+                lines.append(row[:3])  # 取前三个参数
+                weights.append(count)  # 使用次数作为权重
+    
+    # 计算加权随机选择
+    total_count = sum(weights)
+
+
+    # 打开 pool_csv_file 进行写入
+    with open(pool_csv_file, 'w', newline='') as outfile:
+        writer = csv.writer(outfile)
+        
+        for _ in range(num_samples):
+            selected_line = random.choices(lines, weights, k=1)[0]  # 根据权重随机选择一行
+            args = selected_line[:2]
+            # 将第三列的十六进制数转为十进制
+            hex_value = selected_line[2]  # 获取第三列（十六进制数字）
+            decimal_value = str(int(hex_value, 16))  # 转换为十进制字符串
+            args.append(decimal_value)
+            # 为选中的行生成随机数字
+            args.append(str(random.randint(0, 1024)))
+            #args.append(hex_value)
+            outfile.write(','.join(args) + '\n')
+
+    print(f"已通过catalog创建{num_samples}条注错位置，保存到 {pool_csv_file}")
+    return pool_csv_file
+
+
+def generate_Pool_from_catalog2(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=1000):
+    # 该算法忽略了catalog中一行的占比,强制进行随机
     """
     从catalog_csv_file中随机选择num_samples行数据，并将每行的前三个参数保存到pool_csv_file。
 
@@ -323,7 +392,8 @@ def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool
     print(f"已通过catalog创建{num_samples} 条注错位置，保存到 {pool_csv_file}")
     return pool_csv_file
 
-def generate_Pool_from_catalog1(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=2000):
+def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=2000):
+    ##该方法为每行创建20个注错机会,行的选择方式是选择前50条
     """
     从catalog_csv_file中随机选择50行（如果行数大于50），并将每行的前三个参数和一个附加的参数（1到20）写入到pool_csv_file中。
     如果catalog_csv_file的行数小于50，则处理所有行。
@@ -335,12 +405,15 @@ def generate_Pool_from_catalog1(catalog_csv_file=configure.catalog_csv_file, poo
     with open(catalog_csv_file, 'r') as infile:
         lines = infile.readlines()
 
-    # 如果行数大于50，随机选择50行；如果小于50，则使用所有行
-    if len(lines) > 50:
-        lines = random.sample(lines, 50)
-    
+    # # 如果行数大于50，随机选择50行；如果小于50，则使用所有行
+    # if len(lines) > 50:
+    #     lines = random.sample(lines, 50)
 
-    nums_one_inst = int(num_samples/len(lines))
+    # 如果行数大于 100，使用前 100 行；否则使用所有行
+    if len(lines) > 100:
+        lines = lines[:100]
+
+    nums_one_inst = min(int(num_samples/len(lines)),20)
     # 打开 pool_csv_file 进行写入
     with open(pool_csv_file, 'w') as outfile:
         # 遍历每一行
@@ -349,10 +422,11 @@ def generate_Pool_from_catalog1(catalog_csv_file=configure.catalog_csv_file, poo
             columns = line.strip().split(',')  # 假设每行的数据由逗号分隔
             selected_params = columns[:2]  # 获取前两个参数
             selected_params.append(str(int(columns[2], 16)))  # 将第三个参数转换为十进制
-
+            max_iteration = int(columns[-1])-1
             # 为每一行创建20个副本，每个副本附加一个新的参数（从1到20）
-            for i in range(1, nums_one_inst):
-                new_line = selected_params + [str(i)]  # 添加从1到20的数值
+            for i in range(0, nums_one_inst):
+                iteration = str(min(max_iteration,i))
+                new_line = selected_params + [iteration]  # 添加从1到20的数值
                 outfile.write(','.join(new_line) + '\n')
 
     print(f"已通过catalog创建{len(lines) * 20} 条注错位置，保存到 {pool_csv_file}")

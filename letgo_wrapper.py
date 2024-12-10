@@ -170,13 +170,17 @@ if __name__ == "__main__":
 
   
     if configure.inject_random_or_targeted == "targeted":
+        if not os.path.exists(configure.mnemonic_count_file):
+            print("Generating mnemonic_count...")
+            mnemonic_count_file = InstPoolMaker.generate_mnemonic_count_file(mnemonic_count_file = configure.mnemonic_count_file)
+        if not os.path.exists(configure.catalog_csv_file):
+            print("Generating catalog...")
+            catalog_path = InstPoolMaker.generate_catalog(catalog_csv_file = configure.catalog_csv_file)
         if not os.path.exists(configure.pool_csv_file) or os.path.getsize(configure.pool_csv_file)==0:
             print("Generating pool...")
-            catalog_path = InstPoolMaker.generate_catalog(catalog_csv_file = configure.catalog_csv_file)
-            pool_path = InstPoolMaker.generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=configure.num_samples)
+            pool_path = InstPoolMaker.generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=configure.numFI)
         else:
             print("Pool already exists, skip generating pool from catalog...")
-
 
     log_count = 0
 

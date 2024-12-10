@@ -710,7 +710,7 @@ class SigHandler:
             match = re.findall('0[xX]?[A-Fa-f0-9]+', process.before.decode('utf-8'))
             if len(match) == 0:
                 print("Crash place getting no PC!")
-                return
+                return 1
             #print(match[0])
             decpc = int(match[0], 0)    ##此处的match[0]是一个包含0x的十六进制地址,使用int将其转化为十进制
             try:
@@ -1026,11 +1026,14 @@ class SigHandler:
             self.info_at_signal(process)
             self.letgo_start_time = datetime.datetime.now()
             exit_code = self.letgo_frame(process)
-            if exit_code == 1:
+            rcv_sig = 0
+            if exit_code == 1:#letgo执行失败了
                 rcv_sig =1
 
-            ##此处开始计算介入letgo_frame后的错误传播
-            rcv_sig,output= self.error_spread(process,1)
+            ##letgo_frame执行完毕,开始计算介入letgo_frame后的错误传播
+            if rcv_sig==0:
+                rcv_sig,output= self.error_spread(process,1)
+
             if rcv_sig == 0:
                 print("Process Continue!\n")
                 process.sendline(GDB_CONTINUE)

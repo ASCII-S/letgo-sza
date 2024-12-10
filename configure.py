@@ -18,19 +18,20 @@ prognames_supply = [
     "HPCCG", "miniFE", "miniMD", "miniAMR"
 ]
 #应用名取自prognames_supply
-progname = "HPCCG"
+waittochangebyscrips = "miniFE"
+progname = waittochangebyscrips
 
 #随机注错还是对目标类型注错
 inject_random_or_targeted = "random"
-inject_random_or_targeted = "targeted"
+#inject_random_or_targeted = "targeted"
 
 #对目标类型注错,详细参数
-select_type = "float"     #call_retq,stack,mov,integer,float,cmp,div
-num_samples = 3000      #有选择指令的数量
-dynamic_analyze =  0  #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
+select_type = "mov"     #stack,data_transfer,mov,integer,float,logical,call_ret,control_flow, other
+only_memory = 1
+dynamic_analyze =  1  #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
 
 #实验次数
-numFI = 3000
+numFI = 2000
 
 #log起始index
 num_start_from = 0
@@ -231,12 +232,15 @@ analysis_folder = os.path.join(letgo_base_home,analysis_folder_name)
 csv_folder = os.path.join(analysis_folder,'CSV')
 asm_folder  = os.path.join(analysis_folder,'asm')
 pic_folder  = os.path.join(analysis_folder,'PIC')
+mnemonic_count_folder = os.path.join(analysis_folder,'mnemonic_count')
 #文件占位符
+mnemonic_count_name = progname + "_" + "mnemonic_count.csv"
+mnemonic_count_file = os.path.join(mnemonic_count_folder,mnemonic_count_name)
 pool_csv_file = os.path.join(one_batch_folder, insInjection_pool_csv_name)
 csv_file = os.path.join(csv_folder,result_analyze_csv_name)
 
 folders_to_create = []
-folders_to_create.extend([one_batch_folder,log_folder,sdcout_folder,instpool_folder,one_batch_folder,analysis_folder,csv_folder,asm_folder,pic_folder])
+folders_to_create.extend([one_batch_folder,log_folder,sdcout_folder,instpool_folder,one_batch_folder,analysis_folder,csv_folder,asm_folder,pic_folder,mnemonic_count_folder])
 for folder in folders_to_create:
     os.makedirs(folder, exist_ok=True)
 

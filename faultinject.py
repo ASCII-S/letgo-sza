@@ -250,6 +250,7 @@ class FaultInjector:
         else:
             decvalue = int(ori_value)
         print("New value is "+str(decvalue^mask)+" Old value is "+str(decvalue))##将原始值以随机长度,按位异或得到新值
+        print("bit location:",pos)
         return str(decvalue^mask)
     
     def get_stack_size(self):
