@@ -2,6 +2,8 @@ import os
 import pandas as pd
 import configure
 
+number = 2999
+
 def delete_files_based_on_csv(csv_file_path, log_path):
     # 读取 CSV 文件
     df = pd.read_csv(csv_file_path)
@@ -19,7 +21,7 @@ def delete_files_based_on_csv(csv_file_path, log_path):
             print(f"File not found: {file_path}")
 
 
-def delete_log_based_on_index(log_directory=configure.log_path):
+def delete_log_based_on_index(log_directory=configure.log_folder):
     # 列出所有文件
     files = os.listdir(log_directory)
     
@@ -30,7 +32,7 @@ def delete_log_based_on_index(log_directory=configure.log_path):
             try:
                 index = int(file.split('_')[1])
                 # 删除序号大于或等于748的文件
-                if index >= 1026:
+                if index >= number:
                     file_path = os.path.join(log_directory, file)
                     os.remove(file_path)
                     print(f"Deleted: {file_path}")

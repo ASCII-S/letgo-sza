@@ -17,16 +17,21 @@ prognames_supply = [
     # mantevo
     "HPCCG", "miniFE", "miniMD", "miniAMR"
 ]
+#特殊名字
+#special =""
+special = "OnlyH_3_2"
+#special = "OnlyH_3"
+
 #应用名取自prognames_supply
-waittochangebyscrips = "miniFE"
+waittochangebyscrips = "backprop"
 progname = waittochangebyscrips
 
 #随机注错还是对目标类型注错
 inject_random_or_targeted = "random"
-#inject_random_or_targeted = "targeted"
+inject_random_or_targeted = "targeted"
 
 #对目标类型注错,详细参数
-select_type = "mov"     #stack,data_transfer,mov,integer,float,logical,call_ret,control_flow, other
+select_type = "integer"     #stack,data_transfer,mov,integer,float,logical,call_ret,control_flow, other
 only_memory = 1
 dynamic_analyze =  1  #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
 
@@ -216,8 +221,8 @@ if inject_random_or_targeted == "random":
     one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname)
     catalog_csv_file = ''
 if not inject_random_or_targeted == "random":
-    Result_folder_name = "TargetedBenchmarkResult"
-    analysis_folder_name = "TargetedAnalysis"
+    Result_folder_name = "TargetedBenchmarkResult"+special
+    analysis_folder_name = "TargetedAnalysis"+special
     catalog_csv_name = select_type+"_catalog"+".csv"
     insInjection_pool_csv_name = select_type + "_pool" + ".csv"
     result_analyze_csv_name = progname + '_' + select_type +'.csv'

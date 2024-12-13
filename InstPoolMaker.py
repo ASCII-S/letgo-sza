@@ -410,10 +410,10 @@ def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool
     #     lines = random.sample(lines, 50)
 
     # 如果行数大于 100，使用前 100 行；否则使用所有行
-    if len(lines) > 100:
-        lines = lines[:100]
+    if len(lines) > 80:
+        lines = lines[:80]
 
-    nums_one_inst = min(int(num_samples/len(lines)),20)
+    nums_one_inst = min(int(num_samples/len(lines)),50)
     # 打开 pool_csv_file 进行写入
     with open(pool_csv_file, 'w') as outfile:
         # 遍历每一行

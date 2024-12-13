@@ -48,8 +48,8 @@ PTR_ERR_FIX_MAX = "After Fixed:" + PRT_ERR_LEN_MAX
 #debug file
 debugfile = configure.debugfile
 
-is_fake = 1
-is_rewind = 1
+is_fake = 0 ##h_1,h_2
+is_rewind = 1   ##h_3
 
 ##log_path = "./self.log"
 log_path = configure.log_folder
@@ -128,7 +128,14 @@ class SigHandler:
                 args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
 
         if configure.inject_random_or_targeted == "targeted":
-            result = InstPoolMaker.readArgsFromPool(configure.pool_csv_file)
+            pool_file = configure.pool_csv_file
+            if not os.path.exists(pool_file):
+                print(f"Error: File '{pool_file}' does not exist.")
+                sys.exit(1)
+            if os.path.getsize(pool_file)==0:
+                print(f"Error: File '{pool_file}' is empty.")
+                sys.exit(1)
+            result = InstPoolMaker.readArgsFromPool(pool_file)
             #兼容原来的输出
             args = result[0:4]
             randomnum = result[-1]
@@ -695,76 +702,162 @@ class SigHandler:
         self.letgo_start_time = datetime.datetime.now()
         process.sendline(GDB_PRINT_PC)
         i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-        if i == 1:
-            # parse the pc value by regex 0x
-            # send the pc to pin, and get all info we need
-            print('parse the pc value by regex 0x')
-            output = process.before.decode('utf-8')
-            if "receiced signal" in output:
-                try:
-                    print("no => but find:\t",'0x'+output.split('0x')[1].split(' ')[0])
-                except:
-                    print(output)
-            else:
-                print(output)
-            match = re.findall('0[xX]?[A-Fa-f0-9]+', process.before.decode('utf-8'))
-            if len(match) == 0:
-                print("Crash place getting no PC!")
-                return 1
-            #print(match[0])
-            decpc = int(match[0], 0)    ##此处的match[0]是一个包含0x的十六进制地址,使用int将其转化为十进制
+        if i != 1:
+            print("error entering letgo: cannot print pc")
+    
+        # parse the pc value by regex 0x
+        # send the pc to pin, and get all info we need
+        print('parse the pc value by regex 0x')
+        output = process.before.decode('utf-8')
+        if "receiced signal" in output:
             try:
-                fi = faultinject.FaultInjector(self.insts)
-                args = fi.getNextPC(decpc)  ## 此处要关注faultinjecion.cpp中的getNextPC函数
-                
-                if len(args) != 8:
-                    print("No nextpc!")
-                    return 1
-            except Exception as process_error:
-                print("No nextpc!\nOpen file failed...")
-                return
+                print("no => but find:\t",'0x'+output.split('0x')[1].split(' ')[0])
+            except:
+                print(output)
+        else:
+            print(output)
+        match = re.findall('0[xX]?[A-Fa-f0-9]+', process.before.decode('utf-8'))
+        if len(match) == 0:
+            print("Crash place getting no PC!")
+            return 1
+        #print(match[0])
+        decpc = int(match[0], 0)    ##此处的match[0]是一个包含0x的十六进制地址,使用int将其转化为十进制
+        try:
+            fi = faultinject.FaultInjector(self.insts)
+            args = fi.getNextPC(decpc)  ## 此处要关注faultinjecion.cpp中的getNextPC函数
             
-            print(args)
-            nextpc = args[0]    ##ins的下一条指令的pc值
-            regwlist = args[1]  ##ins的所有写寄存器的列表
-            stack = args[2]     ##ins是栈操作则和base相同,否则为nostack
-            flag = args[3]      ## stackw: 1, stackr: 2 , nostack: 3
-            base = args[4]      ##ins在内存中的基地址
-            index = args[5]     ##ins在内存中的索引寄存器值,基地址偏移
-            displacement = args[6]  ##指令中内存操作的位移量
-            scale = args[7]     ##内存因子,用来和index配合使用,实现复杂内存寻址
-            
-            process.sendline(GDB_PRINT_REG + " $pc=" + str(nextpc))
-            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-            print("nextpc:\t",process.before.decode('utf-8'))
-            if i == 0:
-                print("ERROR when setting the pc value")
-                print((process.before.decode('utf-8'), process.after))
-                print((str(process)))
-                self.log.close()
-                process.close()
-                sys.stdout = sys.__stdout__
-                return
+            if len(args) != 8:
+                print("No nextpc!")
+                return 1
+        except Exception as process_error:
+            print("No nextpc!\nOpen file failed...")
+            return
+        
+        print(args)
+        thispc = decpc
+        nextpc = args[0]    ##ins的下一条指令的pc值
+        regwlist = args[1]  ##ins的所有写寄存器的列表
+        stack = args[2]     ##ins是栈操作则和base相同,否则为nostack
+        flag = args[3]      ## stackw: 1, stackr: 2 , nostack: 3
+        base = args[4]      ##ins在内存中的基地址
+        index = args[5]     ##ins在内存中的索引寄存器值,基地址偏移
+        displacement = args[6]  ##指令中内存操作的位移量
+        scale = args[7]     ##内存因子,用来和index配合使用,实现复杂内存寻址
+                    
+        do_recovery = 1
+        if do_recovery == 1:
+            #####
+            # We can have multiple options here. For now, we feed the value (0) to the supposed-to-write register
+            #####
+            print('multiple options')
+            if is_fake == 1:    ##处理写寄存器regw,is_fake是手动开关
+                for regw in regwlist:
+                    if flag == 1:   ##处理栈写，即memory-store，相关的而寄存器, 重计算内存写的位置
+                        print("h_1")
+                        final_b = 0 ##base 
+                        final_i = 0 ##index
+                        final_d = 0 ##displacement
+                        final_s = 0 ##scale
+                        ## we can try to calculate a valid number for regw
+                        if base == "":                          ##开始解析base
+                            print("no base")
+                            continue
+                        print("base:\t",base)
+                        process.sendline(GDB_PRINT_REG + " $" + base)   ##？？？
+                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                        if i == 0:
+                            print("ERROR when getting the base")
+                            print((process.before.decode('utf-8'), process.after))
+                            print((str(process)))
+                            self.log.close()
+                            process.close()
+                            sys.stdout = sys.__stdout__
+                            return
+                        basestr = process.before.decode('utf-8')##开始解析basestr
+                        print("basestr:\t",basestr)
+                        content = ""
+                        if "0x" in basestr:
+                            items = basestr.split(" ")
+                            for item in items:
+                                if "0x" in item:
+                                    content = item
+                        else:
+                            items = basestr.split(" ")
+                            content = items[len(items) - 1]
+                        content = content.lstrip("nan")
+                        content = content.lstrip("-nan")
+                        if "0x" in content:
+                            final_b = int(content, 16)   ## 修复之前的base和现在的这个Base一样吗
+                        else:
+                            final_b = int(content)  ##base解析完毕,content保存了将basestr从16进制转化到10进制的结果
+                        if index == "null":         ##开始解析index
+                            print("no index")
+                        else:
+                            process.sendline(GDB_PRINT_REG + " $" + index)
+                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                            if i == 0:
+                                print("ERROR when getting the index")
+                                print((process.before.decode('utf-8'), process.after))
+                                print((str(process)))
+                                self.log.close()
+                                process.close()
+                                sys.stdout = sys.__stdout__
+                                return
+                            indexstr = process.before.decode('utf-8')
+                            print("indexstr:\t",indexstr)
+                            content = ""
+                            if "0x" in indexstr:
+                                items = indexstr.split(" ")
+                                for item in items:
+                                    if "0x" in item:
+                                        content = item
+                            else:
+                                items = indexstr.split(" ")
+                                content = items[len(items) - 1]
+                            content = content.lstrip("nan")
+                            content = content.lstrip("-nan")
+                            if "0x" in content:
+                                final_i = int(content, 16)
+                            else:
+                                final_i = int(content)  ##index解析完毕
 
-            if i == 1:
-                #####
-                # We can have multiple options here. For now, we feed the value (0) to the supposed-to-write register
-                #####
-                print('multiple options')
-                if is_fake == 1:    ##处理写寄存器regw,is_fake是手动开关
-                    for regw in regwlist:
-                        if flag == 2:   ##处理栈读相关的而寄存器, 这里是把regw设置成合适的值
-                            print("h_1")
-                            final_b = 0 ##base 
-                            final_i = 0 ##index
-                            final_d = 0 ##displacement
-                            final_s = 0 ##scale
-                            ## we can try to calculate a valid number for regw
-                            if base == "":                          ##开始解析base
-                                print("no base")
-                                continue
-                            print("base:\t",base)
-                            process.sendline(GDB_PRINT_REG + " $" + base)   ##？？？
+                            final_d = int(displacement)
+                            final_s = int(scale)
+                            ##用base,displacement,index,scale综合确定修改后的地址值
+                            address = final_b + final_d + final_i * final_s   # 基地址、内存偏移量、基地址偏移、内存因子
+                            print("address: {0}, final_b: {1}, final_d: {2}, final_i: {3}, final_s: {4}".format(
+                                hex(address),  # 将address转换为十六进制
+                                hex(final_b),  # 将final_b转换为十六进制
+                                hex(final_d),           # 将final_d转换为十六进制
+                                hex(final_i),           # 将final_i转换为十六进制
+                                hex(final_s)            # 将final_s转换为十六进制
+                            ))
+
+                            process.sendline(GDB_PRINT_REG + " *" + str(address))
+                            i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                            if i == 0:
+                                print("ERROR when getting the final value")
+                                print((process.before.decode('utf-8'), process.after))
+                                print((str(process)))
+                                self.log.close()
+                                process.close()
+                                sys.stdout = sys.__stdout__
+                                return
+                            finalres = process.before.decode('utf-8')   # 打印位于address中的内容
+                            # finalres是什么？
+                            content = ""
+                            if "0x" in finalres:
+                                items = finalres.split(" ")
+                                for item in items:
+                                    if "0x" in item:
+                                        content = item
+                            else:
+                                items = finalres.split(" ")
+                                content = items[len(items) - 1]
+                            content = content.lstrip("nan")
+                            content = content.lstrip("-nan")
+
+                            process.sendline(GDB_PRINT_REG + " $" + regw)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
                                 print("ERROR when getting the base")
@@ -774,126 +867,15 @@ class SigHandler:
                                 process.close()
                                 sys.stdout = sys.__stdout__
                                 return
-                            basestr = process.before.decode('utf-8')##开始解析basestr
-                            print("basestr:\t",basestr)
-                            content = ""
-                            if "0x" in basestr:
-                                items = basestr.split(" ")
-                                for item in items:
-                                    if "0x" in item:
-                                        content = item
-                            else:
-                                items = basestr.split(" ")
-                                content = items[len(items) - 1]
-                            content = content.lstrip("nan")
-                            content = content.lstrip("-nan")
-                            if "0x" in content:
-                                final_b = int(content, 16)   ## 修复之前的base和现在的这个Base一样吗
-                            else:
-                                final_b = int(content)  ##base解析完毕,content保存了将basestr从16进制转化到10进制的结果
-                            if index == "null":         ##开始解析index
-                                print("no index")
-                            else:
-                                process.sendline(GDB_PRINT_REG + " $" + index)
-                                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                                if i == 0:
-                                    print("ERROR when getting the index")
-                                    print((process.before.decode('utf-8'), process.after))
-                                    print((str(process)))
-                                    self.log.close()
-                                    process.close()
-                                    sys.stdout = sys.__stdout__
-                                    return
-                                indexstr = process.before.decode('utf-8')
-                                print("indexstr:\t",indexstr)
-                                content = ""
-                                if "0x" in indexstr:
-                                    items = indexstr.split(" ")
-                                    for item in items:
-                                        if "0x" in item:
-                                            content = item
-                                else:
-                                    items = indexstr.split(" ")
-                                    content = items[len(items) - 1]
-                                content = content.lstrip("nan")
-                                content = content.lstrip("-nan")
-                                if "0x" in content:
-                                    final_i = int(content, 16)
-                                else:
-                                    final_i = int(content)  ##index解析完毕
+                            print_regw = process.before.decode('utf-8')##开始解析basestr
 
-                                final_d = int(displacement)
-                                final_s = int(scale)
-                                ##用base,displacement,index,scale综合确定修改后的地址值
-                                address = final_b + final_d + final_i * final_s   # 基地址、内存偏移量、基地址偏移、内存因子
-                                print("address: {0}, final_b: {1}, final_d: {2}, final_i: {3}, final_s: {4}".format(
-                                    hex(address),  # 将address转换为十六进制
-                                    hex(final_b),  # 将final_b转换为十六进制
-                                    hex(final_d),           # 将final_d转换为十六进制
-                                    hex(final_i),           # 将final_i转换为十六进制
-                                    hex(final_s)            # 将final_s转换为十六进制
-                                ))
-
-                                process.sendline(GDB_PRINT_REG + " *" + str(address))
-                                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                                if i == 0:
-                                    print("ERROR when getting the final value")
-                                    print((process.before.decode('utf-8'), process.after))
-                                    print((str(process)))
-                                    self.log.close()
-                                    process.close()
-                                    sys.stdout = sys.__stdout__
-                                    return
-                                finalres = process.before.decode('utf-8')   # 打印位于address中的内容
-                                # finalres是什么？
-                                content = ""
-                                if "0x" in finalres:
-                                    items = finalres.split(" ")
-                                    for item in items:
-                                        if "0x" in item:
-                                            content = item
-                                else:
-                                    items = finalres.split(" ")
-                                    content = items[len(items) - 1]
-                                content = content.lstrip("nan")
-                                content = content.lstrip("-nan")
-
-                                process.sendline(GDB_PRINT_REG + " $" + regw)
-                                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                                if i == 0:
-                                    print("ERROR when getting the base")
-                                    print((process.before.decode('utf-8'), process.after))
-                                    print((str(process)))
-                                    self.log.close()
-                                    process.close()
-                                    sys.stdout = sys.__stdout__
-                                    return
-                                print_regw = process.before.decode('utf-8')##开始解析basestr
-
-                                print("change regw key:\t",regw.strip())   
-                                print("unchanged regw value:\t",print_regw.strip())
-                                print("change regw value to:\t",content.strip())
-                                process.sendline(GDB_SET_REG + " $" + regw + "=" + content)     # 这是什么 为什么要这样
-                                i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                                if i == 0:
-                                    print("ERROR when setting the final value")
-                                    print((process.before.decode('utf-8'), process.after))
-                                    print((str(process)))
-                                    self.log.close()
-                                    process.close()
-                                    sys.stdout = sys.__stdout__
-                                    return
-                                if i == 1:
-                                    print("is stackr: have set reg with address calculation ")
-
-                        else:   ##非栈读的寄存器用flag=!2用来控制这个分支条件
-                            if "xmm" in regw:
-                                regw = regw+".uint128"
-                            print("h_2")
-                            process.sendline(GDB_SET_REG + " $" + regw + "=" + GDB_FAKE)   
+                            print("change regw key:\t",regw.strip())   
+                            print("unchanged regw value:\t",print_regw.strip())
+                            print("change regw value to:\t",content.strip())
+                            process.sendline(GDB_SET_REG + " $" + regw + "=" + content)     # 这是什么 为什么要这样
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
-                                print("ERROR when setting the reg value")
+                                print("ERROR when setting the final value")
                                 print((process.before.decode('utf-8'), process.after))
                                 print((str(process)))
                                 self.log.close()
@@ -901,22 +883,77 @@ class SigHandler:
                                 sys.stdout = sys.__stdout__
                                 return
                             if i == 1:
-                                print("not stackr,so set fake:\t",regw)
+                                print("is stackr: have set reg with address calculation ")
 
-                # try to set the rbp and rsp to reasonable values
-                ##print('set rbp and rsp to reasonable values')  怎么判断
-                if is_rewind == 1 and (flag == 1 or flag == 2):    ##flag1表示栈的写入,这里flag和上面multiple options中的if冲突,也就是只有else执行时才执行此处;is_rewind是手动开关
-                    print("h_3")
-                    print('stackw, set rbp and rsp to reasonable values')
-                    stackinfo = ["rbp", "rsp"]
-                    if stack != "":
-                        size = fi.get_stack_size()  ##size保存的是ins所在函数初始为局部变量分配的空间大小,典型的函数栈帧设置的一部分
-                        if size != "":
-                            stackinfo.remove(stack)
-                            rxp = stackinfo[0]#rxp=rsp
-                            print("stack size != null, rxp=", rxp)
-                            ##解析$rxp内容
-                            process.sendline(GDB_PRINT_REG + " $" + rxp)
+                    if flag == 2:   ##处理栈读, 即memory-load，用0代替读到的数据，原因是内存中有很多零
+                        if "xmm" in regw:
+                            regw = regw+".uint128"
+                        print("h_2 start")
+                        process.sendline(GDB_SET_REG + " $" + regw + "=" + GDB_FAKE)   
+                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                        if i == 0:
+                            print("ERROR when setting the reg value")
+                            print((process.before.decode('utf-8'), process.after))
+                            print((str(process)))
+                            self.log.close()
+                            process.close()
+                            sys.stdout = sys.__stdout__
+                            return
+                        if i == 1:
+                            print("not stackr,so set fake:\t",regw)
+                        print("h_2 end")
+
+            # try to set the rbp and rsp to reasonable values
+            ##print('set rbp and rsp to reasonable values')  怎么判断
+            if is_rewind == 1 and (flag == 1 or flag == 2):    ##flag1表示栈的写入,这里flag和上面multiple options中的if冲突,也就是只有else执行时才执行此处;is_rewind是手动开关
+                print("h_3 start")
+                print('stackw, set rbp and rsp to reasonable values')
+                stackinfo = ["rbp", "rsp"]
+                print("stack:\t",stack)
+                if stack != "":
+                    size = fi.get_stack_size()  ##size保存的是ins所在函数初始为局部变量分配的空间大小,典型的函数栈帧设置的一部分
+                    if size == "":
+                        size = "0"
+                    if size != "":
+                        print("size:\t",size)
+                        stackinfo.remove(stack)
+                        rxp = stackinfo[0]#rxp=rsp
+                        print("stack size != null, rxp=", rxp)
+                        ##解析$rxp内容
+                        process.sendline(GDB_PRINT_REG + " $" + rxp)
+                        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+                        if i == 0:
+                            print("ERROR when getting the value of the rbp or rsp")
+                            print((process.before.decode('utf-8'), process.after))
+                            print((str(process)))
+                            self.log.close()
+                            process.close()
+                            sys.stdout = sys.__stdout__
+                            return
+                        if i == 1:
+                            output = process.before.decode('utf-8')
+                            content_rxp = ""
+                            if "0x" in output:
+                                items = output.split(" ")
+                                for item in items:
+                                    if "0x" in item:
+                                        content_rxp = item
+                            else:
+                                items = output.split(" ")
+                                content_rxp = items[len(items) - 1]
+                            content_rxp = content_rxp.lstrip("nan")
+                            content_rxp = content_rxp.lstrip("-nan")
+                            print("content_rxp:",rxp,content_rxp)
+                            size_rxp = 0
+                            if "0x" in content_rxp:
+                                if is_hexnumber(content_rxp):
+                                    size_rxp = int(content_rxp, 16)
+                            else:
+                                if is_number(content_rxp):
+                                    size_rxp = int(content_rxp)
+                            print("size_rxp:",rxp,size_rxp)
+                            ##解析$stack
+                            process.sendline(GDB_PRINT_REG + " $" + stack)
                             i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                             if i == 0:
                                 print("ERROR when getting the value of the rbp or rsp")
@@ -928,83 +965,69 @@ class SigHandler:
                                 return
                             if i == 1:
                                 output = process.before.decode('utf-8')
-                                content_rxp = ""
+                                content_stack = ""
                                 if "0x" in output:
                                     items = output.split(" ")
                                     for item in items:
                                         if "0x" in item:
-                                            content_rxp = item
+                                            content_stack = item
                                 else:
                                     items = output.split(" ")
-                                    content_rxp = items[len(items) - 1]
-                                content_rxp = content_rxp.lstrip("nan")
-                                content_rxp = content_rxp.lstrip("-nan")
-                                print("content_rxp:",rxp,content_rxp)
-                                size_rxp = 0
-                                if "0x" in content_rxp:
-                                    if is_hexnumber(content_rxp):
-                                        size_rxp = int(content_rxp, 16)
+                                    content_stack = items[len(items) - 1]
+                                content_stack = content_stack.lstrip("nan")
+                                content_stack = content_stack.lstrip("-nan")
+                                print("content_stack:",stack,content_stack)
+                                size_stack = 0
+                                if "0x" in content_stack:
+                                    if is_hexnumber(content_stack):
+                                        size_stack = int(content_stack, 16)
                                 else:
-                                    if is_number(content_rxp):
-                                        size_rxp = int(content_rxp)
-                                print("size_rxp:",rxp,size_rxp)
-                                ##解析$stack
-                                process.sendline(GDB_PRINT_REG + " $" + stack)
+                                    if is_number(content_stack):
+                                        size_stack = int(content_stack)
+                                print("size_stack:",stack,size_stack)
+
+                            size = int(size,16)
+                            print("size:\t",size)
+                            # if abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size:##检测是否栈溢出
+                            #     process.sendline(GDB_SET_REG + " $" + stack + "=" + content_rxp)
+                            if (abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size) or (size_rxp-size_stack>0):##检测是否栈溢出
+                                setback = str(size_rxp+size)
+                                process.sendline(GDB_SET_REG + " $" + stack + "=" + setback)
                                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                 if i == 0:
-                                    print("ERROR when getting the value of the rbp or rsp")
+                                    print(("ERROR when resetting the " + stack))
                                     print((process.before.decode('utf-8'), process.after))
                                     print((str(process)))
                                     self.log.close()
                                     process.close()
                                     sys.stdout = sys.__stdout__
                                     return
+
                                 if i == 1:
-                                    output = process.before.decode('utf-8')
-                                    content_stack = ""
-                                    if "0x" in output:
-                                        items = output.split(" ")
-                                        for item in items:
-                                            if "0x" in item:
-                                                content_stack = item
-                                    else:
-                                        items = output.split(" ")
-                                        content_stack = items[len(items) - 1]
-                                    content_stack = content_stack.lstrip("nan")
-                                    content_stack = content_stack.lstrip("-nan")
-                                    print("content_stack:",stack,content_stack)
-                                    size_stack = 0
-                                    if "0x" in content_stack:
-                                        if is_hexnumber(content_stack):
-                                            size_stack = int(content_stack, 16)
-                                    else:
-                                        if is_number(content_stack):
-                                            size_stack = int(content_stack)
-                                    print("size_stack:",stack,size_stack)
-
-                                size = int(size,16)
-                                print("size:\t",size)
-                                # if abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size:##检测是否栈溢出
-                                #     process.sendline(GDB_SET_REG + " $" + stack + "=" + content_rxp)
-                                if (abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size) or (size_rxp-size_stack>0):##检测是否栈溢出
-                                    setback = str(size_rxp+size)
-                                    process.sendline(GDB_SET_REG + " $" + stack + "=" + setback)
-                                    i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
-                                    if i == 0:
-                                        print(("ERROR when resetting the " + stack))
-                                        print((process.before.decode('utf-8'), process.after))
-                                        print((str(process)))
-                                        self.log.close()
-                                        process.close()
-                                        sys.stdout = sys.__stdout__
-                                        return
-
-                                    if i == 1:
-                                        print(("Set the " + stack + " back! "))
-                                        print((process.before.decode('utf-8'), process.after))
+                                    print(("Set the " + stack + " back! "))
+                                    print("h_3 end")
+                                    print((process.before.decode('utf-8'), process.after))
+                                    nextpc = thispc
+                                    print("redo:\t",nextpc)
                     else:
-                        print("Cannot get the size of the current stack frame")
-                
+                        print("size empty")
+                else:
+                    print("Cannot get the size of the current stack frame")
+        
+        #process.interact()
+        process.sendline(GDB_SET_REG + " $pc=" + str(hex(int(nextpc))))
+        i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
+        print("nextpc:\t",process.before.decode('utf-8'))
+        if i == 0:
+            print("ERROR when setting the pc value")
+            print((process.before.decode('utf-8'), process.after))
+            print((str(process)))
+            self.log.close()
+            process.close()
+            sys.stdout = sys.__stdout__
+            return
+
+
     def handle_after_injection(self,process):
         print("process continue...")
         process.sendline(GDB_CONTINUE)

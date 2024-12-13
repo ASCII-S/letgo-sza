@@ -236,6 +236,7 @@ if __name__ == "__main__":
 
         except SystemExit as e:
             print(f"SystemExit encountered during sig.executeProgram: (exit due to sighandle: timeout) {e}")
+            exit_flag = True  # 设置退出标志
 
         except Exception as e:
             print(f"Error during sig.executeProgram: {e}")

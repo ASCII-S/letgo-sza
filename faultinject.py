@@ -256,13 +256,17 @@ class FaultInjector:
     def get_stack_size(self):
         size = ""
         with open(stacksize,"r") as f:  ##stacksize中保存的是ins所在函数的第一个包含sub和rsp的汇编指令,即为局部变量分配空间的指令,由于汇编代码中会集中把局部变量放在开头分配,因此size为该函数为局部变量预留的空间
+            intsize = 0
             lines = f.readlines()
             for line in lines:
                 line = line.rstrip("\n")
-                if "," in line:
+                if "push" in line:
+                    intsize += 8
+                if "sub" in line:
                     items = line.split(",")
-                    size = items[len(items)-1]
-
+                    subsize = items[len(items)-1]
+                    intsize += int(subsize,16)
+        size = str(hex(intsize))
         return size
 
     def getNextPC(self,pc):
@@ -289,12 +293,12 @@ class FaultInjector:
                     nextpc = line.split(":")[1]
                 if "regw" in line:
                     regw.append(line.split(":")[1])
-                if "stackr:" in line:
-                    stack = line.split(":")[1]
-                    flag = 2
                 if "stackw:" in line:
                     stack = line.split(":")[1]
                     flag = 1
+                if "stackr:" in line:
+                    stack = line.split(":")[1]
+                    flag = 2
                 if "nostack" in line:
                     flag = 3
                 if "base:" in line:

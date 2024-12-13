@@ -17,7 +17,7 @@ import seaborn as sns
 ## clsfy == 1 to move unfinished record to folder "unfinish"
 clsfy = 0
 ## delbug = 1 to delete file that encounters Traceback
-delbug = 1
+delbug = 0
 ## to_csv =1 will collect all information to csv under log_path,but cost much more time
 to_csv = 1
 ## findins = 1 will auto find Sig1ins and Sig2ins according to Sig*pc and asm  
@@ -42,7 +42,7 @@ parser.add_argument('-analyze_all', type=str, help='analyze all application one 
 parser.add_argument('-p', type=str, help="picture type")
 parser.add_argument('-t', type=str, help="Table type")
 args = parser.parse_args()
-argslen = len(vars(args))
+argslen =  sum(1 for arg in vars(args).values() if arg is not None)
 
 progname = configure.progname if not args.bname else args.bname
 inject_random_or_targeted = configure.inject_random_or_targeted if not args.i else args.i
@@ -89,7 +89,7 @@ crash_2 = []
 crash_2p = []
 unfinishedlist = []
 #ignore masked and sdc
-ignore_no_crash = 1 if inject_random_or_targeted == "random" else 1
+ignore_no_crash = 0 if inject_random_or_targeted == "random" else 1
 
 # 直接从 configure 中导入所需的变量
 SdcAppList = configure.SdcAppList
@@ -781,6 +781,81 @@ def pic1XappYaveragecrash(csv_dir, output_dir):
     print("pic save in:\t", output_path+'.png')
     plt.close()  # 关闭图形以释放内存
 
+
+def pic1XappYaveragecrash1(csv_dir, output_dir):
+    # 列出文件夹中所有以.csv结尾的文件
+    print("-----------------new_function-----------------")
+    csv_files = [file for file in os.listdir(csv_dir) if file.endswith('.csv')]
+
+    file_names = []
+    double_crash_crash_nopc_c_masked_c_sdc_ratios = []
+    double_crash_crash_nopc_ratios = []
+
+    for file_name in csv_files:
+        file_path = os.path.join(csv_dir, file_name)
+        try:
+            # 读取CSV文件
+            df = pd.read_csv(file_path)
+            if 'result' not in df.columns:
+                print(f"File {file_name} does not contain 'result' column. Skipping...")
+                continue
+
+            total_count = len(df)
+            double_crash_crash_nopc_c_masked_c_sdc_count = len(df[(df['result'] == DOUBLE_CRASH) |
+                                                                 (df['result'] == CRASH_NOPC) |
+                                                                 (df['result'] == C_MASKED) |
+                                                                 (df['result'] == C_SDC)])
+            double_crash_crash_nopc_count = len(df[(df['result'] == DOUBLE_CRASH) |
+                                                   (df['result'] == 'crash')])
+
+            ratio1 = double_crash_crash_nopc_c_masked_c_sdc_count / total_count if total_count > 0 else 0
+            ratio2 = double_crash_crash_nopc_count / total_count if total_count > 0 else 0
+
+            ratio1 = round(ratio1, 2)
+            ratio2 = round(ratio2, 2)
+
+            file_names.append(file_name.replace('.csv', ''))
+            double_crash_crash_nopc_c_masked_c_sdc_ratios.append(ratio1)
+            double_crash_crash_nopc_ratios.append(ratio2)
+
+            print(f"Processed file: {file_name}")
+        except:
+            print("error in file:\t", file_name)
+
+    # 绘制柱状图
+    x = range(len(file_names))
+
+    plt.figure(figsize=(10, 5))
+    bar_width = 0.35
+
+    bar1 = plt.bar(x, double_crash_crash_nopc_c_masked_c_sdc_ratios, width=bar_width, label='[DOUBLE_CRASH,CRASH_NOPC,C_MASKED,C_SDC] Ratio', color='green', align='center')
+    bar2 = plt.bar([i + bar_width for i in x], double_crash_crash_nopc_ratios, width=bar_width, label='[DOUBLE_CRASH,CRASH_NOPC] Ratio', color='red', align='center')
+
+    for b in bar1:
+        yval = b.get_height()
+        plt.text(b.get_x() + b.get_width() / 2, yval, round(yval, 4), ha='center', va='bottom')
+
+    for b in bar2:
+        yval = b.get_height()
+        plt.text(b.get_x() + b.get_width() / 2, yval, round(yval, 4), ha='center', va='bottom')
+
+    plt.ylim(0, 1)
+    plt.yticks([0.1 * i for i in range(0, 11)], [f'{10 * i}%' for i in range(0, 11)])
+
+    plt.xticks([i + bar_width / 2 for i in x], file_names, rotation=45, ha='right')
+
+    plt.ylabel('Ratio')
+    plt.title('Ratios of Different Categories in CSV Files')
+    plt.legend()
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"Created directory: {output_dir}")
+    output_path = os.path.join(output_dir, 'new_function_result')
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=600)
+    print("pic save in:\t", output_path+".png")
+
 def pic4XappYresultundercrash(csv_dir, output_dir):
     # 列出文件夹中所有以 .csv 结尾的文件
     print("-----------------p4-----------------")
@@ -1311,7 +1386,7 @@ def Tab_col_Recovery(csv_dir, grouping_column, output_dir):
     :param target_elements: 要统计的目标元素列表
     :param output_dir: 输出目录
     """
-    target_elements = [C_MASKED,C_SDC,DOUBLE_CRASH,'crash']
+    target_elements = [C_MASKED,C_SDC,DOUBLE_CRASH]
     target_colors = ['green', 'Gold',  'OrangeRed', 'purple']
     # 确保输出目录存在
     output_dir = os.path.join(output_dir, f'Tab_{grouping_column}_Recovery')
