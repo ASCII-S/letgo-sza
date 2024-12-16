@@ -413,7 +413,8 @@ def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool
     if len(lines) > 80:
         lines = lines[:80]
 
-    nums_one_inst = min(int(num_samples/len(lines)),50)
+    minnum = 50
+    nums_one_inst = min(int(num_samples/len(lines)),minnum)
     # 打开 pool_csv_file 进行写入
     with open(pool_csv_file, 'w') as outfile:
         # 遍历每一行
@@ -429,7 +430,7 @@ def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool
                 new_line = selected_params + [iteration]  # 添加从1到20的数值
                 outfile.write(','.join(new_line) + '\n')
 
-    print(f"已通过catalog创建{len(lines) * 20} 条注错位置，保存到 {pool_csv_file}")
+    print(f"已通过catalog创建{len(lines) * minnum} 条注错位置，保存到 {pool_csv_file}")
     return pool_csv_file
 
 def readArgsFromPool(filepath = os.path.join(configure.instpool_folder, poolname)):

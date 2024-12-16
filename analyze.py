@@ -12,7 +12,7 @@ from pandas.plotting import table
 import numpy as np
 import sighandler
 import seaborn as sns
-
+from sdcjudger import Add_SDC_result_to_alllog_common
 #######---------------FOLLOWED ARE SWITCH---------------#########
 ## clsfy == 1 to move unfinished record to folder "unfinish"
 clsfy = 0
@@ -70,7 +70,7 @@ if argslen:
         one_batch_folder = os.path.join(configure.letgo_base_home,Result_folder_name,progname,select_type)
 
 analysis_folder = os.path.join(configure.letgo_base_home,analysis_folder_name)
-analysis_csv_folder = os.path.join(analysis_folder,'CSV')
+analysis_csv_folder = os.path.join(analysis_folder,'CSV',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'CSV')
 analysis_csv_file = os.path.join(analysis_csv_folder,result_analyze_csv_name)
 asm_folder  = os.path.join(analysis_folder,'asm')
 pic_folder  = os.path.join(analysis_folder,'PIC')
@@ -277,7 +277,7 @@ def read_logs(progname, log_folder, output_dir, outputname):
                     after_letgoin = 1
                 if "Program received signal" in line and after_letgoin and flag == 1:
                     flag = 2
-                if "application generate no output" in line:
+                if "application generate no output" in line or "Timeout occurred" in line:
                     flag = 2
                 if "No nextpc file is generated!" in line or "Crash place getting no PC" in line:
                     sdc_flag = 0
@@ -338,7 +338,7 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
         insline = "=> "+line.split("=>")[-1].strip("(gdb)").strip()
         # 更新 Sigpc
         df.loc[0, Sigpc] = insline.split('=>')[-1].split(':')[0].split('<')[0].strip()
-        if address == 'null':
+        if address == 'null' or len(address) != 6 :
             address = df.loc[0, Sigpc]
         # 处理 'Cannot' 错误情况
         if Sig=='Sig1':
@@ -346,7 +346,7 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
                 df.loc[0, SigIns] = 'null'
                 df.loc[0, 'result'] = CAM
                 return
-            if asm_file is not None and not findins.judge_address_in_asm(address.replace('0x', ''), asm_file) :
+            if asm_file is not None and (not findins.judge_address_in_asm(address.replace('0x', ''), asm_file)) :
                 # 如果地址不在汇编文件中
                 #print("crash:",df.loc[0,'input_file'],'\t',address)
                 df.loc[0, SigIns] = 'null'
@@ -375,7 +375,7 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
                 df.loc[0, SigOpe] = df.loc[0, SigIns]
         else:
             df.loc[0, SigOpe] = df.loc[0, SigIns].split(' ')[0]
-
+        
         # if df.loc[0,'result'] == 'crash':
         #     print(df.loc[0,'input_file'])
         #     print("Line:", line)
@@ -390,8 +390,7 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
 
     # 创建一个空的 DataFrame
     df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
-
-
+    
     if flag == 0:
         df.loc[0, 'result'] = MASKED
         if sdc_flag == 1:
@@ -413,6 +412,7 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
     asm_file = os.path.join(asm_folder,progname+'.asm')
     df.loc[0,'input_file'] = file_name
 
+    
     # 读取文件并提取所需内容
     with open(input_file, 'r') as file:
         values = ['null'] * 4
@@ -500,7 +500,10 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
                         df.loc[0,SigFunc] = insline.strip().split(' ')[2].strip().split(' ')[0].strip()
                     insline = next_i_line_content(file,4,'=>')
                     if "=>" in insline:
+                        #print(df.loc[0,"result"])
                         get_ins_info(Sig, Sigpc, SigIns, SigOpe, SigFunc, address, asm_file, df, file, insline)
+                        #print(df.loc[0,"result"])
+                        #sys.exit(1)
                 except Exception as e:
                     print("get info at signal1 fail",input_file)
                     print(e)
@@ -630,13 +633,12 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
         #print("crash:",df.loc[0,'input_file'],'\t',df.loc[0,'Sig1pc'])
         df.loc[0, 'Sig1Ins'] = 'null'
         df.loc[0, 'result'] = ANIA
-
-    if progname in special_bias_app_list:
+    if progname in ["HPCCG","hpl","miniFE","miniMD"]:
         if progname == "miniFE":
             golden_bias = 4.45306e-06
             bias = df.loc[0,'bias']
             #默认最严格的sdc判定，如果误差小，就将sdc进化成masked
-            if abs(float(bias) - golden_bias) < 10.0e-06:
+            if abs(float(bias) - golden_bias) < 1.0e-06:
                 if df.loc[0,'result'] == 'SDC':
                      df.loc[0,'result'] = 'Masked'
                 if df.loc[0,'result'] == 'C-SDC':
@@ -644,12 +646,12 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
         if progname == "HPCCG":
             golden_bias = 2.21357e-28
             bias = df.loc[0,'bias']
-            if abs(float(bias) - golden_bias) < 10.0e-28:
+            if abs(float(bias) - golden_bias) < 1.0e-28:
                 if df.loc[0,'result'] == 'SDC':
                      df.loc[0,'result'] = 'Masked'
                 if df.loc[0,'result'] == 'C-SDC':
                      df.loc[0,'result'] = 'C-Masked'
-
+    
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)  # 如果目录不存在则创建
     # 构造输出文件路径
@@ -1608,8 +1610,14 @@ def main():
             print(f"An error occurred during batch processing: {e}")
             sys.exit(1)
         return
-        
-    # 直接运行configure的情况
+
+    Add_SDC_result_to_alllog_common(progname = progname, \
+                                    output_name = configure.output_name, \
+                                    log_path= os.path.join(one_batch_folder,"log"), \
+                                    sdcout_folder= os.path.join(one_batch_folder,"sdcout"), \
+                                    cmp_str = configure.cmp_str,\
+                                    tolerance=configure.tolerance)
+# 直接运行configure的情况
     analyze_one_batch(progname, log_folder, analysis_csv_folder, result_analyze_csv_name, asm_folder)
 
 

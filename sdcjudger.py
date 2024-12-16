@@ -102,7 +102,7 @@ def Add_SDC_result_to_alllog_LU(log_path=configure.log_folder, sdcout_folder=con
         print('log_'+str(index)+'\n')
 
 
-def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name = configure.output_name, log_path=configure.log_folder, sdcout_folder=configure.sdcout_folder, tolerance=configure.tolerance):
+def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name = configure.output_name, log_path=configure.log_folder, sdcout_folder=configure.sdcout_folder, cmp_str = configure.cmp_str, tolerance=configure.tolerance):
     len = find_max_log_suffix(log_path)
 
     in_path = progname + '/' + output_name
@@ -127,19 +127,19 @@ def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name =
     for index in range(len+1):
         
         log_index_file = os.path.join(log_path, f'log_{index}')
-        this_output = os.path.join(sdcout_folder, f'log_{index}_{configure.output_name}')
-        if configure.output_name == 'none':
+        this_output = os.path.join(sdcout_folder, f'log_{index}_{output_name}')
+        if output_name == 'none':
             this_output = log_index_file
         # 检查文件是否存在
         if not os.path.exists(this_output) or not os.path.exists(golden_output) or not os.path.exists(log_index_file):
-            if not configure.output_name == 'none':
+            if not output_name == 'none':
                 continue
             continue
         
         # 判断是否已经对该log_index进行了判断
         with open(log_index_file, 'r') as f:
             content = f.read()
-            if configure.cmp_str in content or "No nextpc" in content or "application generate no output" in content:
+            if cmp_str in content or "No nextpc" in content or "application generate no output" in content:
                 #print("skip:\t",index)
                 continue
         fail = 0
@@ -541,4 +541,9 @@ if __name__ == "__main__":
     if (configure.progname == 'lu'):
         Add_SDC_result_to_alllog_LU()
     else:
-        Add_SDC_result_to_alllog_common()
+        Add_SDC_result_to_alllog_common(progname = configure.progname, \
+                                        output_name = configure.output_name, \
+                                        log_path=configure.log_folder, \
+                                        sdcout_folder=configure.sdcout_folder, \
+                                        cmp_str = configure.cmp_str,\
+                                        tolerance=configure.tolerance)

@@ -48,8 +48,9 @@ PTR_ERR_FIX_MAX = "After Fixed:" + PRT_ERR_LEN_MAX
 #debug file
 debugfile = configure.debugfile
 
-is_fake = 0 ##h_1,h_2
+set_reg_fake = 1 ##h_1,h_2
 is_rewind = 1   ##h_3
+force_fix_rbp = 0
 
 ##log_path = "./self.log"
 log_path = configure.log_folder
@@ -750,10 +751,10 @@ class SigHandler:
             # We can have multiple options here. For now, we feed the value (0) to the supposed-to-write register
             #####
             print('multiple options')
-            if is_fake == 1:    ##处理写寄存器regw,is_fake是手动开关
+            if set_reg_fake == 1:    ##处理写寄存器regw,set_reg_fake是手动开关
                 for regw in regwlist:
-                    if flag == 1:   ##处理栈写，即memory-store，相关的而寄存器, 重计算内存写的位置
-                        print("h_1")
+                    if flag == 2:   ##处理栈读相关的而寄存器, 重计算内存写的位置
+                        print("h_1 start")
                         final_b = 0 ##base 
                         final_i = 0 ##index
                         final_d = 0 ##displacement
@@ -884,8 +885,9 @@ class SigHandler:
                                 return
                             if i == 1:
                                 print("is stackr: have set reg with address calculation ")
+                            print("h_1 end")
 
-                    if flag == 2:   ##处理栈读, 即memory-load，用0代替读到的数据，原因是内存中有很多零
+                    else:   ##处理其他memory-load，用0代替读到的数据，原因是内存中有很多零
                         if "xmm" in regw:
                             regw = regw+".uint128"
                         print("h_2 start")
@@ -910,13 +912,17 @@ class SigHandler:
                 print('stackw, set rbp and rsp to reasonable values')
                 stackinfo = ["rbp", "rsp"]
                 print("stack:\t",stack)
-                if stack != "":
+                if stack != "" or force_fix_rbp:
                     size = fi.get_stack_size()  ##size保存的是ins所在函数初始为局部变量分配的空间大小,典型的函数栈帧设置的一部分
                     if size == "":
                         size = "0"
                     if size != "":
                         print("size:\t",size)
-                        stackinfo.remove(stack)
+                        try:
+                            stackinfo.remove(stack)
+                        except:
+                            stack = "rbp"
+                            stackinfo.remove("rbp")
                         rxp = stackinfo[0]#rxp=rsp
                         print("stack size != null, rxp=", rxp)
                         ##解析$rxp内容
@@ -991,7 +997,10 @@ class SigHandler:
                             # if abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size:##检测是否栈溢出
                             #     process.sendline(GDB_SET_REG + " $" + stack + "=" + content_rxp)
                             if (abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size) or (size_rxp-size_stack>0):##检测是否栈溢出
-                                setback = str(size_rxp+size)
+                                if stack == "rbp":
+                                    setback = str(size_rxp+size)
+                                if stack == "rsp":
+                                    setback = str(size_rxp-size)
                                 process.sendline(GDB_SET_REG + " $" + stack + "=" + setback)
                                 i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
                                 if i == 0:
@@ -1009,8 +1018,7 @@ class SigHandler:
                                     print((process.before.decode('utf-8'), process.after))
                                     nextpc = thispc
                                     print("redo:\t",nextpc)
-                    else:
-                        print("size empty")
+                    
                 else:
                     print("Cannot get the size of the current stack frame")
         
@@ -1032,13 +1040,18 @@ class SigHandler:
         print("process continue...")
         process.sendline(GDB_CONTINUE)
 
-        index = self.process.expect([GDB_PROMOPT, pexpect.EOF, pexpect.TIMEOUT], timeout=240)
+        index = process.expect([GDB_PROMOPT, pexpect.EOF, pexpect.TIMEOUT], timeout=240)
         if index == 0:
             print("Received GDB prompt,process pause or stop.")
         elif index == 1:
             print("Received EOF")
         elif index == 2:
             print("Timeout occurred")
+            self.log.close()
+            process.terminate()
+            process.close()
+            sys.stdout = sys.__stdout__
+            return
 
         after_continue = self.process.before.decode()
         #print(after_continue)

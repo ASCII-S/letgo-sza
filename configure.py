@@ -17,26 +17,26 @@ prognames_supply = [
     # mantevo
     "HPCCG", "miniFE", "miniMD", "miniAMR"
 ]
-#特殊名字
+#特殊名字后缀，默认为空
 #special =""
-special = "OnlyH_3_2"
+special = ""
 #special = "OnlyH_3"
 
 #应用名取自prognames_supply
-waittochangebyscrips = "backprop"
+waittochangebyscrips = "hpl"
 progname = waittochangebyscrips
 
 #随机注错还是对目标类型注错
 inject_random_or_targeted = "random"
-inject_random_or_targeted = "targeted"
+#inject_random_or_targeted = "targeted"
 
 #对目标类型注错,详细参数
-select_type = "integer"     #stack,data_transfer,mov,integer,float,logical,call_ret,control_flow, other
+select_type = "call_ret"     #stack,data_transfer,mov,integer,float,logical,call_ret,control_flow, cmp,other
 only_memory = 1
 dynamic_analyze =  1  #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
 
 #实验次数
-numFI = 2000
+numFI = 5000
 
 #log起始index
 num_start_from = 0
@@ -154,20 +154,20 @@ elif progname == "streamcluster":
     pcend = "403e30"
 elif progname == "HPCCG":                               ## HPCCG
     progbin = "/home/tongshiyu/programs/mantevo/HPCCG/test_HPCCG"
-    optionlist = ['50', '50', '50']
+    optionlist = ['30', '30', '30']
     pcstart = "4021a0"
     pcend = "40b550"
-elif progname == "miniAMR":                               ## minife
+elif progname == "miniAMR":                              
     progbin = "/home/tongshiyu/programs/mantevo/miniAMR/ref/miniAMR.x"
     optionlist = ["--npx 1 --npy 1 --npz 1", "--report_diffusion","--checksum_freq", "10"]
     pcstart = "401110"
     pcend = "43a2c0"
 elif progname == "miniFE":                               ## minife
     progbin = "/home/tongshiyu/programs/mantevo/miniFE/openmp/basic/miniFE.x"
-    optionlist = ['nx=30','verify_solution=1']
+    optionlist = ['nx=20']#,'verify_solution=1']
     pcstart = "402ba0"
     pcend = "41de90"
-elif progname == "miniMD":                               ## minife
+elif progname == "miniMD":                               
     progbin = "/home/tongshiyu/programs/mantevo/miniMD/ref/miniMD"
     optionlist = []
     pcstart = "401930"
@@ -215,7 +215,7 @@ cmp_str = "Compare within tolerance("+str(tolerance)+"):"
 # configuration of folder
 if inject_random_or_targeted == "random":
     Result_folder_name = "BenchmarkResult"
-    analysis_folder_name = "analysis"
+    analysis_folder_name = "analysis_20241118"
     insInjection_pool_csv_name = progname + ".csv"
     result_analyze_csv_name = progname +'.csv'
     one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname)
@@ -234,7 +234,7 @@ sdcout_folder = os.path.join(one_batch_folder,"sdcout")
 instpool_folder = os.path.join(one_batch_folder)
 #程序运行结果分析文件夹
 analysis_folder = os.path.join(letgo_base_home,analysis_folder_name)
-csv_folder = os.path.join(analysis_folder,'CSV')
+csv_folder = os.path.join(analysis_folder,'CSV',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'CSV')
 asm_folder  = os.path.join(analysis_folder,'asm')
 pic_folder  = os.path.join(analysis_folder,'PIC')
 mnemonic_count_folder = os.path.join(analysis_folder,'mnemonic_count')

@@ -143,7 +143,6 @@ def judge_address_in_asm(address,asm_file):
     if len(address) != 6 :
         #print(f"Invalid address format: {address}. It should be in the format '123456'.")
         return False
-    
     # 读取文件内容并检查地址是否出现
     try:
         with open(asm_file, 'r') as file:
