@@ -78,22 +78,102 @@ def execute(execlist):
 	    #should never go here
 
 def fetchTotalCount():
-    instcount = configure.toolbase + "/obj-intel64/instcount_official.so"
-    execlist = [configure.pin_home,"-t",instcount,"--",configure.benchmark]
+    instcount_so = configure.toolbase + "/obj-intel64/instcount_official.so"
+    instcount_file = configure.instcount
+    execlist = [configure.pin_home,"-t",instcount_so,"-o",instcount_file,"--",configure.benchmark]
     for item in configure.args:
         execlist.append(item)
 
     execute(execlist)
-    with open(configure.instcount,"r") as f:
+    with open(instcount_file,"r") as f:
         lines = f.readlines()
         if len(lines) > 1:
             print("Error while loading inst count.")
+            print(instcount_file)
             sys.exit(1)
         count = lines[0]
         count = count.rstrip("\n")
         totalcount = count.split(" ")[1]
         print("Instcount_official:\t",totalcount)
     return totalcount
+
+
+def countjmp(totalcount):
+    """
+    Executes a tool to count jump instructions and calculates the ratio of jumps to total instructions.
+
+    :param totalcount: Total instruction count to be passed to the tool.
+    :return: The ratio of jump instructions to total instructions.
+    """
+    # Configure the path to the jump-counting tool
+    jumpcount_tool = configure.toolbase + "/obj-intel64/jmpcount.so"
+    
+    # Create a file with 5000 random numbers between 0 and totalcount
+    randnumsfile = "./randnums.txt"
+    all_count = 5000
+    # Ensure the file is clean before generation
+    if os.path.exists(randnumsfile):
+        os.remove(randnumsfile)
+
+    random_numbers = [random.randint(0, totalcount) for _ in range(all_count)]
+    sorted_numbers = sorted(random_numbers)  # Sort numbers from large to small
+
+    with open(randnumsfile, "w") as f:
+        for num in sorted_numbers:
+            f.write(f"{num}\n")
+
+    # Build the execution list with totalcount and randnumsfile as arguments
+    execlist = [
+        configure.pin_home, "-t", jumpcount_tool,
+        "-totalcount", str(totalcount), "-randnumsfile", randnumsfile, "--",
+        configure.benchmark
+    ]
+
+    # Add additional arguments if configured
+    for item in configure.args:
+        execlist.append(item)
+
+    # Execute the tool
+    execute(execlist)
+
+    # Read the result from the output file
+    jmpcount_output = "./jmpcount_output.txt"
+    # if os.path.exists(jmpcount_output):
+    #     os.remove(jmpcount_output)
+    with open(jmpcount_output, "r") as f:
+        lines = f.readlines()
+        if len(lines) < 1:
+            print("Error while loading jump count.")
+            sys.exit(1)
+        
+        # Extract jump count and total instruction count from the file
+        jump_count = int(lines[-1].split(":")[-1].strip())
+    if os.path.exists(jmpcount_output):
+        os.remove(jmpcount_output)
+
+    total_instruction_count = int(all_count)
+    
+    # Calculate the ratio of jump instructions to total instructions
+    ratio = jump_count / total_instruction_count if total_instruction_count > 0 else 0
+    result = f"Benchmark:{configure.progname},Jump Class Samples: {jump_count}, Total Samples: {total_instruction_count}, Ratio: {ratio}"
+
+    # Output the result to a file
+    with open("./jmpradio_result.txt", "a+") as result_file:
+        result_file.write(result + "\n")
+    print("result save in jmpradio_result.txt")
+
+    print(result)
+
+
+    return ratio
+
+
+def radioofjmp():
+    totalcount = int(fetchTotalCount())
+    countjmp(totalcount)
+
+
+
 
 def getBreakpoint(totalcount):
     #用库函数并行的随机找要注错的断点
@@ -294,6 +374,7 @@ def Random_instPoolMaker():
         selectOneIns(totalcount)
 
 
+
 def generate_mnemonic_count_file(mnemonic_count_file = configure.mnemonic_count_file):
     execlist = [configure.pin_home,"-t",distributionInstCatalib,\
                 distributionInstCatalib_mnemonic_count_file,os.path.join(configure.letgo_base_home,configure.progname,mnemonic_count_file),\
@@ -413,7 +494,7 @@ def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool
     if len(lines) > 80:
         lines = lines[:80]
 
-    minnum = 50
+    minnum = configure.minCountInstInj
     nums_one_inst = min(int(num_samples/len(lines)),minnum)
     # 打开 pool_csv_file 进行写入
     with open(pool_csv_file, 'w') as outfile:
@@ -465,9 +546,17 @@ def readArgsFromPool(filepath = os.path.join(configure.instpool_folder, poolname
 if __name__ == "__main__":
     print("PoolMaker!")
     #Random_instPoolMaker()
-    path = generate_catalog()
-    path = generate_Pool_from_catalog(path)
-    print(readArgsFromPool(path))
+
+    do_generate_Pool_from_catalog = 0
+    if do_generate_Pool_from_catalog == 1:
+        path = generate_catalog()
+        path = generate_Pool_from_catalog(path)
+        print(readArgsFromPool(path))
+
     #csv_file = os.path.join(configure.csv_folder,configure.progname+'.csv')
     #extract_args_based_on_csv(csv_file)
     #delete_files_based_on_csv(csv_file)
+
+    do_jmp_count = 1
+    if do_jmp_count == 1 :
+        radioofjmp()

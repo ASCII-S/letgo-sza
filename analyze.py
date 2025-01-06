@@ -13,6 +13,7 @@ import numpy as np
 import sighandler
 import seaborn as sns
 from sdcjudger import Add_SDC_result_to_alllog_common
+from gen_asm import disassemble_binary
 #######---------------FOLLOWED ARE SWITCH---------------#########
 ## clsfy == 1 to move unfinished record to folder "unfinish"
 clsfy = 0
@@ -73,7 +74,7 @@ analysis_folder = os.path.join(configure.letgo_base_home,analysis_folder_name)
 analysis_csv_folder = os.path.join(analysis_folder,'CSV',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'CSV')
 analysis_csv_file = os.path.join(analysis_csv_folder,result_analyze_csv_name)
 asm_folder  = os.path.join(analysis_folder,'asm')
-pic_folder  = os.path.join(analysis_folder,'PIC')
+pic_folder  = os.path.join(analysis_folder,'PIC',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'PIC')
 
 log_folder = os.path.join(one_batch_folder,"log")  ##数据源目录
 
@@ -89,7 +90,8 @@ crash_2 = []
 crash_2p = []
 unfinishedlist = []
 #ignore masked and sdc
-ignore_no_crash = 0 if inject_random_or_targeted == "random" else 1
+#ignore_no_crash = 1 if inject_random_or_targeted == "random" else 1
+ignore_no_crash = 0
 
 # 直接从 configure 中导入所需的变量
 SdcAppList = configure.SdcAppList
@@ -247,6 +249,11 @@ def read_logs(progname, log_folder, output_dir, outputname):
 
     
     for f in log_files:
+        # file_name = os.path.basename(f)
+        # if file_name != "log_995":
+        #     continue
+
+        # print(file_name)
 
         file_count += 1
         f = os.path.join(log_folder, f)
@@ -260,7 +267,7 @@ def read_logs(progname, log_folder, output_dir, outputname):
             if not lines:
                 print(f"文件 '{f}' 是空的，跳过此文件。")
                 continue  # 跳过此文件
-
+                
             bugin = 0
             for line in lines:
                 if "Traceback" in line or "no such Breakpoint" in line or "SystemExit" in line or "exit_flag: True" in line:
@@ -389,8 +396,9 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
  
 
     # 创建一个空的 DataFrame
-    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
+    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'inj_location', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
     
+
     if flag == 0:
         df.loc[0, 'result'] = MASKED
         if sdc_flag == 1:
@@ -412,6 +420,11 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
     asm_file = os.path.join(asm_folder,progname+'.asm')
     df.loc[0,'input_file'] = file_name
 
+    debug = 0
+    if debug == 1:
+        if df.loc[0,"input_file"] != "log_610":
+            return
+        print(df.loc[0, 'result'])
     
     # 读取文件并提取所需内容
     with open(input_file, 'r') as file:
@@ -479,7 +492,13 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
                 except:
                     print(input_file,"extract ins failed")
                 continue
-            
+
+            if "bit location:" in line:
+                try:
+                    df.loc[0,'inj_location'] = line.split(":")[1]
+                except:
+                    df.loc[0,'inj_location'] = "null"
+
             #首次遇到SIG
             if "Program received signal" in line and SIGcount == 0 and after_letgoin==0:
                 Sig = 'Sig1'
@@ -627,6 +646,8 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
             if "Final Resid Norm" in line:
                 df.loc[0,'bias'] = line.split(':')[1].strip()
             #miniMD
+    
+
     #判断完一条log后的总结
     if not pd.isna(df.loc[0,'Sig1pc']) and asm_file is not None and not findins.judge_address_in_asm(str(df.loc[0,'Sig1pc']).replace('0x', ''), asm_file) :
         # 如果地址不在汇编文件中
@@ -635,7 +656,7 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
         df.loc[0, 'result'] = ANIA
     if progname in ["HPCCG","hpl","miniFE","miniMD"]:
         if progname == "miniFE":
-            golden_bias = 4.45306e-06
+            golden_bias = 4.15995e-11
             bias = df.loc[0,'bias']
             #默认最严格的sdc判定，如果误差小，就将sdc进化成masked
             if abs(float(bias) - golden_bias) < 1.0e-06:
@@ -644,14 +665,16 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
                 if df.loc[0,'result'] == 'C-SDC':
                      df.loc[0,'result'] = 'C-Masked'
         if progname == "HPCCG":
-            golden_bias = 2.21357e-28
+            golden_bias = 5.35506e-38
             bias = df.loc[0,'bias']
             if abs(float(bias) - golden_bias) < 1.0e-28:
                 if df.loc[0,'result'] == 'SDC':
                      df.loc[0,'result'] = 'Masked'
                 if df.loc[0,'result'] == 'C-SDC':
                      df.loc[0,'result'] = 'C-Masked'
-    
+
+    if debug == 1:
+        print(df.loc[0, 'result'])
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)  # 如果目录不存在则创建
     # 构造输出文件路径
@@ -1611,6 +1634,7 @@ def main():
             sys.exit(1)
         return
 
+    disassemble_binary()
     Add_SDC_result_to_alllog_common(progname = progname, \
                                     output_name = configure.output_name, \
                                     log_path= os.path.join(one_batch_folder,"log"), \

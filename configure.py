@@ -16,6 +16,8 @@ prognames_supply = [
     "srad", "nn", "particlefilter", "streamcluster", 
     # mantevo
     "HPCCG", "miniFE", "miniMD", "miniAMR"
+    # use
+    "backprop","hpl", "hotspot","kmeans","particlefilter","nn""bfs","HPCCG", "miniFE"
 ]
 #特殊名字后缀，默认为空
 #special =""
@@ -23,7 +25,7 @@ special = ""
 #special = "OnlyH_3"
 
 #应用名取自prognames_supply
-waittochangebyscrips = "hpl"
+waittochangebyscrips = "miniMD"
 progname = waittochangebyscrips
 
 #随机注错还是对目标类型注错
@@ -31,9 +33,11 @@ inject_random_or_targeted = "random"
 #inject_random_or_targeted = "targeted"
 
 #对目标类型注错,详细参数
-select_type = "call_ret"     #stack,data_transfer,mov,integer,float,logical,call_ret,control_flow, cmp,other
+select_type = "control_flow"     #stack,mov,integer,float,call_ret,cmp,control_flow ---|--- data_transfer,logical, other
 only_memory = 1
-dynamic_analyze =  1  #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
+dynamic_analyze =  1 #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
+high_bit_fault = 1 #在寄存器高位进行注错
+minCountInstInj = 20 #类型注错中，对pc重复注错的最小次数
 
 #实验次数
 numFI = 5000
@@ -215,7 +219,7 @@ cmp_str = "Compare within tolerance("+str(tolerance)+"):"
 # configuration of folder
 if inject_random_or_targeted == "random":
     Result_folder_name = "BenchmarkResult"
-    analysis_folder_name = "analysis_20241118"
+    analysis_folder_name = "analysis"+special
     insInjection_pool_csv_name = progname + ".csv"
     result_analyze_csv_name = progname +'.csv'
     one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname)
@@ -236,7 +240,7 @@ instpool_folder = os.path.join(one_batch_folder)
 analysis_folder = os.path.join(letgo_base_home,analysis_folder_name)
 csv_folder = os.path.join(analysis_folder,'CSV',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'CSV')
 asm_folder  = os.path.join(analysis_folder,'asm')
-pic_folder  = os.path.join(analysis_folder,'PIC')
+pic_folder  = os.path.join(analysis_folder,'PIC',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'PIC')
 mnemonic_count_folder = os.path.join(analysis_folder,'mnemonic_count')
 #文件占位符
 mnemonic_count_name = progname + "_" + "mnemonic_count.csv"

@@ -223,13 +223,13 @@ if __name__ == "__main__":
             print("sig.executeProgram start......")
             print("log:\t",os.path.join(configure.log_folder,'log_'+str(i)))
             sig_time1 = datetime.datetime.now()
-            print(sig_time1)
+            print(sig_time1,flush=True)
             sig = sighandler.SigHandler(totalcount,i)	
             sig.executeProgram(sig.process)
             
             sig_time2 = datetime.datetime.now()
             print("sig.executeProgram end.")
-            print(sig_time2)
+            print(sig_time2,flush = True)
         except KeyboardInterrupt:
             print("Program interrupted by user. Exiting...")
             exit_flag = True  # 设置退出标志
@@ -246,10 +246,12 @@ if __name__ == "__main__":
             if 'exit_flag' in locals() and exit_flag:
                 print(f"exit_flag: {exit_flag}")
                 sys.exit(0)  # 退出程序
-            print(f"Finished processing test {i}, moving to the next test.")
+            print(f"Finished processing test {i}, moving to the next test.",flush=True)
             continue
         print("sig time: ",sig_time2 - sig_time1)
-    
+
+    sys.stdout = sys.__stdout__
+    print(f"Finish all!!!\tindex start: {start}, index end: {end}")
     # 实验完成自动分析
     # sys.stdout = sys.__stdout__
     # command = ["python3.8",os.path.join(configure.letgo_base_home,"sdcjudger.py")]

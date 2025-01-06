@@ -135,6 +135,8 @@ class SigHandler:
                 sys.exit(1)
             if os.path.getsize(pool_file)==0:
                 print(f"Error: File '{pool_file}' is empty.")
+                sys.stdout = sys.__stdout__
+                print("Finish all!!!\tindex start: {start}, index end: {end}")
                 sys.exit(1)
             result = InstPoolMaker.readArgsFromPool(pool_file)
             #兼容原来的输出
@@ -683,10 +685,18 @@ class SigHandler:
             process.sendline("x/i $pc")
             process.expect([pexpect.TIMEOUT, "(gdb)"])
             print(process.before.decode('utf-8').replace("\n", "").replace("\r", ""))
-            # process.sendline("backtrace")
-            # process.expect([pexpect.TIMEOUT, "(gdb)"])
-            # gdbout = process.before.decode('utf-8')
-            # print("\nat sig backtrace:\t",(gdbout))
+
+            process.sendline("backtrace")
+            i = process.expect([pexpect.TIMEOUT, "(gdb)"])
+            if i == 0:
+                print((process.before.decode('utf-8'), process.after))
+                print("ERROR when watching backtrace")
+                self.log.close()
+                process.close()
+                sys.stdout = sys.__stdout__
+                return
+            gdbout = process.before.decode('utf-8')
+            print("\nat sig backtrace:\t",(gdbout))
             # if "return" in gdbout:
             #     process.sendline("return")
             #     print(process.expect([pexpect.TIMEOUT, "(gdb)"]))

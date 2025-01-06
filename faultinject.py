@@ -32,6 +32,7 @@ class FaultInjector:
     def __init__(self,totalInst):
         self.totalInst = totalInst
         self.flag = 32
+        self.high_bit_fault = configure.high_bit_fault  # 是否在高位注错
 
     def searchInInstfile(self, seq):
         regmem = ""
@@ -242,7 +243,12 @@ class FaultInjector:
         bitsize = 31
         if self.flag == 64:
             bitsize = 63
-        pos = random.randint(0,bitsize)
+
+        if self.high_bit_fault:
+            pos = random.randint(bitsize // 2, bitsize)  # 在高位选择位置
+        else:
+            pos = random.randint(0, bitsize)  # 在低位随机选择位置
+            
         mask = (1 << pos)
         decvalue = 0
         if "0x" in ori_value:
