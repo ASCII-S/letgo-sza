@@ -320,7 +320,7 @@ else:
 sdcprogram = []
 sdcprogram.extend(["HPCCG", "hpl", "miniFE", "miniMD"])
 sdcprogram.extend(PolyBenchtList)
-tolerance = 0.0
+tolerance = 0.1
 lu_tolerance = 1e-4
 if progname == 'hotspot3D':
     tolerance = 1e-2
@@ -329,6 +329,8 @@ elif progname == 'lu':
 elif progname in ['2mm', 'fdtd-2d', 'bicg', 'correlation', 'gesummv', 'syr2k']:
     # polybench采用相对误差
     tolerance = 0.1
+# elif progname in ["HPCCG", "hpl", "miniFE", "miniMD"]:
+#     tolerance = 0.1
 cmp_str = "Compare within tolerance("+str(tolerance)+"):"
 
 

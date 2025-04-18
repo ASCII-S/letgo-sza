@@ -679,36 +679,69 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
     if df.loc[0,'result'] == DOUBLE_CRASH or df.loc[0,'result'] == CRASH_NOPC:
         df.loc[0,'bias'] = 'inf'
     if progname in configure.sdcprogram:
+        #默认最严格的sdc判定，如果误差小，就将sdc进化成masked
+        def update_sdc_result(bias, tolerance, df):
+            """
+            根据bias和容差更新SDC结果分类
+            
+            Args:
+                bias: 偏差值
+                tolerance: 容差阈值
+                df: 待更新的DataFrame
+            """
+            if abs(bias) > tolerance:
+                # 无需修复的样例
+                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
+                    df.loc[0,'result'] = SDC_UNACCEPTED
+                # 进行崩溃后修复的案例  
+                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
+                    df.loc[0,'result'] = C_SDC_UNACCEPTED
+            else:
+                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
+                    df.loc[0,'result'] = SDC_ACCEPTED
+                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
+                    df.loc[0,'result'] = C_SDC_ACCEPTED
+        
         if progname == "miniFE":
             golden_bias = 4.15995e-11
-            bias = df.loc[0,'bias']
-            #默认最严格的sdc判定，如果误差小，就将sdc进化成masked
-            if abs(float(bias) - golden_bias) < 1.0e-06:
-                if df.loc[0,'result'] == SDC:
-                     df.loc[0,'result'] = MASKED
-                if df.loc[0,'result'] == C_SDC:
-                     df.loc[0,'result'] = C_MASKED
-        if progname == "HPCCG":
-            golden_bias = 5.35506e-38
-            bias = df.loc[0,'bias']
-            if abs(float(bias) - golden_bias) < 1.0e-28:
-                if df.loc[0,'result'] == SDC:
-                     df.loc[0,'result'] = MASKED
-                if df.loc[0,'result'] == C_SDC:
-                     df.loc[0,'result'] = C_MASKED
-        if progname in configure.PolyBenchtList:
             bias = float(df.loc[0,'bias'])
-            ## 增加sdc的可接受分析
-            if df.loc[0,'result'] == SDC:
-                df.loc[0,'result'] = SDC_UNACCEPTED
-            if df.loc[0,'result'] == C_SDC:
-                df.loc[0,'result'] = C_SDC_UNACCEPTED
-            # ## 从masked中提取可接受
-            if bias >1e-10:
-                if df.loc[0,'result'] == MASKED:
-                    df.loc[0,'result'] = SDC_ACCEPTED
-                if df.loc[0,'result'] == C_MASKED:
-                    df.loc[0,'result'] = C_SDC_ACCEPTED
+            bias = bias - golden_bias
+            update_sdc_result(bias, 1.0e-06, df)
+        elif progname == "hpl":
+            golden_bias = 0.00808361278
+            bias = float(df.loc[0,'bias'])
+            bias = bias - golden_bias
+            update_sdc_result(bias, 16.0, df)
+        elif progname == "HPCCG":
+            golden_bias = 5.35506e-38
+            bias = float(df.loc[0,'bias'])
+            bias = bias - golden_bias
+            if abs(bias) > 1.0e-28:
+                # 无需修复的样例
+                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
+                     df.loc[0,'result'] = SDC_UNACCEPTED
+                # 进行崩溃后修复的案例
+                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
+                     df.loc[0,'result'] = C_SDC_UNACCEPTED
+            else:
+                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
+                     df.loc[0,'result'] = SDC_ACCEPTED
+                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
+                     df.loc[0,'result'] = C_SDC_ACCEPTED
+        elif progname in configure.PolyBenchtList:
+            bias = float(df.loc[0,'bias'])
+            if abs(bias) > 1e-10:
+                # 无需修复的样例
+                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
+                     df.loc[0,'result'] = SDC_UNACCEPTED
+                # 进行崩溃后修复的案例
+                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
+                     df.loc[0,'result'] = C_SDC_UNACCEPTED
+            else:
+                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
+                     df.loc[0,'result'] = SDC_ACCEPTED
+                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
+                     df.loc[0,'result'] = C_SDC_ACCEPTED
             # else:
             #     print(bias,df.loc[0,'input_file'])
     if debug == 1:
