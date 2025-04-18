@@ -1,12 +1,109 @@
-**/log*
-**/sdcout*
+# .gitignore文件
+# 用于指定Git版本控制系统应该忽略的文件和目录
+# 这有助于保持仓库干净，只包含必要的源代码文件
+
+# 编译生成的文件和目录
+*.o
+*.so
+*.a
+*.dll
+*.dylib
+*.exe
+*.out
+*.obj
+*.com
+*.class
+*.lib
+/bin/
+/build/
+/obj/
+/Debug/
+/Release/
+
+# Pin工具特定文件
+pintool.log
+pin.log
+*.pintool.log
+/pintools/
+
+# 临时文件
+*.tmp
+*.temp
+*.swp
+*~
+.*.swp
+*.bak
+
+# 系统文件
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 日志文件
+*.log
+log/
+logs/
+
+# 依赖目录
+/dependencies/
+/third_party/
+/ext/
+
+# IDE和编辑器特定文件
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.cproject
+.settings/
+.classpath
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+
+# 其他常见忽略文件
+/core
+core.*
+vgcore.*
+tags
+.gdb_history
+
+# 自定义目录
+**/__pycache__
+/BenchmarkResult*
+**/log
+**/sdcout
+/InstPool
+/letgo_pinfi
+/letgo_Target
+/massif*
+/mnt
+/VirtualEnv
+/analysis*
+/TargetedAnalysis*
+**/analysis_results*
+**/results*
+**/CSV
+
+# 根目录下的临时文件
+activate
+*.swo
+example*
+filelist.txt
+filename
+graph64.txt
+HPL.dat
+iteration
+image_out.pgm
+instruction*
+*.txt
+sample*
+
+# 本地忽略文件
+**/MemAnalyze
 **/*.csv
 **/*.png
-
-**/__pycache__
-/analysis*
-/MemAnalyze*
-**/*Analysis
-**/Analysis*
-**/BenchmarkResult*
-**/TargetedAnalysis*

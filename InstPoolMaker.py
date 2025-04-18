@@ -5,6 +5,7 @@ from faultinject import FaultInjector
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import multiprocessing
 
+import sys
 import random
 import subprocess
 import time
@@ -23,6 +24,20 @@ randinst_config = "-randinst"
 iterationinst = "obj-intel64/determineInst.so"
 iterationinst_config1 = "-pc"
 iterationinst_config2 = "-randinst"
+saveInsTypelib  = configure.toolbase + "/obj-intel64/saveInstcategory.so"
+saveInsTypelib_config1 = "-ins_type"
+saveInsTypelib_config2 = "-address_count_file"
+saveInsTypelib_config3 = "-dynamic_analyze"
+saveInsTypelib_config4 = "-inst_type_table_file"
+saveInsTypelib_config5 = "-only_memory"
+
+distributionInstCatalib  = configure.toolbase + "/obj-intel64/distributionInstCata.so"
+distributionInstCatalib_config1 = "-inst_type_table_file"
+distributionInstCatalib_mnemonic_count_file = "-mnemonic_count_file"
+distributionInstCatalib_dynamic_analyze = "-dynamic_analyze"
+distributionInstCatalib_config4 = "-des_register_count_file"
+distributionInstCatalib_config5 = "-src_register_count_file"
+
 nextinst = "obj-intel64/findnextinst.so"
 nextinst_config1 = "-pc"
 instructionfile = "instruction"
@@ -39,6 +54,7 @@ instructionend = 4
 
 totalcount = 0
 timeout = 500
+
 def execute(execlist):
 
         """
@@ -62,16 +78,18 @@ def execute(execlist):
 	    #should never go here
 
 def fetchTotalCount():
-    instcount = configure.toolbase + "/obj-intel64/instcount_official.so"
-    execlist = [configure.pin_home,"-t",instcount,"--",configure.benchmark]
+    instcount_so = configure.toolbase + "/obj-intel64/instcount_official.so"
+    instcount_file = configure.instcount
+    execlist = [configure.pin_home,"-t",instcount_so,"-o",instcount_file,"--",configure.benchmark]
     for item in configure.args:
         execlist.append(item)
 
     execute(execlist)
-    with open(configure.instcount,"r") as f:
+    with open(instcount_file,"r") as f:
         lines = f.readlines()
         if len(lines) > 1:
             print("Error while loading inst count.")
+            print(instcount_file)
             sys.exit(1)
         count = lines[0]
         count = count.rstrip("\n")
@@ -79,7 +97,86 @@ def fetchTotalCount():
         print("Instcount_official:\t",totalcount)
     return totalcount
 
+
+def countjmp(totalcount):
+    """
+    Executes a tool to count jump instructions and calculates the ratio of jumps to total instructions.
+
+    :param totalcount: Total instruction count to be passed to the tool.
+    :return: The ratio of jump instructions to total instructions.
+    """
+    # Configure the path to the jump-counting tool
+    jumpcount_tool = configure.toolbase + "/obj-intel64/jmpcount.so"
+    
+    # Create a file with 5000 random numbers between 0 and totalcount
+    randnumsfile = "./randnums.txt"
+    all_count = 5000
+    # Ensure the file is clean before generation
+    if os.path.exists(randnumsfile):
+        os.remove(randnumsfile)
+
+    random_numbers = [random.randint(0, totalcount) for _ in range(all_count)]
+    sorted_numbers = sorted(random_numbers)  # Sort numbers from large to small
+
+    with open(randnumsfile, "w") as f:
+        for num in sorted_numbers:
+            f.write(f"{num}\n")
+
+    # Build the execution list with totalcount and randnumsfile as arguments
+    execlist = [
+        configure.pin_home, "-t", jumpcount_tool,
+        "-totalcount", str(totalcount), "-randnumsfile", randnumsfile, "--",
+        configure.benchmark
+    ]
+
+    # Add additional arguments if configured
+    for item in configure.args:
+        execlist.append(item)
+
+    # Execute the tool
+    execute(execlist)
+
+    # Read the result from the output file
+    jmpcount_output = "./jmpcount_output.txt"
+    # if os.path.exists(jmpcount_output):
+    #     os.remove(jmpcount_output)
+    with open(jmpcount_output, "r") as f:
+        lines = f.readlines()
+        if len(lines) < 1:
+            print("Error while loading jump count.")
+            sys.exit(1)
+        
+        # Extract jump count and total instruction count from the file
+        jump_count = int(lines[-1].split(":")[-1].strip())
+    if os.path.exists(jmpcount_output):
+        os.remove(jmpcount_output)
+
+    total_instruction_count = int(all_count)
+    
+    # Calculate the ratio of jump instructions to total instructions
+    ratio = jump_count / total_instruction_count if total_instruction_count > 0 else 0
+    result = f"Benchmark:{configure.progname},Jump Class Samples: {jump_count}, Total Samples: {total_instruction_count}, Ratio: {ratio}"
+
+    # Output the result to a file
+    with open("./jmpradio_result.txt", "a+") as result_file:
+        result_file.write(result + "\n")
+    print("result save in jmpradio_result.txt")
+
+    print(result)
+
+
+    return ratio
+
+
+def radioofjmp():
+    totalcount = int(fetchTotalCount())
+    countjmp(totalcount)
+
+
+
+
 def getBreakpoint(totalcount):
+    #用库函数并行的随机找要注错的断点
     ## get
     """
 
@@ -225,7 +322,7 @@ def extract_args_based_on_csv(csv_file):
         saveargs(result)
 
 
-def delete_files_based_on_csv(csv_file_path, log_path=configure.log_path):
+def delete_files_based_on_csv(csv_file_path, log_path=configure.log_folder):
     # 读取 CSV 文件
     df = pd.read_csv(csv_file_path)
 
@@ -257,7 +354,7 @@ def saveargs(args):
         writer = csv.writer(file)
         writer.writerow(args)
     print("args add to:\t",filename)
-
+    
 
 def selectOneIns(totalcount):
     result = getBreakpoint(totalcount)
@@ -269,10 +366,156 @@ def selectOneIns(totalcount):
 
     saveargs(result)
 
+def Random_instPoolMaker():
+    totalcount = int(fetchTotalCount())
+    need = NEED
+    while need>0:
+        need -=1
+        selectOneIns(totalcount)
 
-def readArgsFromPool():
-    # 构建文件路径
-    filepath = os.path.join(configure.instpool_folder, poolname)
+
+
+def generate_mnemonic_count_file(mnemonic_count_file = configure.mnemonic_count_file):
+    execlist = [configure.pin_home,"-t",distributionInstCatalib,\
+                distributionInstCatalib_mnemonic_count_file,os.path.join(configure.letgo_base_home,configure.progname,mnemonic_count_file),\
+                distributionInstCatalib_dynamic_analyze,"0",\
+                "--",configure.benchmark]
+    for item in configure.args:
+        execlist.append(item)
+    #print(''.join(execlist))
+    execute(execlist)
+    return mnemonic_count_file
+
+
+def generate_catalog(catalog_csv_file = configure.catalog_csv_file):
+    execlist = [configure.pin_home,"-t",saveInsTypelib,saveInsTypelib_config1,configure.select_type,saveInsTypelib_config2,catalog_csv_file,saveInsTypelib_config3,str(configure.dynamic_analyze),saveInsTypelib_config5 ,str(configure.only_memory), "--",configure.benchmark]
+    for item in configure.args:
+        execlist.append(item)
+    print(''.join(execlist))
+    execute(execlist)
+    return catalog_csv_file
+
+def generate_Pool_from_catalog1(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=1000):
+    # 该算法考虑了catalog中一行的占比进行随机
+    """
+    从catalog_csv_file中随机选择num_samples行数据，并将每行的前三个参数保存到pool_csv_file。
+    选择行的概率基于每行的出现次数。
+
+    :param catalog_csv_file: 输入的csv文件路径
+    :param pool_csv_file: 输出的csv文件路径
+    :param num_samples: 随机选择的样本数量，默认为1000
+    """
+    # 读取 catalog_csv_file 的内容并解析为行和出现次数
+    lines = []
+    weights = []
+    
+    with open(catalog_csv_file, 'r') as infile:
+        reader = csv.reader(infile)
+        for row in reader:
+            if row:  # 忽略空行
+                count = int(row[4])  # 取出出现次数
+                lines.append(row[:3])  # 取前三个参数
+                weights.append(count)  # 使用次数作为权重
+    
+    # 计算加权随机选择
+    total_count = sum(weights)
+
+
+    # 打开 pool_csv_file 进行写入
+    with open(pool_csv_file, 'w', newline='') as outfile:
+        writer = csv.writer(outfile)
+        
+        for _ in range(num_samples):
+            selected_line = random.choices(lines, weights, k=1)[0]  # 根据权重随机选择一行
+            args = selected_line[:2]
+            # 将第三列的十六进制数转为十进制
+            hex_value = selected_line[2]  # 获取第三列（十六进制数字）
+            decimal_value = str(int(hex_value, 16))  # 转换为十进制字符串
+            args.append(decimal_value)
+            # 为选中的行生成随机数字
+            args.append(str(random.randint(0, 1024)))
+            #args.append(hex_value)
+            outfile.write(','.join(args) + '\n')
+
+    print(f"已通过catalog创建{num_samples}条注错位置，保存到 {pool_csv_file}")
+    return pool_csv_file
+
+
+def generate_Pool_from_catalog2(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=1000):
+    # 该算法忽略了catalog中一行的占比,强制进行随机
+    """
+    从catalog_csv_file中随机选择num_samples行数据，并将每行的前三个参数保存到pool_csv_file。
+
+    :param catalog_csv_file: 输入的csv文件路径
+    :param num_samples: 随机选择的样本数量，默认为1000
+    """
+    # 读取 catalog_csv_file 的内容
+    with open(catalog_csv_file, 'r') as infile:
+        lines = infile.readlines()
+
+
+    # 打开 pool_csv_file 进行写入
+    with open(pool_csv_file, 'w') as outfile:
+        # 随机选择 num_samples 行并处理
+        for _ in range(num_samples):
+            random_line = random.choice(lines)  # 随机选择一行
+
+            # 提取前三个参数
+            columns = random_line.strip().split(',')  # 假设每行的数据由逗号分隔
+            selected_params = columns[:2]  # 获取前三个参数
+            selected_params.append(str(int(columns[2],16)))
+
+            random_number = str(random.randint(0, 64))
+            selected_params.append(random_number)
+            # 将结果写入文件
+            outfile.write(','.join(selected_params) + '\n')
+
+    print(f"已通过catalog创建{num_samples} 条注错位置，保存到 {pool_csv_file}")
+    return pool_csv_file
+
+def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=2000):
+    ##该方法为每行创建20个注错机会,行的选择方式是选择前50条
+    """
+    从catalog_csv_file中随机选择50行（如果行数大于50），并将每行的前三个参数和一个附加的参数（1到20）写入到pool_csv_file中。
+    如果catalog_csv_file的行数小于50，则处理所有行。
+
+    :param catalog_csv_file: 输入的csv文件路径
+    :param num_samples: 随机选择的样本数量，默认为1000
+    """
+    # 读取 catalog_csv_file 的所有行
+    with open(catalog_csv_file, 'r') as infile:
+        lines = infile.readlines()
+
+    # # 如果行数大于50，随机选择50行；如果小于50，则使用所有行
+    # if len(lines) > 50:
+    #     lines = random.sample(lines, 50)
+
+    # 如果行数大于 100，使用前 100 行；否则使用所有行
+    if len(lines) > 80:
+        lines = lines[:80]
+
+    minnum = configure.minCountInstInj
+    nums_one_inst = min(int(num_samples/len(lines)),minnum)
+    # 打开 pool_csv_file 进行写入
+    with open(pool_csv_file, 'w') as outfile:
+        # 遍历每一行
+        for line in lines:
+            # 提取前三个参数
+            columns = line.strip().split(',')  # 假设每行的数据由逗号分隔
+            selected_params = columns[:2]  # 获取前两个参数
+            selected_params.append(str(int(columns[2], 16)))  # 将第三个参数转换为十进制
+            max_iteration = int(columns[-1])-1
+            # 为每一行创建20个副本，每个副本附加一个新的参数（从1到20）
+            for i in range(0, nums_one_inst):
+                iteration = str(min(max_iteration,i))
+                new_line = selected_params + [iteration]  # 添加从1到20的数值
+                outfile.write(','.join(new_line) + '\n')
+                print(new_line)
+
+    print(f"已通过catalog创建{len(lines) * minnum} 条注错位置，保存到 {pool_csv_file}")
+    return pool_csv_file
+
+def readArgsFromPool(filepath = os.path.join(configure.instpool_folder, poolname)):
     
     # 用于存储最后一行数据
     args = []
@@ -300,17 +543,29 @@ def readArgsFromPool():
     return args
 
 
-def Random_instPoolMaker():
-    totalcount = int(fetchTotalCount())
-    need = NEED
-    while need>0:
-        need -=1
-        selectOneIns(totalcount)
 
 if __name__ == "__main__":
     print("PoolMaker!")
-    Random_instPoolMaker()
+    do_random_inst_pool_maker = 0
+    if do_random_inst_pool_maker == 1:
+        Random_instPoolMaker()
+
+    do_generate_Pool_from_catalog = 0
+    if do_generate_Pool_from_catalog == 1:
+        path = generate_catalog()
+        path = generate_Pool_from_catalog(path)
+        print(readArgsFromPool(path))
+
+    do_generate_Pool_from_catalog = 1
+    if do_generate_Pool_from_catalog == 1:
+        path = generate_catalog()
+        path = generate_Pool_from_catalog(path)
+        print(readArgsFromPool(path))
 
     #csv_file = os.path.join(configure.csv_folder,configure.progname+'.csv')
     #extract_args_based_on_csv(csv_file)
     #delete_files_based_on_csv(csv_file)
+
+    # do_jmp_count = 1
+    # if do_jmp_count == 1 :
+    #     radioofjmp()

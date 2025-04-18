@@ -12,10 +12,11 @@ from pandas.plotting import table
 import numpy as np
 import sighandler
 import seaborn as sns
-
+from sdcjudger import Add_SDC_result_to_alllog_common
+from gen_asm import disassemble_binary
 #######---------------FOLLOWED ARE SWITCH---------------#########
 ## clsfy == 1 to move unfinished record to folder "unfinish"
-clsfy = 0
+clsfy = 1
 ## delbug = 1 to delete file that encounters Traceback
 delbug = 0
 ## to_csv =1 will collect all information to csv under log_path,but cost much more time
@@ -27,6 +28,8 @@ debug_mode = 5
 ## show file example find by string like "No reg, Exit"
 show_ss_example = 0
 
+
+
 ##定义parser
 parser = argparse.ArgumentParser(description="Analyze log files.")
 parser.add_argument('-file', type=str, help='Log file to process,benchmark according to configure.py')
@@ -34,41 +37,72 @@ parser.add_argument('-flag', type=str, help='flag means the number of Sig receiv
 parser.add_argument('-sdc_flag', type=str, help='sdc_flag means the number of SDC')
 
 parser.add_argument('-bname', type=str, help='bname means benchmark name')
+parser.add_argument('-i', type=str, help='specify param: inject_random_or_targeted(random,targeted)')
+parser.add_argument('-s', type=str, help='specify param: select_type(call_retq,stack,mov,integer,float,cmp)')
 parser.add_argument('-analyze_all', type=str, help='analyze all application one time')
 parser.add_argument('-p', type=str, help="picture type")
 parser.add_argument('-t', type=str, help="Table type")
 args = parser.parse_args()
+argslen =  sum(1 for arg in vars(args).values() if arg is not None)
 
-progname = configure.progname
-if args.bname:
-    progname = args.bname
-
+progname = configure.progname if not args.bname else args.bname
+inject_random_or_targeted = configure.inject_random_or_targeted if not args.i else args.i
+select_type = configure.select_type if not args.s else args.s
+analysis_folder = configure.analysis_folder 
 
 file_count = 0
+
+#不指定参数,默认从configure中获得参数
+one_batch_folder = configure.one_batch_folder 
+analysis_folder_name = configure.analysis_folder_name
+result_analyze_csv_name = configure.result_analyze_csv_name
+
+#手动输入参数,根据输入参数以configure的规则构建需要的参数
+if argslen:    
+    if inject_random_or_targeted == "random":
+        Result_folder_name = "BenchmarkResult"
+        analysis_folder_name = "analysis"
+        result_analyze_csv_name = progname +'.csv'
+        one_batch_folder = os.path.join(configure.letgo_base_home,Result_folder_name,progname)
+    if inject_random_or_targeted == "targeted":
+        Result_folder_name = "TargetedBenchmarkResult"
+        analysis_folder_name = "TargetedAnalysis"
+        result_analyze_csv_name = progname + '_' + select_type +'.csv'
+        one_batch_folder = os.path.join(configure.letgo_base_home,Result_folder_name,progname,select_type)
+
+analysis_folder = os.path.join(configure.letgo_base_home,analysis_folder_name)
+analysis_csv_folder = os.path.join(analysis_folder,'CSV',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'CSV')
+analysis_csv_file = os.path.join(analysis_csv_folder,result_analyze_csv_name)
+asm_folder  = os.path.join(analysis_folder,'asm')
+pic_folder  = os.path.join(analysis_folder,'PIC',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'PIC')
+
+log_folder = os.path.join(one_batch_folder,"log")  ##数据源目录
+
+print("log_folder in:\t",log_folder)
+if not (os.path.exists(log_folder) and os.path.isdir(log_folder)):
+    print("{} does not exist or is not a directory".format(log_folder))
+    exit(0)
+
+
+finish = []
 crash_1 = []
 crash_2 = []
 crash_2p = []
-finish = []
-flag = 0
 unfinishedlist = []
-output = []
-
-log_dir = os.path.join(configure.result_path,progname,"log")  ##数据源目录
-print("log_dir in:\t",log_dir)
-if not (os.path.exists(log_dir) and os.path.isdir(log_dir)):
-    print("{} does not exist or is not a directory".format(log_dir))
-    exit(0)
-
-csv_dir = configure.csv_folder                  ##将log_dir的海量数据收集整理到csv_dir中
-pic_dir = configure.pic_folder
-
+#ignore masked and sdc
+#ignore_no_crash = 1 if inject_random_or_targeted == "random" else 1
+ignore_no_crash = 0
 
 # 直接从 configure 中导入所需的变量
 SdcAppList = configure.SdcAppList
 MASKED = configure.MASKED
 SDC = configure.SDC
+SDC_UNACCEPTED = configure.SDC_UNACCEPTED
+SDC_ACCEPTED = configure.SDC_ACCEPTED
 C_MASKED = configure.C_MASKED
 C_SDC = configure.C_SDC
+C_SDC_UNACCEPTED = configure.C_SDC_UNACCEPTED
+C_SDC_ACCEPTED = configure.C_SDC_ACCEPTED
 DOUBLE_CRASH = configure.DOUBLE_CRASH
 CRASH_NOPC = configure.CRASH_NOPC
 # CAM = 'CntAccMem'
@@ -105,9 +139,9 @@ def next_i_line_content(file, i, target):
     # 如果没有找到目标，返回所有行的连接
     return '\n'.join(lines) if lines else 'null'  # 如果没有读取到任何行，返回'null'
 
-def move_file_to_dir(f, log_dir, folder_name):
+def move_file_to_dir(f, log_folder, folder_name):
     # 创建目标文件夹路径
-    target_dir = os.path.join(log_dir, folder_name)
+    target_dir = os.path.join(log_folder, folder_name)
 
     # 检查目标文件夹是否存在，如果不存在则创建
     if not os.path.exists(target_dir):
@@ -146,7 +180,7 @@ def search_string_in_log():
     ]
 
     # 定义文件夹路径
-    folder_path = log_dir # 修改为你实际的文件夹路径
+    folder_path = log_folder # 修改为你实际的文件夹路径
 
     # 用于存储结果的字典
     results = {key: [] for key in search_strings}
@@ -197,30 +231,36 @@ def search_string_in_log():
                 top_n -=1
 
 
-def read_logs(progname):
+def read_logs(progname, log_folder, output_dir, outputname):
     global file_count, crash_1, crash_2, crash_2p, finish, flag, detected, correct, sdc, unfinishedlist, output
-    log_dir = os.path.join(configure.result_path,progname,"log") 
+    
+        
+    print("read log in folder:\t",log_folder)
     if to_csv == 1:
-        csv_file_path = os.path.join(log_dir, csv_dir, progname + '.csv')
+        csv_file_path = analysis_csv_file
         # 检查文件是否存在，如果存在则删除
         if os.path.exists(csv_file_path):
             os.remove(csv_file_path)
-            print("Deleted old", csv_file_path)
+            print("Deleted old csv:\t", csv_file_path)
         else:
-            print(progname + '.csv', "does not exist.")
+            print("Csv not exist:\t",csv_file_path)
 
     # 只选择以 "log_" 开头的文件并按名称排序
     log_files = sorted(
-        [f for f in os.listdir(log_dir) if f.startswith("log_") and int(re.search(r'(\d+)', f).group()) < 99999],
+        [f for f in os.listdir(log_folder) if f.startswith("log_") and int(re.search(r'(\d+)', f).group()) < 99999],
         key=lambda x: int(re.search(r'(\d+)', x).group())
     )
 
     
-    print("deal with log folfer:\t",log_dir)
     for f in log_files:
+        # file_name = os.path.basename(f)
+        # if file_name != "log_995":
+        #     continue
+
+        # print(file_name)
 
         file_count += 1
-        f = os.path.join(log_dir, f)
+        f = os.path.join(log_folder, f)
         flag = 0
         sdc_flag = -1
         after_letgoin = 0
@@ -231,27 +271,30 @@ def read_logs(progname):
             if not lines:
                 print(f"文件 '{f}' 是空的，跳过此文件。")
                 continue  # 跳过此文件
-
+                
             bugin = 0
             for line in lines:
-                if "Traceback" in line:
+                if "Traceback" in line or "no such Breakpoint" in line or "SystemExit" in line or "exit_flag: True" in line:
                     print("Bug in:\t", f)
                     bugin = 1
                     if delbug == 1:
                         os.remove(f)  # 删除文件
                         print("delete:\t", f)
                         break
+                    break
                 if "Program received signal" in line and not after_letgoin and flag == 0:
                     flag = 1
                 if "Letgo in!" in line :
                     after_letgoin = 1
                 if "Program received signal" in line and after_letgoin and flag == 1:
                     flag = 2
-                if "application generate no output" in line:
+                if "application generate no output" in line or "Timeout occurred" in line:
                     flag = 2
                 if "No nextpc file is generated!" in line or "Crash place getting no PC" in line:
                     sdc_flag = 0
                     flag = 2
+
+                ##Sdc Test
                 if "1 tests completed and " in line:  # hpl
                     sdc_flag = 0
                     if "failed residual checks" in line:
@@ -264,10 +307,17 @@ def read_logs(progname):
                     sdc_flag = 0
                     if 'False' in line:
                         sdc_flag = 1
+                if "Verification " in line and progname in ["bt", "cg", "ep", "ft", "is"]:
+                    if "Successful" in line:
+                        sdc_flag = 0
+                    if "failed" in line:
+                        sdc_flag = 1
+
+
 
                 if "Exit" in line:
                     unfinished = 1
-                if "Error" in line:
+                if "Error" in line or "ERROR" in line: 
                     unfinished = 1
                 if "Cannot insert breakpoint" in line:
                     unfinished = 1
@@ -275,7 +325,7 @@ def read_logs(progname):
             if unfinished == 1:
                 unfinishedlist.append(f)
                 if clsfy == 1:
-                    move_file_to_dir(f, log_dir, "unfinish")
+                    move_file_to_dir(f, log_folder, "unfinish")
                 #continue
             if bugin == 1:
                 continue
@@ -288,9 +338,13 @@ def read_logs(progname):
                 crash_2p.append(f)
             if flag == 0:
                 finish.append(f)
+        if ignore_no_crash == 1 and flag == 0:
+            continue
+        if unfinished == 1:
+            continue
         if to_csv == 1:
-            extract_values_and_append_to_csv(f, log_dir, progname + '.csv', flag, sdc_flag)
-
+            # 创建 CSV 文件保存的目录
+            extract_values_and_append_to_csv(log_folder, f,  output_dir, outputname, flag, sdc_flag)
 
 def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope', SigFunc='Sig1Func', address=None, asm_file=None, df=None, file=None, insline_context = None):
     """
@@ -306,19 +360,19 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
         insline = "=> "+line.split("=>")[-1].strip("(gdb)").strip()
         # 更新 Sigpc
         df.loc[0, Sigpc] = insline.split('=>')[-1].split(':')[0].split('<')[0].strip()
-        if address == 'null':
+        if address == 'null' or len(address) != 6 :
             address = df.loc[0, Sigpc]
         # 处理 'Cannot' 错误情况
         if Sig=='Sig1':
             if 'Cannot' in insline :
                 df.loc[0, SigIns] = 'null'
-                df.loc[0, 'result'] = CAM
+                df.loc[0,'result'] = CAM
                 return
-            if asm_file is not None and not findins.judge_address_in_asm(address.replace('0x', ''), asm_file) :
+            if asm_file is not None and (not findins.judge_address_in_asm(address.replace('0x', ''), asm_file)) :
                 # 如果地址不在汇编文件中
                 #print("crash:",df.loc[0,'input_file'],'\t',address)
                 df.loc[0, SigIns] = 'null'
-                df.loc[0, 'result'] = ANIA
+                df.loc[0,'result'] = ANIA
                 return
             
         # 提取函数名
@@ -343,7 +397,7 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
                 df.loc[0, SigOpe] = df.loc[0, SigIns]
         else:
             df.loc[0, SigOpe] = df.loc[0, SigIns].split(' ')[0]
-
+        
         # if df.loc[0,'result'] == 'crash':
         #     print(df.loc[0,'input_file'])
         #     print("Line:", line)
@@ -353,39 +407,39 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
         print(df.loc[0, 'input_file'],"\tLine:", line)
 
 
-def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_flag):
-    if debug_mode >=6:
-        print("\nnow do extract_values_and_append_to_csv")
-    # 创建 CSV 文件保存的目录
-    output_dir = os.path.join(log_dir,csv_dir)
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)  # 如果目录不存在则创建
+def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputname, flag, sdc_flag):
 
     # 创建一个空的 DataFrame
-    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
-
+    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'inj_location', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'tolerance' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
+    
 
     if flag == 0:
-        df.loc[0, 'result'] = MASKED
+        df.loc[0,'result'] = MASKED
         if sdc_flag == 1:
-            df.loc[0, 'result'] = SDC
+            df.loc[0,'result'] = SDC
     elif flag == 1:
         if sdc_flag == 0:
-            df.loc[0, 'result'] = C_MASKED
+            df.loc[0,'result'] = C_MASKED
         if sdc_flag == 1:
-            df.loc[0, 'result'] = C_SDC
+            df.loc[0,'result'] = C_SDC
         if sdc_flag == -1:
-            df.loc[0, 'result'] = 'C-unknown'
+            df.loc[0,'result'] = 'C-unknown'
     elif flag == 2:
-        df.loc[0, 'result'] = DOUBLE_CRASH
+        df.loc[0,'result'] = DOUBLE_CRASH
     else:
-        df.loc[0, 'result'] = 'crash2+'
+        df.loc[0,'result'] = 'crash2+'
         
     # 获取文件名
     file_name = os.path.basename(input_file)
-    asm_file = os.path.join(configure.asm_folder,progname+'.asm')
+    asm_file = os.path.join(asm_folder,progname+'.asm')
     df.loc[0,'input_file'] = file_name
 
+    debug = 0
+    if debug == 1:
+        if df.loc[0,"input_file"] != "log_610":
+            return
+        print(df.loc[0,'result'])
+    
     # 读取文件并提取所需内容
     with open(input_file, 'r') as file:
         values = ['null'] * 4
@@ -452,7 +506,13 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                 except:
                     print(input_file,"extract ins failed")
                 continue
-            
+
+            if "bit location:" in line:
+                try:
+                    df.loc[0,'inj_location'] = line.split(":")[1]
+                except:
+                    df.loc[0,'inj_location'] = "null"
+
             #首次遇到SIG
             if "Program received signal" in line and SIGcount == 0 and after_letgoin==0:
                 Sig = 'Sig1'
@@ -473,7 +533,10 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                         df.loc[0,SigFunc] = insline.strip().split(' ')[2].strip().split(' ')[0].strip()
                     insline = next_i_line_content(file,4,'=>')
                     if "=>" in insline:
+                        #print(df.loc[0,"result"])
                         get_ins_info(Sig, Sigpc, SigIns, SigOpe, SigFunc, address, asm_file, df, file, insline)
+                        #print(df.loc[0,"result"])
+                        #sys.exit(1)
                 except Exception as e:
                     print("get info at signal1 fail",input_file)
                     print(e)
@@ -553,7 +616,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
                     df.loc[0,Sig] = tmp.strip()
                     insline = next_i_line_content(file,1,'0x')
                     address = 'null'
-                    asm_file = os.path.join(configure.asm_folder,progname+'.asm')
+                    asm_file = os.path.join(asm_folder,progname+'.asm')
                     if '0x' in insline and 'in' in insline:
                         df.loc[0,Sigpc] = '0x' + insline.split(' ')[0].lstrip('0x').lstrip('0')
                         address = df.loc[0,Sigpc].lstrip("0x")
@@ -583,49 +646,77 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
             if ("After Fixed" in line) :
                 df.loc[0,'ErrSpd_Fix'] = str(max_error_spread)+'+'
 
-            ###SDC判断
+            ###保存tolerance,需要保留四位小数
+            df.loc[0,'tolerance'] = '{:.4f}'.format(configure.tolerance)
+            ###保存bias,需要保留四位小数
             special_bias_app_list = ["HPCCG","hpl","miniFE","miniMD"]
-            if configure.progname not in special_bias_app_list and configure.cmp_str in line:
-                df.loc[0,'bias'] = line.split('(')[1].split(')')[0].strip()
             #hpl
             if "||Ax-b||_oo/(eps*(||A||_oo*||x||_oo+||b||_oo)*N)=" in line:
-                df.loc[0,'bias'] = line.split('=')[1].split("......")[0].strip()
+                bias_value = float(line.split('=')[1].split("......")[0].strip())
+                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
             #HPCCG
             if "Final residual:" in line:
-                df.loc[0,'bias'] = line.split(':')[1].strip()
+                bias_value = float(line.split(':')[1].strip())
+                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
             #miniFE
             if "Final Resid Norm" in line:
-                df.loc[0,'bias'] = line.split(':')[1].strip()
-            #miniMD
+                bias_value = float(line.split(':')[1].strip())
+                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
+            #polybench
+            if "max relative error" in line:
+                bias_value = float(line.split(':')[1].strip())
+                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
+            
+    
+
     #判断完一条log后的总结
     if not pd.isna(df.loc[0,'Sig1pc']) and asm_file is not None and not findins.judge_address_in_asm(str(df.loc[0,'Sig1pc']).replace('0x', ''), asm_file) :
         # 如果地址不在汇编文件中
         #print("crash:",df.loc[0,'input_file'],'\t',df.loc[0,'Sig1pc'])
         df.loc[0, 'Sig1Ins'] = 'null'
-        df.loc[0, 'result'] = ANIA
-
-    if configure.progname in special_bias_app_list:
-        if configure.progname == "miniFE":
-            golden_bias = 4.45306e-06
+        df.loc[0,'result'] = ANIA
+    #没有崩溃的情况，将bias设置为无穷大
+    if df.loc[0,'result'] == DOUBLE_CRASH or df.loc[0,'result'] == CRASH_NOPC:
+        df.loc[0,'bias'] = 'inf'
+    if progname in configure.sdcprogram:
+        if progname == "miniFE":
+            golden_bias = 4.15995e-11
             bias = df.loc[0,'bias']
             #默认最严格的sdc判定，如果误差小，就将sdc进化成masked
-            if 1.0e-06 < float(bias) < 10.0e-06:
-                if df.loc[0,'result'] == 'SDC':
-                     df.loc[0,'result'] = 'Masked'
-                if df.loc[0,'result'] == 'C-SDC':
-                     df.loc[0,'result'] = 'C-Masked'
-        if configure.progname == "HPCCG":
-            golden_bias = 2.21357e-28
+            if abs(float(bias) - golden_bias) < 1.0e-06:
+                if df.loc[0,'result'] == SDC:
+                     df.loc[0,'result'] = MASKED
+                if df.loc[0,'result'] == C_SDC:
+                     df.loc[0,'result'] = C_MASKED
+        if progname == "HPCCG":
+            golden_bias = 5.35506e-38
             bias = df.loc[0,'bias']
-            if abs(float(bias) - golden_bias) > 10.0e-28:
-                if df.loc[0,'result'] == 'SDC':
-                     df.loc[0,'result'] = 'Masked'
-                if df.loc[0,'result'] == 'C-SDC':
-                     df.loc[0,'result'] = 'C-Masked'
-            
+            if abs(float(bias) - golden_bias) < 1.0e-28:
+                if df.loc[0,'result'] == SDC:
+                     df.loc[0,'result'] = MASKED
+                if df.loc[0,'result'] == C_SDC:
+                     df.loc[0,'result'] = C_MASKED
+        if progname in configure.PolyBenchtList:
+            bias = float(df.loc[0,'bias'])
+            ## 增加sdc的可接受分析
+            if df.loc[0,'result'] == SDC:
+                df.loc[0,'result'] = SDC_UNACCEPTED
+            if df.loc[0,'result'] == C_SDC:
+                df.loc[0,'result'] = C_SDC_UNACCEPTED
+            # ## 从masked中提取可接受
+            if bias >1e-10:
+                if df.loc[0,'result'] == MASKED:
+                    df.loc[0,'result'] = SDC_ACCEPTED
+                if df.loc[0,'result'] == C_MASKED:
+                    df.loc[0,'result'] = C_SDC_ACCEPTED
+            # else:
+            #     print(bias,df.loc[0,'input_file'])
+    if debug == 1:
+        print(df.loc[0,'result'])
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)  # 如果目录不存在则创建
     # 构造输出文件路径
     output_file = os.path.join(output_dir, outputname)
-
     # 以追加的形式写入到CSV文件
     df.to_csv(output_file, mode='a+', header=not os.path.exists(output_file), index=False, na_rep='null')
 
@@ -753,6 +844,81 @@ def pic1XappYaveragecrash(csv_dir, output_dir):
     print("pic save in:\t", output_path+'.png')
     plt.close()  # 关闭图形以释放内存
 
+
+def pic1XappYaveragecrash1(csv_dir, output_dir):
+    # 列出文件夹中所有以.csv结尾的文件
+    print("-----------------new_function-----------------")
+    csv_files = [file for file in os.listdir(csv_dir) if file.endswith('.csv')]
+
+    file_names = []
+    double_crash_crash_nopc_c_masked_c_sdc_ratios = []
+    double_crash_crash_nopc_ratios = []
+
+    for file_name in csv_files:
+        file_path = os.path.join(csv_dir, file_name)
+        try:
+            # 读取CSV文件
+            df = pd.read_csv(file_path)
+            if 'result' not in df.columns:
+                print(f"File {file_name} does not contain 'result' column. Skipping...")
+                continue
+
+            total_count = len(df)
+            double_crash_crash_nopc_c_masked_c_sdc_count = len(df[(df['result'] == DOUBLE_CRASH) |
+                                                                 (df['result'] == CRASH_NOPC) |
+                                                                 (df['result'] == C_MASKED) |
+                                                                 (df['result'] == C_SDC)])
+            double_crash_crash_nopc_count = len(df[(df['result'] == DOUBLE_CRASH) |
+                                                   (df['result'] == 'crash')])
+
+            ratio1 = double_crash_crash_nopc_c_masked_c_sdc_count / total_count if total_count > 0 else 0
+            ratio2 = double_crash_crash_nopc_count / total_count if total_count > 0 else 0
+
+            ratio1 = round(ratio1, 2)
+            ratio2 = round(ratio2, 2)
+
+            file_names.append(file_name.replace('.csv', ''))
+            double_crash_crash_nopc_c_masked_c_sdc_ratios.append(ratio1)
+            double_crash_crash_nopc_ratios.append(ratio2)
+
+            print(f"Processed file: {file_name}")
+        except:
+            print("error in file:\t", file_name)
+
+    # 绘制柱状图
+    x = range(len(file_names))
+
+    plt.figure(figsize=(10, 5))
+    bar_width = 0.35
+
+    bar1 = plt.bar(x, double_crash_crash_nopc_c_masked_c_sdc_ratios, width=bar_width, label='[DOUBLE_CRASH,CRASH_NOPC,C_MASKED,C_SDC] Ratio', color='green', align='center')
+    bar2 = plt.bar([i + bar_width for i in x], double_crash_crash_nopc_ratios, width=bar_width, label='[DOUBLE_CRASH,CRASH_NOPC] Ratio', color='red', align='center')
+
+    for b in bar1:
+        yval = b.get_height()
+        plt.text(b.get_x() + b.get_width() / 2, yval, round(yval, 4), ha='center', va='bottom')
+
+    for b in bar2:
+        yval = b.get_height()
+        plt.text(b.get_x() + b.get_width() / 2, yval, round(yval, 4), ha='center', va='bottom')
+
+    plt.ylim(0, 1)
+    plt.yticks([0.1 * i for i in range(0, 11)], [f'{10 * i}%' for i in range(0, 11)])
+
+    plt.xticks([i + bar_width / 2 for i in x], file_names, rotation=45, ha='right')
+
+    plt.ylabel('Ratio')
+    plt.title('Ratios of Different Categories in CSV Files')
+    plt.legend()
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"Created directory: {output_dir}")
+    output_path = os.path.join(output_dir, 'new_function_result')
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=600)
+    print("pic save in:\t", output_path+".png")
+
 def pic4XappYresultundercrash(csv_dir, output_dir):
     # 列出文件夹中所有以 .csv 结尾的文件
     print("-----------------p4-----------------")
@@ -793,7 +959,7 @@ def pic4XappYresultundercrash(csv_dir, output_dir):
                 element_ratios[element].append(ratio)
 
             # 存储文件名
-            file_names.append(file_name.strip('.csv'))
+            file_names.append(file_name.replace(".csv",""))
 
             print(f"Processed file: {file_name}")
         except Exception as e:
@@ -1283,7 +1449,7 @@ def Tab_col_Recovery(csv_dir, grouping_column, output_dir):
     :param target_elements: 要统计的目标元素列表
     :param output_dir: 输出目录
     """
-    target_elements = [C_MASKED,C_SDC,DOUBLE_CRASH,'crash']
+    target_elements = [C_MASKED,C_SDC,DOUBLE_CRASH]
     target_colors = ['green', 'Gold',  'OrangeRed', 'purple']
     # 确保输出目录存在
     output_dir = os.path.join(output_dir, f'Tab_{grouping_column}_Recovery')
@@ -1428,22 +1594,26 @@ def Tab_col_Recovery2(csv_dir, grouping_column, output_dir):
             print(f"Error processing file {file_name}: {e}")
 
 
-def all(progname):
+def analyze_one_batch(progname, log_folder, analysis_csv_folder, result_analyze_csv_name, asm_folder):
     print("Read logs and generate csv")
 
     print(f"Processing program: {progname}")
-    read_logs(progname)  # 读取日志并生成 CSV
-    
+    read_logs(progname, log_folder, analysis_csv_folder, result_analyze_csv_name)
+
     # 检查是否需要进行更多的查找
     if findmorebypc == 1:
         try:
-            findins.findinsbyasm(progname)
-        except:
-            print("error findins.findinsbyasm(progname)")
+            asm_file = os.path.join(asm_folder,progname+'.asm')
+            findins.findinsbyasm(progname,asm_file,analysis_csv_file)
+        except Exception as e:
+            print("error findins.findinsbyasm(progname):\t",e)
 
 
 def main():
+    global progname,inject_random_or_targeted,select_type
     if args.p or args.t:
+        csv_dir = analysis_csv_folder
+        pic_dir = pic_folder
         if args.p == '1':
             pic1XappYaveragecrash(csv_dir,pic_dir)
         elif args.p == '2':
@@ -1474,18 +1644,16 @@ def main():
             Tab_col_Recovery(csv_dir,'Sig1',pic_dir)
             Tab_col_Recovery(csv_dir, 'injreg', pic_dir)
             Tab_col_Recovery(csv_dir, 'Sig1Ope', pic_dir)
+            Tab_col_Recovery(csv_dir, 'ErrSpd_Fix', pic_dir)
+            
         return
 
     if args.file and args.flag:##调试单个log
-        extract_values_and_append_to_csv(os.path.join(log_dir,str(args.file)),log_dir,args.file+'.csv',args.flag, args.sdc_flag)
-        return
-
-    if args.bname:
-        all(args.bname)
+        extract_values_and_append_to_csv(os.path.join(log_folder,str(args.file)),log_folder,args.file+'.csv',args.flag, args.sdc_flag)
         return
 
     if args.analyze_all:
-        directory = configure.result_path
+        directory = os.path.join(configure.letgo_base_home,Result_folder_name)
         try:
             # 获取目录中所有子文件夹名
             prognames = [name for name in os.listdir(directory) if os.path.isdir(os.path.join(directory, name))]
@@ -1494,7 +1662,8 @@ def main():
             for progname in prognames:
                 try:
                     print (progname)
-                    all(progname)
+                    continue
+                    analyze_one_batch(progname, log_folder, analysis_csv_folder, result_analyze_csv_name, asm_folder)
                 except:
                     print("--------------------------------fail--------------------------------")
                     continue
@@ -1502,9 +1671,16 @@ def main():
             print(f"An error occurred during batch processing: {e}")
             sys.exit(1)
         return
-        
-    # 直接运行configure的情况
-    all(configure.progname)
+
+    disassemble_binary()
+    Add_SDC_result_to_alllog_common(progname = progname, \
+                                    output_name = configure.output_name, \
+                                    log_path= os.path.join(one_batch_folder,"log"), \
+                                    sdcout_folder= os.path.join(one_batch_folder,"sdcout"), \
+                                    cmp_str = configure.cmp_str,\
+                                    tolerance=configure.tolerance)
+# 直接运行configure的情况
+    analyze_one_batch(progname, log_folder, analysis_csv_folder, result_analyze_csv_name, asm_folder)
 
 
 

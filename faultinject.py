@@ -32,6 +32,7 @@ class FaultInjector:
     def __init__(self,totalInst):
         self.totalInst = totalInst
         self.flag = 32
+        self.high_bit_fault = configure.high_bit_fault  # 是否在高位注错
 
     def searchInInstfile(self, seq):
         regmem = ""
@@ -242,7 +243,12 @@ class FaultInjector:
         bitsize = 31
         if self.flag == 64:
             bitsize = 63
-        pos = random.randint(0,bitsize)
+
+        if self.high_bit_fault:
+            pos = random.randint(bitsize // 2, bitsize)  # 在高位选择位置
+        else:
+            pos = random.randint(0, bitsize)  # 在低位随机选择位置
+            
         mask = (1 << pos)
         decvalue = 0
         if "0x" in ori_value:
@@ -250,18 +256,23 @@ class FaultInjector:
         else:
             decvalue = int(ori_value)
         print("New value is "+str(decvalue^mask)+" Old value is "+str(decvalue))##将原始值以随机长度,按位异或得到新值
+        print("bit location:",pos)
         return str(decvalue^mask)
     
     def get_stack_size(self):
         size = ""
         with open(stacksize,"r") as f:  ##stacksize中保存的是ins所在函数的第一个包含sub和rsp的汇编指令,即为局部变量分配空间的指令,由于汇编代码中会集中把局部变量放在开头分配,因此size为该函数为局部变量预留的空间
+            intsize = 0
             lines = f.readlines()
             for line in lines:
                 line = line.rstrip("\n")
-                if "," in line:
+                if "push" in line:
+                    intsize += 8
+                if "sub" in line:
                     items = line.split(",")
-                    size = items[len(items)-1]
-
+                    subsize = items[len(items)-1]
+                    intsize += int(subsize,16)
+        size = str(hex(intsize))
         return size
 
     def getNextPC(self,pc):
@@ -288,12 +299,12 @@ class FaultInjector:
                     nextpc = line.split(":")[1]
                 if "regw" in line:
                     regw.append(line.split(":")[1])
-                if "stackr:" in line:
-                    stack = line.split(":")[1]
-                    flag = 2
                 if "stackw:" in line:
                     stack = line.split(":")[1]
                     flag = 1
+                if "stackr:" in line:
+                    stack = line.split(":")[1]
+                    flag = 2
                 if "nostack" in line:
                     flag = 3
                 if "base:" in line:

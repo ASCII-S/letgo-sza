@@ -9,7 +9,7 @@ import datetime
 import traceback
 import re
 import argparse
-
+import InstPoolMaker
 timeout = 500
 
 
@@ -116,39 +116,12 @@ def find_max_log_suffix(directory):
                 max_file = filename
     
     if max_file:
-        print("最大的 log 文件是: ",max_file, "后缀数字是: ","max_number")
+        print("最大的 log 文件是: ",max_file, "后缀数字是: ",max_number)
         return max_number
     else:
         print("没有找到符合条件的文件。")
         return None
 
-
-def find_max_log_suffix(directory):
-    # 初始化最大值
-    max_number = -1
-    max_file = None
-    
-    # 定义匹配以 "log_" 开头，后面跟数字的正则表达式
-    pattern = re.compile(r"log_(\d+)")
-    
-    # 遍历指定文件夹中的所有文件
-    for filename in os.listdir(directory):
-        # 使用正则表达式匹配文件名
-        match = pattern.match(filename)
-        if match:
-            # 提取匹配的数字部分
-            number = int(match.group(1))
-            # 如果找到更大的数字，更新最大值和对应的文件名
-            if number > max_number:
-                max_number = number
-                max_file = filename
-    
-    if max_file:
-        print(f"最大的 log 文件是: {max_file}, 后缀数字是: {max_number},所在地址是: {directory}")
-        return max_number
-    else:
-        print("没有找到符合条件的文件。")
-        return None
 
 
 if __name__ == "__main__":
@@ -180,15 +153,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     totalcount = ""
-    # with open(configure.instcount,"r") as f:
-    #     lines = f.readlines()
-    #     if len(lines) > 1:
-    #         print("Error while loading inst count.")
-    #         sys.exit(1)
-    #     count = lines[0]
-    #     count = count.rstrip("\n")
-    #     totalcount = count.split(" ")[1]
-    #     print("Instcount:\t",totalcount)
     file_path = configure.instcount
     try:
         with open(file_path, 'r') as f:
@@ -203,20 +167,35 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"An error occurred: {e}")
 
+
+  
+    if configure.inject_random_or_targeted == "targeted":
+        if not os.path.exists(configure.mnemonic_count_file):
+            print("Generating mnemonic_count...")
+            mnemonic_count_file = InstPoolMaker.generate_mnemonic_count_file(mnemonic_count_file = configure.mnemonic_count_file)
+        if not os.path.exists(configure.catalog_csv_file):
+            print("Generating catalog...")
+            catalog_path = InstPoolMaker.generate_catalog(catalog_csv_file = configure.catalog_csv_file)
+        if not os.path.exists(configure.pool_csv_file) or os.path.getsize(configure.pool_csv_file)==0:
+            print("Generating pool...")
+            pool_path = InstPoolMaker.generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=configure.numFI)
+        else:
+            print("Pool already exists, skip generating pool from catalog...")
+
     log_count = 0
 
     # 检查 log_path 是否存在，不存在则创建并初始化 log_count 为 0
-    if not os.path.exists(configure.log_path):
-        os.makedirs(configure.log_path)
-        print(f"Created directory: {configure.log_path}")
+    if not os.path.exists(configure.log_folder):
+        os.makedirs(configure.log_folder)
+        print(f"Created directory: {configure.log_folder}")
     else:
         # 遍历 log_path 中的文件，统计文件数
-        for root, dirs, files in os.walk(configure.log_path):
+        for root, dirs, files in os.walk(configure.log_folder):
             log_count += len(files)
 
     # 如果 log_count 不为 0，则计算最大日志后缀
     if log_count != 0:
-        log_count = find_max_log_suffix(configure.log_path) + 1
+        log_count = find_max_log_suffix(configure.log_folder) + 1
     
     if configure.num_start_from >  log_count:
         log_count = configure.num_start_from
@@ -231,6 +210,7 @@ if __name__ == "__main__":
     end = log_count + configure.numFI
     if configure.num_end_at < end :
         end = configure.num_end_at
+
     print(f"index start: {start}, index end: {end}")
     for i in range(start,end):    ##从序号log_count开始写记录
         sys.stdout = sys.__stdout__
@@ -241,21 +221,22 @@ if __name__ == "__main__":
         silentremove(configure.activate)
         try:
             print("sig.executeProgram start......")
-            print("log:\t",os.path.join(configure.log_path,'log_'+str(i)))
+            print("log:\t",os.path.join(configure.log_folder,'log_'+str(i)))
             sig_time1 = datetime.datetime.now()
-            print(sig_time1)
+            print(sig_time1,flush=True)
             sig = sighandler.SigHandler(totalcount,i)	
             sig.executeProgram(sig.process)
             
             sig_time2 = datetime.datetime.now()
             print("sig.executeProgram end.")
-            print(sig_time2)
+            print(sig_time2,flush = True)
         except KeyboardInterrupt:
             print("Program interrupted by user. Exiting...")
             exit_flag = True  # 设置退出标志
 
         except SystemExit as e:
             print(f"SystemExit encountered during sig.executeProgram: (exit due to sighandle: timeout) {e}")
+            exit_flag = True  # 设置退出标志
 
         except Exception as e:
             print(f"Error during sig.executeProgram: {e}")
@@ -265,19 +246,12 @@ if __name__ == "__main__":
             if 'exit_flag' in locals() and exit_flag:
                 print(f"exit_flag: {exit_flag}")
                 sys.exit(0)  # 退出程序
-            print(f"Finished processing test {i}, moving to the next test.")
+            print(f"Finished processing test {i}, moving to the next test.",flush=True)
             continue
         print("sig time: ",sig_time2 - sig_time1)
-    
-    # 实验完成自动分析
-    sys.stdout = sys.__stdout__
-    command = ["python3.8",os.path.join(configure.letgo_base_home,"sdcjudger.py")]
-    result = run_command(command)
-    print(result.get("stdout","No sdcout"))
 
-    command = ["python3.8",os.path.join(configure.letgo_base_home,"analyze.py"),"-bname",configure.progname]
-    result = run_command(command)
-    print(result.get("stdout","No analyze output"))
+    sys.stdout = sys.__stdout__
+    print(f"Finish all!!!\tindex start: {start}, index end: {end}")
 
 
 

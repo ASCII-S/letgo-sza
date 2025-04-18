@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import re
 import configure
+import sys
 ##debug_mode = 1 will print debug info
 debug_mode = 5
 
@@ -108,17 +109,10 @@ def extract_instruction_from_asm(benchmark_csv, asm_file,PC,df_Ins,df_Ope,df_Fun
 
 
 
-def findinsbyasm(program):
-    # 使用示例：
-    benchmark = program
-    csv_folder = configure.csv_folder
-    asm_folder  = configure.asm_folder
-    csv_output = benchmark +'.csv'
-
-    benchmark_csv = os.path.join(csv_folder,benchmark+'.csv')  # CSV 文件路径
-    benchmark_fix_csv = os.path.join(csv_folder,csv_output)
-    asm_file = os.path.join(asm_folder,benchmark+'.asm')  # asm 文件路径
-
+def findinsbyasm(progname,asm_file,analysis_csv_file):
+    print("findinsbyasm:\n\tasm_file:\t",asm_file,"\n\tanalysis_csv_file:\t",analysis_csv_file)
+    benchmark_csv = analysis_csv_file
+    benchmark_fix_csv = analysis_csv_file
     if(1):
         df_updated = extract_instruction_from_asm(benchmark_csv, asm_file,"hexpc","ins","opcode","Func")
         df_updated.to_csv(benchmark_fix_csv, index=False,na_rep='null')
@@ -149,7 +143,6 @@ def judge_address_in_asm(address,asm_file):
     if len(address) != 6 :
         #print(f"Invalid address format: {address}. It should be in the format '123456'.")
         return False
-    
     # 读取文件内容并检查地址是否出现
     try:
         with open(asm_file, 'r') as file:
@@ -162,6 +155,7 @@ def judge_address_in_asm(address,asm_file):
                 return False
     except FileNotFoundError:
         print(f"Error: The file {asm_file} was not found.")
+        sys.exit(1)
         return False
     except Exception as e:
         print(f"An error occurred: {e}")
