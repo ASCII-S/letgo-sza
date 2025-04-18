@@ -1713,15 +1713,19 @@ def main():
             sys.exit(1)
         return
 
-    disassemble_binary()
-    Add_SDC_result_to_alllog_common(progname = progname, \
-                                    output_name = configure.output_name, \
-                                    log_path= os.path.join(one_batch_folder,"log"), \
-                                    sdcout_folder= os.path.join(one_batch_folder,"sdcout"), \
-                                    cmp_str = configure.cmp_str,\
-                                    tolerance=configure.tolerance)
-# 直接运行configure的情况
-    analyze_one_batch(progname, log_folder, analysis_csv_folder, result_analyze_csv_name, asm_folder)
+    # 下面是针对单个程序的分析，会解析该程序的log文件夹，生成csv文件
+    if 1:
+        # 先反汇编得到静态信息
+        disassemble_binary()
+        # 通过golden_output比较,在log文件中添加sdc结果
+        Add_SDC_result_to_alllog_common(progname = progname, \
+                                        output_name = configure.output_name, \
+                                        log_path= os.path.join(one_batch_folder,"log"), \
+                                        sdcout_folder= os.path.join(one_batch_folder,"sdcout"), \
+                                        cmp_str = configure.cmp_str,\
+                                        tolerance=configure.tolerance)
+        # 读取一个log文件,生成csv文件的一行结果
+        analyze_one_batch(progname, log_folder, analysis_csv_folder, result_analyze_csv_name, asm_folder)
 
 
 

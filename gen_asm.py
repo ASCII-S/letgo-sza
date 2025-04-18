@@ -56,4 +56,5 @@ def extract_text_section_address_range(asm_file):
     return pcstart.lstrip('0'), pcend.lstrip('0')
 
 # 运行反汇编函数
-disassemble_binary()
+if __name__ == "__main__":
+    disassemble_binary()
