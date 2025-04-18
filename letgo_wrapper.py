@@ -116,7 +116,7 @@ def find_max_log_suffix(directory):
                 max_file = filename
     
     if max_file:
-        print("最大的 log 文件是: ",max_file, "后缀数字是: ","max_number")
+        print("最大的 log 文件是: ",max_file, "后缀数字是: ",max_number)
         return max_number
     else:
         print("没有找到符合条件的文件。")
@@ -252,15 +252,6 @@ if __name__ == "__main__":
 
     sys.stdout = sys.__stdout__
     print(f"Finish all!!!\tindex start: {start}, index end: {end}")
-    # 实验完成自动分析
-    # sys.stdout = sys.__stdout__
-    # command = ["python3.8",os.path.join(configure.letgo_base_home,"sdcjudger.py")]
-    # result = run_command(command)
-    # print(result.get("stdout","No sdcout"))
-
-    # command = ["python3.8",os.path.join(configure.letgo_base_home,"analyze.py"),"-bname",configure.progname]
-    # result = run_command(command)
-    # print(result.get("stdout","No analyze output"))
 
 
 

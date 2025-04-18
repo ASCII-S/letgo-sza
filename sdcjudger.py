@@ -122,9 +122,22 @@ def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name =
         golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/kmeans/output.txt"
     if progname == 'particlefilter':
         golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/output.txt"
+    if progname in ['2mm', 'fdtd-2d', 'bicg', 'correlation', 'gesummv', 'syr2k']:
+        golden_output_folder = "/home/tongshiyu/programs/PolyBenchC-4.2.1/golden_output"
+        golden_output_name = progname+"_ref.out"
+        golden_output = os.path.join(golden_output_folder, golden_output_name)
 
-    
+    # 检查golden_output是否存在
+    if not os.path.exists(golden_output):
+        print("golden_output not found")
+        sys.exit(1)
+
     for index in range(len+1):
+        # # 测试功能,仅对index=k进行测试
+        # k = 0
+        # if index != k:
+        #     continue
+        # print("do:\t",index)
         
         log_index_file = os.path.join(log_path, f'log_{index}')
         this_output = os.path.join(sdcout_folder, f'log_{index}_{output_name}')
@@ -132,6 +145,7 @@ def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name =
             this_output = log_index_file
         # 检查文件是否存在
         if not os.path.exists(this_output) or not os.path.exists(golden_output) or not os.path.exists(log_index_file):
+            # print("file not found:\t",this_output,golden_output,log_index_file)
             if not output_name == 'none':
                 continue
             continue
@@ -139,8 +153,11 @@ def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name =
         # 判断是否已经对该log_index进行了判断
         with open(log_index_file, 'r') as f:
             content = f.read()
-            if cmp_str in content or "No nextpc" in content or "application generate no output" in content:
-                #print("skip:\t",index)
+            if cmp_str in content :
+                print("already judged:\t",index)
+                continue
+            if "No nextpc" in content or "application generate no output" in content:
+                # print("no output:\t",index)
                 continue
         fail = 0
         # 重定向输出到 log_index_file
@@ -159,15 +176,14 @@ def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name =
                         miniFE_compare_outputs(this_output, golden_output, tolerance)
                     elif progname == 'HPCCG':
                         HPCCG_compare_outputs(this_output, golden_output, tolerance)
+                    # 添加PolyBench应用的处理
+                    elif progname in ['2mm', 'fdtd-2d', 'bicg', 'correlation', 'gesummv', 'syr2k']:
+                        polybench_compare_outputs(this_output, golden_output, tolerance)
                     else:
                         common_compare_outputs(this_output, golden_output, tolerance)
                 except Exception as e:
                     fail = 1
                     print("fail:\t",e)
-                # print(log_index_file)
-                # print(this_output)
-                # print(golden_output)
-                # sys.exit(1) 
         if fail == 1:
             print("fail in:\t"+'log_'+str(index)+'\n')
     print(progname,":\tadd sdc result from log_0 to ",'log_'+str(index)+'\n')
@@ -177,12 +193,15 @@ def Init():
     if progname in configure.OpenMpOutPutList:
         in_path = progname + '/' + configure.output_name
         golden_output_path = os.path.join(configure.Rodinia_base, "results", in_path)
-    if progname == 'lu':
+        this_output_path = os.path.join('./',configure.output_name)
+    elif progname in configure.PolyBenchOutPutList:
+        golden_output_path = os.path.join(configure.PolyBench_base, "golden_output")
+        this_output_path = os.path.join('/tmp/',configure.output_name)
+    elif progname == 'lu':
         m_output_name = 'm_matrix_512.txt'
         golden_output_path = os.path.join('./' 'm_matrix_512.txt')
-
-    this_output_path = os.path.join('./',configure.output_name)
-
+        this_output_path = os.path.join('./',configure.output_name)
+    print(this_output_path)
     return this_output_path,golden_output_path
 
 def move_this_output(output_path,save_dir,index):
@@ -518,6 +537,59 @@ def common_compare_outputs(this_output, golden_output, tolerance=configure.toler
         print(configure.cmp_str+"False")
         return 1
 
+def polybench_compare_outputs(this_output_path, golden_output_path, tolerance):
+    """
+    比较PolyBench应用输出是否在容差范围内
+    
+    :param this_output_path: 实验输出文件路径
+    :param golden_output_path: 黄金参考输出文件路径
+    :param tolerance: 允许的误差范围
+    :return: 0表示在容差范围内，1表示超出容差
+    """
+    cmp_str = configure.cmp_str  # 自定义比较字符串
+    tolerance = configure.tolerance
+    try:
+        # 添加sdcjudger-lib目录到系统路径
+        sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "sdcjudger-lib"))
+        from polybench_output_validator import compare_outputs
+        
+        # 使用compare_outputs函数进行比较
+        # 注意输出结果前会自动打印 "Compare within tolerance: True/False"
+        # 这里禁用该输出，通过重定向来实现
+        old_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w') 
+        
+        is_relative_error = True
+        result, max_rel_error, max_abs_error, ref_value, out_value, debug_msg = compare_outputs(
+            golden_output_path, 
+            this_output_path, 
+            tolerance=tolerance,
+            relative_error=is_relative_error
+        )
+        
+        # 恢复标准输出
+        sys.stdout.close()
+        sys.stdout = old_stdout
+        
+        # 打印具体误差
+        print("--------------------------------")
+        print(f"tolerance: {tolerance}")
+        print(f"max relative error: {max_rel_error:.6f}")
+        print(f"max absolute error: {max_abs_error:.6f}")
+        if ref_value is not None and out_value is not None:
+            print(f"golden output value: {ref_value}")
+            print(f"experiment output value: {out_value}")
+        if result == 0:
+            print(f"{cmp_str}True")
+        else:
+            print(f"{cmp_str}False")
+            
+        return result
+        
+    except Exception as e:
+        print(f"{cmp_str}False (Error: {str(e)})")
+        return 1
+    
 
 def SDC_saver(index,progname=configure.progname,sdcout_dir=configure.sdcout_folder):
     print("SDC_saver...")
@@ -528,9 +600,9 @@ def SDC_saver(index,progname=configure.progname,sdcout_dir=configure.sdcout_fold
     elif progname in ['b+tree','bfs','heartwall','hotspot','kmeans','lavaMD','leukocyte','nn','particlefilter','streamcluster'] or progname == 'backprop':
         this_output,golden_output = Init()
         this_output = move_this_output(this_output,sdcout_dir,index)
-    
-
-
+    elif progname in ['2mm','bicg','convolution','correlation','fdtd-2d','gesummv','syr2k','gaussian','mvt']:
+        this_output,golden_output = Init()
+        this_output = move_this_output(this_output,sdcout_dir,index)
 
 
 

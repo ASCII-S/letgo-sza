@@ -1050,7 +1050,7 @@ class SigHandler:
         print("process continue...")
         process.sendline(GDB_CONTINUE)
 
-        index = process.expect([GDB_PROMOPT, pexpect.EOF, pexpect.TIMEOUT], timeout=240)
+        index = process.expect([GDB_PROMOPT, pexpect.EOF, pexpect.TIMEOUT], timeout=600)
         if index == 0:
             print("Received GDB prompt,process pause or stop.")
         elif index == 1:
@@ -1061,6 +1061,7 @@ class SigHandler:
             process.terminate()
             process.close()
             sys.stdout = sys.__stdout__
+            raise Exception("Process timed out")  # 或者使用自定义异常
             return
 
         after_continue = self.process.before.decode()
@@ -1102,7 +1103,7 @@ class SigHandler:
 
         
         try:
-            sdcjudger.SDC_saver(index = str(self.trial))
+            # sdcjudger.SDC_saver(index = str(self.trial))
             self.sig_end_time = datetime.datetime.now()
             print("Letgo time: ",self.sig_end_time - self.letgo_start_time)
         except:
@@ -1128,8 +1129,15 @@ class SigHandler:
         # 获取并打印进程输出
         output = self.process_remote_target.before.decode('utf-8').strip()
         if output:
-            print(output)
+            if configure.progname in configure.PolyBenchOutPutList:
+                output_path = os.path.join('/tmp/',configure.output_name)
+                with open(output_path, 'w') as f:
+                    f.write(output)
+            else:
+                print(output)
         print("end output.")
+        
+        sdcjudger.SDC_saver(index = str(self.trial))
         
         print("injection info:")
         self.print_file_to_log(configure.activate)

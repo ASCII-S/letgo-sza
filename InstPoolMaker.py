@@ -510,6 +510,7 @@ def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool
                 iteration = str(min(max_iteration,i))
                 new_line = selected_params + [iteration]  # 添加从1到20的数值
                 outfile.write(','.join(new_line) + '\n')
+                print(new_line)
 
     print(f"已通过catalog创建{len(lines) * minnum} 条注错位置，保存到 {pool_csv_file}")
     return pool_csv_file
@@ -545,9 +546,17 @@ def readArgsFromPool(filepath = os.path.join(configure.instpool_folder, poolname
 
 if __name__ == "__main__":
     print("PoolMaker!")
-    #Random_instPoolMaker()
+    do_random_inst_pool_maker = 0
+    if do_random_inst_pool_maker == 1:
+        Random_instPoolMaker()
 
     do_generate_Pool_from_catalog = 0
+    if do_generate_Pool_from_catalog == 1:
+        path = generate_catalog()
+        path = generate_Pool_from_catalog(path)
+        print(readArgsFromPool(path))
+
+    do_generate_Pool_from_catalog = 1
     if do_generate_Pool_from_catalog == 1:
         path = generate_catalog()
         path = generate_Pool_from_catalog(path)
@@ -557,6 +566,6 @@ if __name__ == "__main__":
     #extract_args_based_on_csv(csv_file)
     #delete_files_based_on_csv(csv_file)
 
-    do_jmp_count = 1
-    if do_jmp_count == 1 :
-        radioofjmp()
+    # do_jmp_count = 1
+    # if do_jmp_count == 1 :
+    #     radioofjmp()

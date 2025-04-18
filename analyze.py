@@ -16,7 +16,7 @@ from sdcjudger import Add_SDC_result_to_alllog_common
 from gen_asm import disassemble_binary
 #######---------------FOLLOWED ARE SWITCH---------------#########
 ## clsfy == 1 to move unfinished record to folder "unfinish"
-clsfy = 0
+clsfy = 1
 ## delbug = 1 to delete file that encounters Traceback
 delbug = 0
 ## to_csv =1 will collect all information to csv under log_path,but cost much more time
@@ -97,8 +97,12 @@ ignore_no_crash = 0
 SdcAppList = configure.SdcAppList
 MASKED = configure.MASKED
 SDC = configure.SDC
+SDC_UNACCEPTED = configure.SDC_UNACCEPTED
+SDC_ACCEPTED = configure.SDC_ACCEPTED
 C_MASKED = configure.C_MASKED
 C_SDC = configure.C_SDC
+C_SDC_UNACCEPTED = configure.C_SDC_UNACCEPTED
+C_SDC_ACCEPTED = configure.C_SDC_ACCEPTED
 DOUBLE_CRASH = configure.DOUBLE_CRASH
 CRASH_NOPC = configure.CRASH_NOPC
 # CAM = 'CntAccMem'
@@ -289,6 +293,8 @@ def read_logs(progname, log_folder, output_dir, outputname):
                 if "No nextpc file is generated!" in line or "Crash place getting no PC" in line:
                     sdc_flag = 0
                     flag = 2
+
+                ##Sdc Test
                 if "1 tests completed and " in line:  # hpl
                     sdc_flag = 0
                     if "failed residual checks" in line:
@@ -301,10 +307,17 @@ def read_logs(progname, log_folder, output_dir, outputname):
                     sdc_flag = 0
                     if 'False' in line:
                         sdc_flag = 1
+                if "Verification " in line and progname in ["bt", "cg", "ep", "ft", "is"]:
+                    if "Successful" in line:
+                        sdc_flag = 0
+                    if "failed" in line:
+                        sdc_flag = 1
+
+
 
                 if "Exit" in line:
                     unfinished = 1
-                if "Error" in line:
+                if "Error" in line or "ERROR" in line: 
                     unfinished = 1
                 if "Cannot insert breakpoint" in line:
                     unfinished = 1
@@ -326,6 +339,8 @@ def read_logs(progname, log_folder, output_dir, outputname):
             if flag == 0:
                 finish.append(f)
         if ignore_no_crash == 1 and flag == 0:
+            continue
+        if unfinished == 1:
             continue
         if to_csv == 1:
             # 创建 CSV 文件保存的目录
@@ -351,13 +366,13 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
         if Sig=='Sig1':
             if 'Cannot' in insline :
                 df.loc[0, SigIns] = 'null'
-                df.loc[0, 'result'] = CAM
+                df.loc[0,'result'] = CAM
                 return
             if asm_file is not None and (not findins.judge_address_in_asm(address.replace('0x', ''), asm_file)) :
                 # 如果地址不在汇编文件中
                 #print("crash:",df.loc[0,'input_file'],'\t',address)
                 df.loc[0, SigIns] = 'null'
-                df.loc[0, 'result'] = ANIA
+                df.loc[0,'result'] = ANIA
                 return
             
         # 提取函数名
@@ -393,27 +408,26 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
 
 
 def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputname, flag, sdc_flag):
- 
 
     # 创建一个空的 DataFrame
-    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'inj_location', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
+    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'inj_location', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'tolerance' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
     
 
     if flag == 0:
-        df.loc[0, 'result'] = MASKED
+        df.loc[0,'result'] = MASKED
         if sdc_flag == 1:
-            df.loc[0, 'result'] = SDC
+            df.loc[0,'result'] = SDC
     elif flag == 1:
         if sdc_flag == 0:
-            df.loc[0, 'result'] = C_MASKED
+            df.loc[0,'result'] = C_MASKED
         if sdc_flag == 1:
-            df.loc[0, 'result'] = C_SDC
+            df.loc[0,'result'] = C_SDC
         if sdc_flag == -1:
-            df.loc[0, 'result'] = 'C-unknown'
+            df.loc[0,'result'] = 'C-unknown'
     elif flag == 2:
-        df.loc[0, 'result'] = DOUBLE_CRASH
+        df.loc[0,'result'] = DOUBLE_CRASH
     else:
-        df.loc[0, 'result'] = 'crash2+'
+        df.loc[0,'result'] = 'crash2+'
         
     # 获取文件名
     file_name = os.path.basename(input_file)
@@ -424,7 +438,7 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
     if debug == 1:
         if df.loc[0,"input_file"] != "log_610":
             return
-        print(df.loc[0, 'result'])
+        print(df.loc[0,'result'])
     
     # 读取文件并提取所需内容
     with open(input_file, 'r') as file:
@@ -632,20 +646,27 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
             if ("After Fixed" in line) :
                 df.loc[0,'ErrSpd_Fix'] = str(max_error_spread)+'+'
 
-            ###SDC判断
+            ###保存tolerance,需要保留四位小数
+            df.loc[0,'tolerance'] = '{:.4f}'.format(configure.tolerance)
+            ###保存bias,需要保留四位小数
             special_bias_app_list = ["HPCCG","hpl","miniFE","miniMD"]
-            if progname not in special_bias_app_list and configure.cmp_str in line:
-                df.loc[0,'bias'] = line.split('(')[1].split(')')[0].strip()
             #hpl
             if "||Ax-b||_oo/(eps*(||A||_oo*||x||_oo+||b||_oo)*N)=" in line:
-                df.loc[0,'bias'] = line.split('=')[1].split("......")[0].strip()
+                bias_value = float(line.split('=')[1].split("......")[0].strip())
+                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
             #HPCCG
             if "Final residual:" in line:
-                df.loc[0,'bias'] = line.split(':')[1].strip()
+                bias_value = float(line.split(':')[1].strip())
+                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
             #miniFE
             if "Final Resid Norm" in line:
-                df.loc[0,'bias'] = line.split(':')[1].strip()
-            #miniMD
+                bias_value = float(line.split(':')[1].strip())
+                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
+            #polybench
+            if "max relative error" in line:
+                bias_value = float(line.split(':')[1].strip())
+                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
+            
     
 
     #判断完一条log后的总结
@@ -653,28 +674,45 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
         # 如果地址不在汇编文件中
         #print("crash:",df.loc[0,'input_file'],'\t',df.loc[0,'Sig1pc'])
         df.loc[0, 'Sig1Ins'] = 'null'
-        df.loc[0, 'result'] = ANIA
-    if progname in ["HPCCG","hpl","miniFE","miniMD"]:
+        df.loc[0,'result'] = ANIA
+    #没有崩溃的情况，将bias设置为无穷大
+    if df.loc[0,'result'] == DOUBLE_CRASH or df.loc[0,'result'] == CRASH_NOPC:
+        df.loc[0,'bias'] = 'inf'
+    if progname in configure.sdcprogram:
         if progname == "miniFE":
             golden_bias = 4.15995e-11
             bias = df.loc[0,'bias']
             #默认最严格的sdc判定，如果误差小，就将sdc进化成masked
             if abs(float(bias) - golden_bias) < 1.0e-06:
-                if df.loc[0,'result'] == 'SDC':
-                     df.loc[0,'result'] = 'Masked'
-                if df.loc[0,'result'] == 'C-SDC':
-                     df.loc[0,'result'] = 'C-Masked'
+                if df.loc[0,'result'] == SDC:
+                     df.loc[0,'result'] = MASKED
+                if df.loc[0,'result'] == C_SDC:
+                     df.loc[0,'result'] = C_MASKED
         if progname == "HPCCG":
             golden_bias = 5.35506e-38
             bias = df.loc[0,'bias']
             if abs(float(bias) - golden_bias) < 1.0e-28:
-                if df.loc[0,'result'] == 'SDC':
-                     df.loc[0,'result'] = 'Masked'
-                if df.loc[0,'result'] == 'C-SDC':
-                     df.loc[0,'result'] = 'C-Masked'
-
+                if df.loc[0,'result'] == SDC:
+                     df.loc[0,'result'] = MASKED
+                if df.loc[0,'result'] == C_SDC:
+                     df.loc[0,'result'] = C_MASKED
+        if progname in configure.PolyBenchtList:
+            bias = float(df.loc[0,'bias'])
+            ## 增加sdc的可接受分析
+            if df.loc[0,'result'] == SDC:
+                df.loc[0,'result'] = SDC_UNACCEPTED
+            if df.loc[0,'result'] == C_SDC:
+                df.loc[0,'result'] = C_SDC_UNACCEPTED
+            # ## 从masked中提取可接受
+            if bias >1e-10:
+                if df.loc[0,'result'] == MASKED:
+                    df.loc[0,'result'] = SDC_ACCEPTED
+                if df.loc[0,'result'] == C_MASKED:
+                    df.loc[0,'result'] = C_SDC_ACCEPTED
+            # else:
+            #     print(bias,df.loc[0,'input_file'])
     if debug == 1:
-        print(df.loc[0, 'result'])
+        print(df.loc[0,'result'])
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)  # 如果目录不存在则创建
     # 构造输出文件路径
