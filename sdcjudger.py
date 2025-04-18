@@ -105,32 +105,33 @@ def Add_SDC_result_to_alllog_LU(log_path=configure.log_folder, sdcout_folder=con
 def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name = configure.output_name, log_path=configure.log_folder, sdcout_folder=configure.sdcout_folder, cmp_str = configure.cmp_str, tolerance=configure.tolerance):
     len = find_max_log_suffix(log_path)
 
-    in_path = progname + '/' + output_name
+    # in_path = progname + '/' + output_name
 
-    golden_output = os.path.join(configure.Rodinia_base, "results", in_path)
-    if progname == 'hotspot':
-        golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/output.txt"
-    if progname == 'miniMD':
-        golden_output = "/home/tongshiyu/programs/mantevo/miniMD/ref/output.txt"
-    if configure.progname == 'miniFE':
-        golden_output = "/mnt/c/Users/Administrator/Desktop/ShellDownlad/letgo-sza/golden_output/miniFE.txt"
-    if configure.progname == 'HPCCG':
-        golden_output = "/home/tongshiyu/programs/mantevo/HPCCG/output.txt"
-    if progname == 'nn':
-        golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/nn/output.txt"
-    if progname == 'kmeans':
-        golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/kmeans/output.txt"
-    if progname == 'particlefilter':
-        golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/output.txt"
-    if progname in ['2mm', 'fdtd-2d', 'bicg', 'correlation', 'gesummv', 'syr2k']:
-        golden_output_folder = "/home/tongshiyu/programs/PolyBenchC-4.2.1/golden_output"
-        golden_output_name = progname+"_ref.out"
-        golden_output = os.path.join(golden_output_folder, golden_output_name)
+    # golden_output = os.path.join(configure.Rodinia_base, "results", in_path)
+    # if progname == 'hotspot':
+    #     golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/output.txt"
+    # if progname == 'miniMD':
+    #     golden_output = "/home/tongshiyu/programs/mantevo/miniMD/ref/output.txt"
+    # if configure.progname == 'miniFE':
+    #     golden_output = "/mnt/c/Users/Administrator/Desktop/ShellDownlad/letgo-sza/golden_output/miniFE.txt"
+    # if configure.progname == 'HPCCG':
+    #     golden_output = "/home/tongshiyu/programs/mantevo/HPCCG/output.txt"
+    # if progname == 'nn':
+    #     golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/nn/output.txt"
+    # if progname == 'kmeans':
+    #     golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/kmeans/output.txt"
+    # if progname == 'particlefilter':
+    #     golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/output.txt"
+    # if progname in ['2mm', 'fdtd-2d', 'bicg', 'correlation', 'gesummv', 'syr2k']:
+    #     golden_output_folder = "/home/tongshiyu/programs/PolyBenchC-4.2.1/golden_output"
+    #     golden_output_name = progname+"_ref.out"
+    #     golden_output = os.path.join(golden_output_folder, golden_output_name)
 
+    golden_output = configure.golden_output
+    
     # 检查golden_output是否存在
     if not os.path.exists(golden_output):
         print("golden_output not found")
-        sys.exit(1)
 
     for index in range(len+1):
         # # 测试功能,仅对index=k进行测试

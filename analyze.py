@@ -653,19 +653,19 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
             #hpl
             if "||Ax-b||_oo/(eps*(||A||_oo*||x||_oo+||b||_oo)*N)=" in line:
                 bias_value = float(line.split('=')[1].split("......")[0].strip())
-                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
+                df.loc[0,'bias'] = '{:.4e}'.format(bias_value)
             #HPCCG
             if "Final residual:" in line:
                 bias_value = float(line.split(':')[1].strip())
-                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
+                df.loc[0,'bias'] = '{:.4e}'.format(bias_value)
             #miniFE
             if "Final Resid Norm" in line:
                 bias_value = float(line.split(':')[1].strip())
-                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
+                df.loc[0,'bias'] = '{:.4e}'.format(bias_value)
             #polybench
             if "max relative error" in line:
                 bias_value = float(line.split(':')[1].strip())
-                df.loc[0,'bias'] = '{:.4f}'.format(bias_value)
+                df.loc[0,'bias'] = '{:.4e}'.format(bias_value)
             
     
 
@@ -680,16 +680,18 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
         df.loc[0,'bias'] = 'inf'
     if progname in configure.sdcprogram:
         #默认最严格的sdc判定，如果误差小，就将sdc进化成masked
-        def update_sdc_result(bias, tolerance, df):
+        def update_sdc_result(bias, sdc_tolerance, masked_tolerance, df):
             """
             根据bias和容差更新SDC结果分类
             
             Args:
                 bias: 偏差值
-                tolerance: 容差阈值
+                sdc_tolerance: SDC容差阈值
+                masked_tolerance: masked容差阈值
                 df: 待更新的DataFrame
             """
-            if abs(bias) > tolerance:
+            if abs(bias) > sdc_tolerance:
+                # 超出sdc容差，直接判定为SDC_UNACCEPTED
                 # 无需修复的样例
                 if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
                     df.loc[0,'result'] = SDC_UNACCEPTED
@@ -697,37 +699,43 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
                 if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
                     df.loc[0,'result'] = C_SDC_UNACCEPTED
             else:
+                # 在sdc容差内，需要进一步判断是否在masked容差内
                 if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
-                    df.loc[0,'result'] = SDC_ACCEPTED
+                    if abs(bias) > masked_tolerance:
+                        # 超出masked容差，直接判定为SDC_UNACCEPTED
+                        df.loc[0,'result'] = SDC_ACCEPTED
+                    else:
+                        df.loc[0,'result'] = MASKED
                 if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
-                    df.loc[0,'result'] = C_SDC_ACCEPTED
+                    if abs(bias) > masked_tolerance:
+                        df.loc[0,'result'] = C_SDC_ACCEPTED
+                    else:
+                        df.loc[0,'result'] = C_MASKED
         
         if progname == "miniFE":
+            # 这里暂时用bias指代程序输出值
             golden_bias = 4.15995e-11
-            bias = float(df.loc[0,'bias'])
+            # bias 需要精确保存,使用科学计数法
+            bias = np.double(df.loc[0,'bias'])
             bias = bias - golden_bias
-            update_sdc_result(bias, 1.0e-06, df)
+            sdc_tolerance = abs(golden_bias - 1.0e-06)
+            masked_tolerance = 1.0e-11
+
+            update_sdc_result(bias, sdc_tolerance, masked_tolerance, df)
         elif progname == "hpl":
             golden_bias = 0.00808361278
-            bias = float(df.loc[0,'bias'])
+            bias = np.double(df.loc[0,'bias'])
             bias = bias - golden_bias
-            update_sdc_result(bias, 16.0, df)
+            sdc_tolerance = abs(golden_bias - 16.0)
+            masked_tolerance = 1.0e-03
+            update_sdc_result(bias, sdc_tolerance, masked_tolerance, df)
         elif progname == "HPCCG":
             golden_bias = 5.35506e-38
-            bias = float(df.loc[0,'bias'])
+            bias = np.double(df.loc[0,'bias'])
             bias = bias - golden_bias
-            if abs(bias) > 1.0e-28:
-                # 无需修复的样例
-                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
-                     df.loc[0,'result'] = SDC_UNACCEPTED
-                # 进行崩溃后修复的案例
-                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
-                     df.loc[0,'result'] = C_SDC_UNACCEPTED
-            else:
-                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
-                     df.loc[0,'result'] = SDC_ACCEPTED
-                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
-                     df.loc[0,'result'] = C_SDC_ACCEPTED
+            sdc_tolerance = abs(golden_bias - 1.0e-28)
+            masked_tolerance = 1.0e-38
+            update_sdc_result(bias, sdc_tolerance, masked_tolerance, df)
         elif progname in configure.PolyBenchtList:
             bias = float(df.loc[0,'bias'])
             if abs(bias) > 1e-10:

@@ -37,12 +37,12 @@ special = ""
 #special = "OnlyH_3"
 
 #应用名取自prognames_supply
-waittochangebyscrips = "syr2k"
+waittochangebyscrips = "miniFE"
 progname = waittochangebyscrips
 
 #随机注错还是对目标类型注错
 inject_random_or_targeted = "random"
-inject_random_or_targeted = "targeted"
+# inject_random_or_targeted = "targeted"
 
 # 对目标类型注错,详细参数
 # all
@@ -292,7 +292,8 @@ if progname in MPI_APP:
     MPI_SET = 1
 
 
-# configuration of save outputs
+
+# configuration of experiment outputs
 OpenMpOutPutList = ['b+tree','backprop', 'bfs', 'heartwall', 'hotspot', 'hotspot3D','kmeans', 'lavaMD', 'leukocyte', 'lu', 'nn', 'particlefilter', 'streamcluster']
 PolyBenchOutPutList = PolyBenchtList
 SdcAppList = ['lu','hpl'].append(OpenMpOutPutList)
@@ -316,6 +317,32 @@ elif progname in PolyBenchOutPutList:
 else:
     output_name = ''
 
+
+# golden output of program
+if 1:
+    in_path = progname + '/' + output_name
+    golden_output = os.path.join(Rodinia_base, "results", in_path)
+    if progname == 'hotspot':
+        golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/output.txt"
+    if progname == 'miniMD':
+        golden_output = "/home/tongshiyu/programs/mantevo/miniMD/ref/output.txt"
+    if progname == 'miniFE':
+        golden_output = "/home/tongshiyu/programs/mantevo/miniFE/openmp/basic/output.txt"
+    if progname == 'HPCCG':
+        golden_output = "/home/tongshiyu/programs/mantevo/HPCCG/output.txt"
+    elif progname == 'hpl':
+        golden_output = "/home/tongshiyu/programs/hpl-2.3/testing/output.txt"
+    if progname == 'nn':
+        golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/nn/output.txt"
+    if progname == 'kmeans':
+        golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/kmeans/output.txt"
+    if progname == 'particlefilter':
+        golden_output = "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/output.txt"
+    if progname in ['2mm', 'fdtd-2d', 'bicg', 'correlation', 'gesummv', 'syr2k']:
+        golden_output_folder = "/home/tongshiyu/programs/PolyBenchC-4.2.1/golden_output"
+        golden_output_name = progname+"_ref.out"
+        golden_output = os.path.join(golden_output_folder, golden_output_name)
+
 # configuration of sdc tolerance
 sdcprogram = []
 sdcprogram.extend(["HPCCG", "hpl", "miniFE", "miniMD"])
@@ -335,43 +362,43 @@ cmp_str = "Compare within tolerance("+str(tolerance)+"):"
 
 
 # configuration of folder
-if inject_random_or_targeted == "random":
-    Result_folder_name = "BenchmarkResult"
-    analysis_folder_name = "analysis"+special
-    insInjection_pool_csv_name = progname + ".csv"
-    result_analyze_csv_name = progname +'.csv'
-    one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname)
-    catalog_csv_file = ''
-if not inject_random_or_targeted == "random":
-    Result_folder_name = "TargetedBenchmarkResult"+special
-    analysis_folder_name = "TargetedAnalysis"+special
-    catalog_csv_name = select_type+"_catalog"+".csv"
-    insInjection_pool_csv_name = select_type + "_pool" + ".csv"
-    result_analyze_csv_name = progname + '_' + select_type +'.csv'
-    one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname,select_type)
-    catalog_csv_file = os.path.join(one_batch_folder,catalog_csv_name)
-#程序运行数据文件夹
-log_folder = os.path.join(one_batch_folder,"log")
-sdcout_folder = os.path.join(one_batch_folder,"sdcout")
-instpool_folder = os.path.join(one_batch_folder)
-#程序运行结果分析文件夹
-analysis_folder = os.path.join(letgo_base_home,analysis_folder_name)
-csv_folder = os.path.join(analysis_folder,'CSV',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'CSV')
-asm_folder  = os.path.join(analysis_folder,'asm')
-pic_folder  = os.path.join(analysis_folder,'PIC',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'PIC')
-mnemonic_count_folder = os.path.join(analysis_folder,'mnemonic_count')
-#文件占位符
-mnemonic_count_name = progname + "_" + "mnemonic_count.csv"
-mnemonic_count_file = os.path.join(mnemonic_count_folder,mnemonic_count_name)
-pool_csv_file = os.path.join(one_batch_folder, insInjection_pool_csv_name)
-csv_file = os.path.join(csv_folder,result_analyze_csv_name)
+if 1:
+    if inject_random_or_targeted == "random":
+        # Result_folder_name = "BenchmarkResult"
+        Result_folder_name = "mnt/BenchmarkResult-202501"
+        analysis_folder_name = "analysis"+special
+        insInjection_pool_csv_name = progname + ".csv"
+        result_analyze_csv_name = progname +'.csv'
+        one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname)
+        catalog_csv_file = ''
+    if not inject_random_or_targeted == "random":
+        Result_folder_name = "TargetedBenchmarkResult"+special
+        analysis_folder_name = "TargetedAnalysis"+special
+        catalog_csv_name = select_type+"_catalog"+".csv"
+        insInjection_pool_csv_name = select_type + "_pool" + ".csv"
+        result_analyze_csv_name = progname + '_' + select_type +'.csv'
+        one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname,select_type)
+        catalog_csv_file = os.path.join(one_batch_folder,catalog_csv_name)
+    #程序运行数据文件夹
+    log_folder = os.path.join(one_batch_folder,"log")
+    sdcout_folder = os.path.join(one_batch_folder,"sdcout")
+    instpool_folder = os.path.join(one_batch_folder)
+    #程序运行结果分析文件夹
+    analysis_folder = os.path.join(letgo_base_home,analysis_folder_name)
+    csv_folder = os.path.join(analysis_folder,'CSV',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'CSV')
+    asm_folder  = os.path.join(analysis_folder,'asm')
+    pic_folder  = os.path.join(analysis_folder,'PIC',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'PIC')
+    mnemonic_count_folder = os.path.join(analysis_folder,'mnemonic_count')
+    #文件占位符
+    mnemonic_count_name = progname + "_" + "mnemonic_count.csv"
+    mnemonic_count_file = os.path.join(mnemonic_count_folder,mnemonic_count_name)
+    pool_csv_file = os.path.join(one_batch_folder, insInjection_pool_csv_name)
+    csv_file = os.path.join(csv_folder,result_analyze_csv_name)
 
-folders_to_create = []
-folders_to_create.extend([one_batch_folder,log_folder,sdcout_folder,instpool_folder,one_batch_folder,analysis_folder,csv_folder,asm_folder,pic_folder,mnemonic_count_folder])
-for folder in folders_to_create:
-    os.makedirs(folder, exist_ok=True)
-
-
+    folders_to_create = []
+    folders_to_create.extend([one_batch_folder,log_folder,sdcout_folder,instpool_folder,one_batch_folder,analysis_folder,csv_folder,asm_folder,pic_folder,mnemonic_count_folder])
+    for folder in folders_to_create:
+        os.makedirs(folder, exist_ok=True)
 
 # define results
 MASKED = 'Masked'
