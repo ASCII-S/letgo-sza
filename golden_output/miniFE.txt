@@ -1,0 +1,81 @@
+      creating/filling mesh...0.0047648s, total time: 0.0047648
+generating matrix structure...0.128788s, total time: 0.133553
+         assembling FE data...0.364144s, total time: 0.497697
+      imposing Dirichlet BC...0.254654s, total time: 0.752351
+      imposing Dirichlet BC...0.239054s, total time: 0.991405
+making matrix indices local...0s, total time: 0.991405
+Starting CG solver ... 
+Initial Residual = 31.014
+Iteration = 5   Residual = 0.20357
+Iteration = 10   Residual = 0.147493
+Iteration = 15   Residual = 0.0398258
+Iteration = 20   Residual = 0.0498268
+Iteration = 25   Residual = 0.0100173
+Iteration = 30   Residual = 0.013387
+Iteration = 35   Residual = 0.000747709
+Iteration = 40   Residual = 0.000257713
+Iteration = 45   Residual = 2.33378e-05
+Iteration = 50   Residual = 4.45306e-06
+Final Resid Norm: 4.45306e-06
+Mini-Application Name: miniFE
+Mini-Application Version: 2.0
+Global Run Parameters: 
+  dimensions: 
+    nx: 30
+    ny: 30
+    nz: 30
+  load_imbalance: 0
+  mv_overlap_comm_comp: 0 (no)
+  number of processors: 1
+  ScalarType: double
+  GlobalOrdinalType: int
+  LocalOrdinalType: int
+Platform: 
+  hostname: tongshiyu-virtual-machine
+  kernel name: 'Linux'
+  kernel release: '4.15.0-142-generic'
+  processor: 'x86_64'
+Build: 
+  CXX: '/usr/bin/g++'
+  compiler version: 'g++ (Ubuntu 5.4.0-6ubuntu1~16.04.12) 5.4.0 20160609'
+  CXXFLAGS: '-g'
+  using MPI: no
+  Threading: none
+Run Date/Time: 2024-11-24, 20-52-48
+Rows-per-proc Load Imbalance: 
+  Largest (from avg, %): 0
+  Std Dev (%): 0
+Matrix structure generation: 
+  Mat-struc-gen Time: 0.128788
+FE assembly: 
+  FE assembly Time: 0.364144
+Matrix attributes: 
+  Global Nrows: 29791
+  Global NNZ: 753571
+  Global Memory (GB): 0.00864377
+  Pll Memory Overhead (MB): 0
+  Rows per proc MIN: 29791
+  Rows per proc MAX: 29791
+  Rows per proc AVG: 29791
+  NNZ per proc MIN: 753571
+  NNZ per proc MAX: 753571
+  NNZ per proc AVG: 753571
+CG solve: 
+  Iterations: 50
+  Final Resid Norm: 4.45306e-06
+  WAXPY Time: 0.0273941
+  WAXPY Flops: 1.2312e+07
+  WAXPY Mflops: 449.441
+  DOT Time: 0.024086
+  DOT Flops: 5.4e+06
+  DOT Mflops: 224.197
+  MATVEC Time: 0.193763
+  MATVEC Flops: 7.68642e+07
+  MATVEC Mflops: 396.693
+  Total: 
+    Total CG Time: 0.246342
+    Total CG Flops: 9.45762e+07
+    Total CG Mflops: 383.923
+  Time per iteration: 0.00492684
+Total Program Time: 1.23958
+

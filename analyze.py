@@ -609,7 +609,7 @@ def extract_values_and_append_to_csv(input_file, log_dir, outputname, flag, sdc_
             golden_bias = 4.45306e-06
             bias = df.loc[0,'bias']
             #默认最严格的sdc判定，如果误差小，就将sdc进化成masked
-            if abs(float(bias) - golden_bias) < 10.0e-06:
+            if 1.0e-06 < float(bias) < 10.0e-06:
                 if df.loc[0,'result'] == 'SDC':
                      df.loc[0,'result'] = 'Masked'
                 if df.loc[0,'result'] == 'C-SDC':

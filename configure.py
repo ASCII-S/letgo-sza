@@ -1,6 +1,6 @@
 import os
 pin_home = "/home/tongshiyu/pin/pin"
-letgo_base_home = "/home/tongshiyu/pin/source/tools/letgo"
+letgo_base_home = "./"
 toolbase = "/home/tongshiyu/pin/source/tools/pinfi"
 filib = toolbase + "/obj-intel64/faultinjection.so"
 pin_tool_config = "/home/tongshiyu/pin/source/tools/pinfi/config_pintool.h"
@@ -16,9 +16,28 @@ prognames_supply = [
     "srad", "nn", "particlefilter", "streamcluster", 
     # mantevo
     "HPCCG", "miniFE", "miniMD", "miniAMR"
+    # rodinia
+    "backprop","hpl", "hotspot","kmeans","particlefilter","nn""bfs",
 ]
+#特殊名字后缀，默认为空
+#special =""
+special = ""
+#special = "OnlyH_3"
+
 #应用名取自prognames_supply
-progname = "HPCCG"
+waittochangebyscrips = "particlefilter"
+progname = waittochangebyscrips
+
+#随机注错还是对目标类型注错
+inject_random_or_targeted = "random"
+inject_random_or_targeted = "targeted"
+
+#对目标类型注错,详细参数
+select_type = "call_ret"     #stack,mov,integer,float,call_ret,cmp,---|---,data_transfer,logical,control_flow, other
+only_memory = 1
+dynamic_analyze =  1 #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
+high_bit_fault = 1 #在寄存器高位进行注错
+minCountInstInj = 20 #类型注错中，对pc重复注错的最小次数
 
 #实验次数
 numFI = 5000
@@ -26,16 +45,19 @@ numFI = 5000
 #log起始index
 num_start_from = 0
 #log终止index
-num_end_at = 5000   
+num_end_at = 5000
 
-#注错模式
-injectmode = 'pinfi'
-#injectmode = 'breakpoint'
+#注错工具
+if inject_random_or_targeted == "targeted":
+    inject_tool = 'breakpoint'
+if inject_random_or_targeted == "random":
+    inject_tool = 'pinfi'
 
+#debugfile,用来生成sighandle中调试步骤,process.txt
+debugfile = 1
 #废案
 inject_op = 'all' ##用all表示不进行启发式注错,已废弃
 #inject_op = '' 
-
 
 if progname == "amg":                                   ## amg    ----------有效实验太少
     progbin = "/home/tongshiyu/programs/LLNL/AMG-master/test/amg"
@@ -56,8 +78,8 @@ elif progname == "bfs":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/bfs/bfs"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/bfs/inputGen/graph64k.txt"
     optionlist = [datafile]
-    pcstart = "400740"
-    pcend = "400cd0"
+    pcstart = "400720"
+    pcend = "400e80"
 elif progname == "heartwall": 
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/heartwall/heartwall"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/heartwall/test.avi"
@@ -83,8 +105,8 @@ elif progname == "kmeans":                              ## Kmeans
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/kmeans/kmeans"
     datafile = "/home/tongshiyu/programs/rodinia-master/data/kmeans/inputGen/1000_34.txt"
     optionlist = ['-i', datafile]
-    pcstart = "400d50"
-    pcend = "401b70"
+    pcstart = "400d20"
+    pcend = "402110"
 elif progname == "knn":                                 ## KNN
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn"
     datafile = ("/home/tongshiyu/programs/rodinia-master/openmp/nn/cane10k.db")
@@ -127,8 +149,8 @@ elif progname == "nn":
 elif progname == "particlefilter":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/particle_filter"
     optionlist = ['-x', '64', '-y', '64', '-z', '5', '-np', '1000']
-    pcstart = "400960"
-    pcend = "402c00"
+    pcstart = "4009c0"
+    pcend = "4030a0"
 elif progname == "streamcluster":
     progbin = "/home/tongshiyu/programs/rodinia-master/openmp/streamcluster/streamcluster"
     optionlist = ["10", "20", "256", "4096", "4096", "100", "none", "output.txt", "1"]
@@ -136,20 +158,20 @@ elif progname == "streamcluster":
     pcend = "403e30"
 elif progname == "HPCCG":                               ## HPCCG
     progbin = "/home/tongshiyu/programs/mantevo/HPCCG/test_HPCCG"
-    optionlist = ['50', '50', '50']
+    optionlist = ['30', '30', '30']
     pcstart = "4021a0"
     pcend = "40b550"
-elif progname == "miniAMR":                               ## minife
+elif progname == "miniAMR":                              
     progbin = "/home/tongshiyu/programs/mantevo/miniAMR/ref/miniAMR.x"
     optionlist = ["--npx 1 --npy 1 --npz 1", "--report_diffusion","--checksum_freq", "10"]
     pcstart = "401110"
     pcend = "43a2c0"
 elif progname == "miniFE":                               ## minife
     progbin = "/home/tongshiyu/programs/mantevo/miniFE/openmp/basic/miniFE.x"
-    optionlist = ['nx=30','verify_solution=1']
+    optionlist = ['nx=20']#,'verify_solution=1']
     pcstart = "402ba0"
     pcend = "41de90"
-elif progname == "miniMD":                               ## minife
+elif progname == "miniMD":                               
     progbin = "/home/tongshiyu/programs/mantevo/miniMD/ref/miniMD"
     optionlist = []
     pcstart = "401930"
@@ -179,8 +201,10 @@ elif progname == 'lu':
     output_name = 'lu_matrix_512.txt'
     lu_output_name = 'lu_matrix_512.txt'
     m_output_path = 'm_matrix_512.txt'
-elif progname in ['miniMD','miniFE','HPCCG']:
+elif progname in ['miniMD','miniFE','HPCCG','hpl']:
     output_name = 'none'
+else:
+    output_name = ''
 
 # configuration of sdc tolerance
 tolerance = 0.0
@@ -193,18 +217,43 @@ cmp_str = "Compare within tolerance("+str(tolerance)+"):"
 
 
 # configuration of folder
-result_path = os.path.join(letgo_base_home,"BenchmarkResult")
-#result_path = os.path.join(letgo_base_home,"nosdcarchive","BenchmarkResult")
-
-prog_folder = os.path.join(result_path,progname)
-log_path = os.path.join(result_path,progname,"log")
-sdcout_folder = os.path.join(result_path,progname,"sdcout")
-instpool_folder = os.path.join(result_path,progname)
-
-analysis_folder = os.path.join(letgo_base_home,'analysis')
-csv_folder = os.path.join(analysis_folder,'CSV')
+if inject_random_or_targeted == "random":
+    Result_folder_name = "BenchmarkResult"
+    analysis_folder_name = "analysis"+special
+    insInjection_pool_csv_name = progname + ".csv"
+    result_analyze_csv_name = progname +'.csv'
+    one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname)
+    catalog_csv_file = ''
+if not inject_random_or_targeted == "random":
+    Result_folder_name = "TargetedBenchmarkResult"+special
+    analysis_folder_name = "TargetedAnalysis"+special
+    catalog_csv_name = select_type+"_catalog"+".csv"
+    insInjection_pool_csv_name = select_type + "_pool" + ".csv"
+    result_analyze_csv_name = progname + '_' + select_type +'.csv'
+    one_batch_folder = os.path.join(letgo_base_home,Result_folder_name,progname,select_type)
+    catalog_csv_file = os.path.join(one_batch_folder,catalog_csv_name)
+#程序运行数据文件夹
+log_folder = os.path.join(one_batch_folder,"log")
+sdcout_folder = os.path.join(one_batch_folder,"sdcout")
+instpool_folder = os.path.join(one_batch_folder)
+#程序运行结果分析文件夹
+analysis_folder = os.path.join(letgo_base_home,analysis_folder_name)
+csv_folder = os.path.join(analysis_folder,'CSV',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'CSV')
 asm_folder  = os.path.join(analysis_folder,'asm')
-pic_folder  = os.path.join(analysis_folder,'PIC')
+pic_folder  = os.path.join(analysis_folder,'PIC',progname) if inject_random_or_targeted=="targeted" else  os.path.join(analysis_folder,'PIC')
+mnemonic_count_folder = os.path.join(analysis_folder,'mnemonic_count')
+#文件占位符
+mnemonic_count_name = progname + "_" + "mnemonic_count.csv"
+mnemonic_count_file = os.path.join(mnemonic_count_folder,mnemonic_count_name)
+pool_csv_file = os.path.join(one_batch_folder, insInjection_pool_csv_name)
+csv_file = os.path.join(csv_folder,result_analyze_csv_name)
+
+folders_to_create = []
+folders_to_create.extend([one_batch_folder,log_folder,sdcout_folder,instpool_folder,one_batch_folder,analysis_folder,csv_folder,asm_folder,pic_folder,mnemonic_count_folder])
+for folder in folders_to_create:
+    os.makedirs(folder, exist_ok=True)
+
+
 
 # define results
 MASKED = 'Masked'
@@ -212,8 +261,8 @@ SDC = 'SDC'
 C_MASKED = 'C-Masked'
 C_SDC = 'C-SDC'
 DOUBLE_CRASH = 'Recrash'
-CRASH_NOPC = 'crash'
+CRASH_NOPC = 'Recrash'
 
-# about faultinjection.cpp
+# tmp file about faultinjection.cpp
 pin_instcount = "./pin.instcount.txt"
 activate = "./activate"

@@ -1,0 +1,12 @@
+**/log*
+**/sdcout*
+**/*.csv
+**/*.png
+
+**/__pycache__
+/analysis*
+/MemAnalyze*
+**/*Analysis
+**/Analysis*
+**/BenchmarkResult*
+**/TargetedAnalysis*

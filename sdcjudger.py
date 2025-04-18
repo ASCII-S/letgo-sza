@@ -113,7 +113,7 @@ def Add_SDC_result_to_alllog_common(log_path=configure.log_path, sdcout_folder=c
     if configure.progname == 'miniMD':
         golden_output = "/home/tongshiyu/programs/mantevo/miniMD/ref/output.txt"
     if configure.progname == 'miniFE':
-        golden_output = "/home/tongshiyu/programs/mantevo/miniFE/openmp/basic/output.txt"
+        golden_output = "/mnt/c/Users/Administrator/Desktop/ShellDownlad/letgo-sza/golden_output/miniFE.txt"
     if configure.progname == 'HPCCG':
         golden_output = "/home/tongshiyu/programs/mantevo/HPCCG/output.txt"
     if configure.progname == 'nn':
@@ -151,6 +151,7 @@ def Add_SDC_result_to_alllog_common(log_path=configure.log_path, sdcout_folder=c
                         miniMD_compare_outputs(this_output, golden_output, tolerance)
                     elif configure.progname == 'miniFE':
                         miniFE_compare_outputs(this_output, golden_output, tolerance)
+                        #print("test")
                     elif configure.progname == 'HPCCG':
                         HPCCG_compare_outputs(this_output, golden_output, tolerance)
                     elif configure.progname in ['backprop','nn']:
@@ -416,7 +417,8 @@ def miniFE_compare_outputs(this_output_path, golden_output_path, tolerance):
                 break
 
         if golden_resid_norm is None:
-            print(f"{cmp_str}False ('Final Resid Norm' not found in golden_output)")
+            print("bias not found in golden_output)")
+            sys.exit(1)
             return 1
 
         # Compare the residual norms
