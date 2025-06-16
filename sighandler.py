@@ -1118,6 +1118,8 @@ class SigHandler:
         #rcv_sig,output= self.error_spread(process,0)
 
         self.handle_after_injection(process)
+        
+        sdcjudger.SDC_saver(index = str(self.trial))
 
     def inject_by_pinfi_and_recover(self,process):
         self.process_remote_target = self.inject_inst_by_faultinjection(process)

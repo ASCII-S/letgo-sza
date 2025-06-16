@@ -1,6 +1,6 @@
 import os
 pin_home = "/home/tongshiyu/pin/pin"
-letgo_base_home = "./"
+letgo_base_home = "/home/tongshiyu/pin/source/tools/letgo"
 toolbase = "/home/tongshiyu/pin/source/tools/pinfi"
 filib = toolbase + "/obj-intel64/faultinjection.so"
 pin_tool_config = "/home/tongshiyu/pin/source/tools/pinfi/config_pintool.h"
@@ -15,7 +15,7 @@ rodinia_app_list = ["amg", "b+tree", "backprop", "bfs", "heartwall", "hotspot", 
                     "srad", "nn", "particlefilter", "streamcluster"]
 mantevo_app_list = ["HPCCG", "miniFE", "miniMD", "miniAMR"]
 NPB_SER_app_list = ["bt","cg","ep","ft","is","lu","mg","sp","ua"]
-PolyBenchtList = ['2mm','bicg','convolution','correlation','fdtd-2d','gesummv','syr2k','gaussian','mvt']
+PolyBenchtList = ['2mm','bicg','correlation','fdtd-2d','gesummv','syr2k','gaussian','convolution','mvt']
 
 prognames_supply = [
     # rodinia
@@ -33,22 +33,21 @@ prognames_supply = [
 ]
 #特殊名字后缀，默认为空
 #special =""
-special = ""
-#special = "OnlyH_3"
+special = "-202506testTargeted"
 
 #应用名取自prognames_supply
-waittochangebyscrips = "miniFE"
+waittochangebyscrips = "hpl"
 progname = waittochangebyscrips
 
 #随机注错还是对目标类型注错
 inject_random_or_targeted = "random"
-# inject_random_or_targeted = "targeted"
+inject_random_or_targeted = "targeted"
 
-# 对目标类型注错,详细参数
+# 对目标类型注错,详细参数。请保持select_type不变，对不同progname批量进行实验!!!
 # all
-# stack,mov,integer,float,call_ret,cmp
+# | stack   |   mov |   integer |   float   |   call_ret    |   cmp
 # data_transfer,logical,control_flow, other
-select_type = "cmp"     
+select_type = "stack"     
 only_memory = 1
 dynamic_analyze =  1 #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
 high_bit_fault = 0 #在寄存器高位进行注错
@@ -69,7 +68,7 @@ if inject_random_or_targeted == "random":
     inject_tool = 'pinfi'
 
 #debugfile,用来生成sighandle中调试步骤,process.txt
-debugfile = 1
+debugfile = 0
 #废案
 inject_op = 'all' ##用all表示不进行启发式注错,已废弃
 #inject_op = '' 
@@ -252,12 +251,12 @@ if 1:
         pcend = "40e870"
     elif progname == "correlation":
         progbin = "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/correlation_ref"
-        optionlist = []
+        optionlist = ["2>/tmp/output_correlation.txt"]
         pcstart = "11a0"
         pcend = "1dc4"
     elif progname == "fdtd-2d":
         progbin = "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/fdtd-2d_ref"
-        optionlist = ["2>/tmp/output_fdtd2d.txt"]
+        optionlist = ["2>/tmp/output_fdtd-2d.txt"]
         pcstart = "1180"
         pcend = "1e34"
     elif progname == "gesummv":
@@ -364,8 +363,8 @@ cmp_str = "Compare within tolerance("+str(tolerance)+"):"
 # configuration of folder
 if 1:
     if inject_random_or_targeted == "random":
-        # Result_folder_name = "BenchmarkResult"
-        Result_folder_name = "mnt/BenchmarkResult-202501"
+        Result_folder_name = "BenchmarkResult"
+        # Result_folder_name = "mnt/BenchmarkResult-202501"
         analysis_folder_name = "analysis"+special
         insInjection_pool_csv_name = progname + ".csv"
         result_analyze_csv_name = progname +'.csv'
@@ -373,7 +372,9 @@ if 1:
         catalog_csv_file = ''
     if not inject_random_or_targeted == "random":
         Result_folder_name = "TargetedBenchmarkResult"+special
+        # Result_folder_name = "/home/tongshiyu/pin/source/tools/letgo/mnt/TargetedBenchmarkResult-202501"
         analysis_folder_name = "TargetedAnalysis"+special
+        # analysis_folder_name = "/home/tongshiyu/pin/source/tools/letgo/TargetedAnalysis-202501"
         catalog_csv_name = select_type+"_catalog"+".csv"
         insInjection_pool_csv_name = select_type + "_pool" + ".csv"
         result_analyze_csv_name = progname + '_' + select_type +'.csv'

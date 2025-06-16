@@ -85,9 +85,12 @@ tags
 /VirtualEnv
 /analysis*
 /TargetedAnalysis*
+/TargetedBenchmark*
+DataGet/
 **/analysis_results*
 **/results*
 **/CSV
+**/asm
 
 # 根目录下的临时文件
 activate

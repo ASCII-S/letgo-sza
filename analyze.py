@@ -61,12 +61,15 @@ result_analyze_csv_name = configure.result_analyze_csv_name
 if argslen:    
     if inject_random_or_targeted == "random":
         Result_folder_name = "BenchmarkResult"
+        Result_folder_name = configure.Result_folder_name
         analysis_folder_name = "analysis"
         result_analyze_csv_name = progname +'.csv'
         one_batch_folder = os.path.join(configure.letgo_base_home,Result_folder_name,progname)
     if inject_random_or_targeted == "targeted":
         Result_folder_name = "TargetedBenchmarkResult"
+        Result_folder_name = configure.Result_folder_name
         analysis_folder_name = "TargetedAnalysis"
+        analysis_folder_name = configure.analysis_folder_name
         result_analyze_csv_name = progname + '_' + select_type +'.csv'
         one_batch_folder = os.path.join(configure.letgo_base_home,Result_folder_name,progname,select_type)
 
@@ -434,10 +437,12 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
     asm_file = os.path.join(asm_folder,progname+'.asm')
     df.loc[0,'input_file'] = file_name
 
+    # 单独调试某个log
     debug = 0
     if debug == 1:
-        if df.loc[0,"input_file"] != "log_610":
+        if df.loc[0,"input_file"] != "log_659":
             return
+        print("debug log:\t",df.loc[0,'input_file'])
         print(df.loc[0,'result'])
     
     # 读取文件并提取所需内容
@@ -675,7 +680,7 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
         #print("crash:",df.loc[0,'input_file'],'\t',df.loc[0,'Sig1pc'])
         df.loc[0, 'Sig1Ins'] = 'null'
         df.loc[0,'result'] = ANIA
-    #没有崩溃的情况，将bias设置为无穷大
+    #崩溃的情况，将bias设置为无穷大
     if df.loc[0,'result'] == DOUBLE_CRASH or df.loc[0,'result'] == CRASH_NOPC:
         df.loc[0,'bias'] = 'inf'
     if progname in configure.sdcprogram:
@@ -700,13 +705,13 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
                     df.loc[0,'result'] = C_SDC_UNACCEPTED
             else:
                 # 在sdc容差内，需要进一步判断是否在masked容差内
-                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
+                if df.loc[0,'result'] in [SDC,SDC_ACCEPTED,SDC_UNACCEPTED,MASKED]:
                     if abs(bias) > masked_tolerance:
                         # 超出masked容差，直接判定为SDC_UNACCEPTED
                         df.loc[0,'result'] = SDC_ACCEPTED
                     else:
                         df.loc[0,'result'] = MASKED
-                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
+                if df.loc[0,'result'] in [C_SDC,C_SDC_ACCEPTED,C_SDC_UNACCEPTED,C_MASKED]:
                     if abs(bias) > masked_tolerance:
                         df.loc[0,'result'] = C_SDC_ACCEPTED
                     else:
@@ -738,20 +743,9 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
             update_sdc_result(bias, sdc_tolerance, masked_tolerance, df)
         elif progname in configure.PolyBenchtList:
             bias = float(df.loc[0,'bias'])
-            if abs(bias) > 1e-10:
-                # 无需修复的样例
-                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
-                     df.loc[0,'result'] = SDC_UNACCEPTED
-                # 进行崩溃后修复的案例
-                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
-                     df.loc[0,'result'] = C_SDC_UNACCEPTED
-            else:
-                if df.loc[0,'result'] == SDC or df.loc[0,'result'] == MASKED:
-                     df.loc[0,'result'] = SDC_ACCEPTED
-                if df.loc[0,'result'] == C_SDC or df.loc[0,'result'] == C_MASKED:
-                     df.loc[0,'result'] = C_SDC_ACCEPTED
-            # else:
-            #     print(bias,df.loc[0,'input_file'])
+            sdc_tolerance = 0.1
+            masked_tolerance = 0.00001
+            update_sdc_result(bias, sdc_tolerance, masked_tolerance, df)
     if debug == 1:
         print(df.loc[0,'result'])
     if not os.path.exists(output_dir):
@@ -1107,6 +1101,10 @@ def pic2XdynamicexcYcrash(csv_dir, output_dir):
 
             plt.close()  # 关闭图形以释放内存
 
+            # 保存数据
+            df.to_csv(os.path.join(output_dir, f'XdynamicYcrash_{file_name.replace(".csv","")}.csv'), index=False)
+            print(f"Saved data for {file_name} in {output_dir}")
+
         except Exception as e:
             print("error in file:\t",file_name)
             # 打印错误信息
@@ -1404,8 +1402,10 @@ def count_result_elements(csv_dir, output_dir, app='all'):
                 data = pd.read_csv(file)
                 if 'result' in data.columns:
                     file_name = os.path.basename(file)
+                    # 去掉文件后缀
+                    Benchmark_name = file_name.split('.')[0]
                     result_counts = data['result'].value_counts()
-                    result_dict = {'app': file_name}
+                    result_dict = {'app': Benchmark_name}
                     result_dict['total'] = int(result_counts.sum())
                     result_dict.update(result_counts.to_dict())
                     results.append(result_dict)

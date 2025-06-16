@@ -179,6 +179,7 @@ if __name__ == "__main__":
         if not os.path.exists(configure.pool_csv_file) or os.path.getsize(configure.pool_csv_file)==0:
             print("Generating pool...")
             pool_path = InstPoolMaker.generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=configure.numFI)
+            print(f"Pool generated at: {pool_path}")
         else:
             print("Pool already exists, skip generating pool from catalog...")
 

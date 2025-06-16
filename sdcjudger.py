@@ -128,25 +128,25 @@ def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name =
     #     golden_output = os.path.join(golden_output_folder, golden_output_name)
 
     golden_output = configure.golden_output
-    
+
     # 检查golden_output是否存在
     if not os.path.exists(golden_output):
         print("golden_output not found")
-
+    
+    print(progname)
     for index in range(len+1):
         # # 测试功能,仅对index=k进行测试
         # k = 0
         # if index != k:
         #     continue
         # print("do:\t",index)
-        
         log_index_file = os.path.join(log_path, f'log_{index}')
         this_output = os.path.join(sdcout_folder, f'log_{index}_{output_name}')
         if output_name == 'none':
             this_output = log_index_file
         # 检查文件是否存在
         if not os.path.exists(this_output) or not os.path.exists(golden_output) or not os.path.exists(log_index_file):
-            # print("file not found:\t",this_output,golden_output,log_index_file)
+            print("file not found:\t",this_output,golden_output,log_index_file)
             if not output_name == 'none':
                 continue
             continue
@@ -158,11 +158,12 @@ def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name =
                 print("already judged:\t",index)
                 continue
             if "No nextpc" in content or "application generate no output" in content:
-                # print("no output:\t",index)
+                print("no output:\t",index)
                 continue
         fail = 0
         # 重定向输出到 log_index_file
         with open(log_index_file, 'a') as log_file:
+            print("index:\t",index)
             with contextlib.redirect_stdout(log_file):
             #with contextlib.redirect_stdout(sys.__stdout__):
                 # 创建判断对象并进行比较
@@ -176,16 +177,16 @@ def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name =
                     elif progname == 'miniFE':
                         miniFE_compare_outputs(this_output, golden_output, tolerance)
                         #print("test")
-                    elif configure.progname == 'HPCCG':
+                    elif progname == 'HPCCG':
                         HPCCG_compare_outputs(this_output, golden_output, tolerance)
                     # 添加PolyBench应用的处理
                     elif progname in ['2mm', 'fdtd-2d', 'bicg', 'correlation', 'gesummv', 'syr2k']:
                         polybench_compare_outputs(this_output, golden_output, tolerance)
-                    else:
-                        common_compare_outputs(this_output, golden_output, tolerance)
+                    # else:
+                    #     common_compare_outputs(this_output, golden_output, tolerance)
                 except Exception as e:
                     fail = 1
-                    print("fail:\t",e)
+                    print("add sdc judgement fail:\t",e)
         if fail == 1:
             print("fail in:\t"+'log_'+str(index)+'\n')
     print(progname,":\tadd sdc result from log_0 to ",'log_'+str(index)+'\n')
