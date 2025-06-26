@@ -33,10 +33,10 @@ prognames_supply = [
 ]
 #特殊名字后缀，默认为空
 #special =""
-special = ""
+special = "TargetedpopCheckParser"
 
 #应用名取自prognames_supply
-waittochangebyscrips = "nn"
+waittochangebyscrips = "gesummv"
 progname = waittochangebyscrips
 
 #随机注错还是对目标类型注错
@@ -47,7 +47,7 @@ inject_random_or_targeted = "targeted"
 # all
 # | stack   |   mov |   integer |   float   |   call_ret    |   cmp
 # data_transfer,logical,control_flow, other
-select_type = "call_ret"     
+select_type = "stack"     
 only_memory = 1
 dynamic_analyze =  1 #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
 high_bit_fault = 0 #在寄存器高位进行注错
@@ -69,6 +69,9 @@ if inject_random_or_targeted == "random":
 
 #debugfile,用来生成sighandle中调试步骤,process.txt
 debugfile = 0
+
+#gdb_verbose,控制是否显示GDB交互信息，默认不显示
+gdb_verbose = False
 #废案
 inject_op = 'all' ##用all表示不进行启发式注错,已废弃
 #inject_op = '' 
