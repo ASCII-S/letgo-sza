@@ -182,8 +182,8 @@ def Add_SDC_result_to_alllog_common(progname = configure.progname, output_name =
                     # 添加PolyBench应用的处理
                     elif progname in ['2mm', 'fdtd-2d', 'bicg', 'correlation', 'gesummv', 'syr2k']:
                         polybench_compare_outputs(this_output, golden_output, tolerance)
-                    # else:
-                    #     common_compare_outputs(this_output, golden_output, tolerance)
+                    else:
+                        common_compare_outputs(this_output, golden_output, tolerance)
                 except Exception as e:
                     fail = 1
                     print("add sdc judgement fail:\t",e)
@@ -238,10 +238,10 @@ def read_binary_file(filename, dtype=np.float32):
 def strong_compare_outputs(this_output, golden_output):
     # 使用 filecmp.cmp() 比较两个文件
     if filecmp.cmp(this_output, golden_output, shallow=False):
-        print("Compare within tolerance(0.0): True")
+        print(configure.cmp_str + "True")
         return 0
     else:
-        print("Compare within tolerance(0.0): False")
+        print(configure.cmp_str + "False")
         return 1
 
 def clean_non_numeric(data):

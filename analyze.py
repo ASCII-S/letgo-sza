@@ -352,6 +352,14 @@ def read_logs(progname, log_folder, output_dir, outputname):
 def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope', SigFunc='Sig1Func', address=None, asm_file=None, df=None, file=None, insline_context = None):
     """
     从 GDB 输出中提取指令信息并更新 DataFrame。
+    
+    解析所需的关键字符串模式 (请勿修改这些log输出格式):
+    - "=>" : 用于标识当前执行指令行
+    - "Cannot" : 标识无法获取指令信息的错误情况  
+    - "<" 和 ">" : 用于提取函数名，格式如 "<function_name+offset>"
+    - ":" : 用于分隔地址和指令内容，格式如 "0x123456: mov %rax,%rbx"
+    - "rex" : 特殊指令前缀，需要特殊处理操作码提取
+    - "(gdb)" : GDB提示符，需要在解析时去除
     """
     if df is None or file is None:
         print("Error: DataFrame or line is missing.")
@@ -411,6 +419,45 @@ def get_ins_info(Sig='Sig1', Sigpc='Sig1pc', SigIns='Sig1Ins', SigOpe='Sig1Ope',
 
 
 def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputname, flag, sdc_flag):
+    """
+    从日志文件中提取实验数据并追加到CSV文件。
+    
+    解析所需的关键字符串模式 (请勿修改这些log输出格式):
+    
+    故障注入相关:
+    - "-randinst" : 提取随机指令序号，格式如 "-randinst 12345"
+    - "args ready for set breakpoint:" : 提取注入参数，格式如 "['rsi', '', '4202512', '641371']"
+    - "fi inject instance:" : Pin工具注入实例号
+    - "Activated:" : Pin工具激活信息，包含注入寄存器和地址
+    - "display the inject inst start" : 注入指令显示开始标记
+    - "bit location:" : 故障注入的位位置
+    
+    信号和崩溃相关:
+    - "Program received signal" : 程序接收到信号，如SIGSEGV、SIGBUS等
+    - "=>" : GDB显示的当前执行指令标记
+    - "0x" : 十六进制地址标识
+    - "in " : 函数定位信息
+    
+    LetGo修复相关:
+    - "Letgo in!" : LetGo框架启动标记
+    - "parse the pc value" : 解析PC值
+    - "multiple options" : 修复策略h_0
+    - "is stackr: have set reg with address calculation" 或 "h_1" : 栈读取修复策略
+    - "not stackr,so set fake:" 或 "h_2" : 非栈操作修复策略  
+    - "Set the" 或 "h_3" : 栈指针修复策略
+    
+    错误传播相关:
+    - "Inj2Sig" : 注入到信号的错误传播长度，格式如 "Valid Inj2Sig:25"
+    - "After Inject:" : 注入后安全传播标记
+    - "Valid Fix2Sig" : 修复后错误传播长度
+    - "After Fixed" : 修复后安全传播标记
+    
+    程序输出相关:
+    - "||Ax-b||_oo/(eps*(||A||_oo*||x||_oo+||b||_oo)*N)=" : HPL程序输出
+    - "Final residual:" : HPCCG程序输出
+    - "Final Resid Norm" : miniFE程序输出  
+    - "max relative error" : Polybench程序输出
+    """
 
     # 创建一个空的 DataFrame
     df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'inj_location', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'tolerance' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
