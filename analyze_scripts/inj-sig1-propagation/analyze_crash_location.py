@@ -5,6 +5,10 @@
 
 此脚本用于分析单个CSV文件，通过比较pc和Sig1pc是否相等，
 判断实验是否是注错后原位崩溃。
+
+新增功能：
+- 支持导出原位crash和非原位crash的具体条目到单独的CSV文件
+- 文件名格式：{原文件名}_samelocation.csv 和 {原文件名}_differentlocation.csv
 """
 
 import os
@@ -13,13 +17,15 @@ import pandas as pd
 import argparse
 
 
-def analyze_crash_location(input_file, output_file=None):
+def analyze_crash_location(input_file, output_file=None, export_details=False, details_output_dir=None):
     """
     分析CSV文件中的原位崩溃和非原位崩溃的分布占比
     
     参数:
         input_file (str): 输入CSV文件路径
         output_file (str, optional): 输出CSV文件路径，默认为None
+        export_details (bool, optional): 是否导出具体条目，默认为False
+        details_output_dir (str, optional): 详细条目输出目录，默认为None
         
     返回:
         dict: 包含分析结果的字典
@@ -62,6 +68,26 @@ def analyze_crash_location(input_file, output_file=None):
         same_location_percentage = (same_location_count / total_count * 100) if total_count > 0 else 0
         different_location_percentage = (different_location_count / total_count * 100) if total_count > 0 else 0
         
+        # 导出具体条目到单独文件
+        if export_details and same_location_count > 0:
+            # 设置详细输出目录
+            if details_output_dir is None:
+                details_output_dir = "results/details"
+            
+            # 确保输出目录存在
+            os.makedirs(details_output_dir, exist_ok=True)
+            
+            # 导出原位crash条目
+            same_location_file = os.path.join(details_output_dir, f"{file_name}_samelocation.csv")
+            same_location.to_csv(same_location_file, index=False)
+            print(f"原位crash条目已保存到 {same_location_file}")
+            
+            # 可选：也导出非原位crash条目
+            if different_location_count > 0:
+                different_location_file = os.path.join(details_output_dir, f"{file_name}_differentlocation.csv")
+                different_location.to_csv(different_location_file, index=False)
+                print(f"非原位crash条目已保存到 {different_location_file}")
+        
         # 准备结果
         result = {
             'file_name': file_name,
@@ -92,6 +118,10 @@ def main():
                         help='输入CSV文件路径')
     parser.add_argument('--output', '-o', type=str, required=False,
                         help='输出CSV文件路径')
+    parser.add_argument('--export-details', '-e', action='store_true',
+                        help='是否导出原位crash和非原位crash的具体条目到单独文件')
+    parser.add_argument('--details-dir', '-d', type=str, required=False, default='results/details',
+                        help='详细条目输出目录，默认为results/details')
     args = parser.parse_args()
     
     # 如果输入是目录，提示用户使用批处理脚本
@@ -114,7 +144,7 @@ def main():
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
     
     # 运行分析
-    analyze_crash_location(args.input, args.output)
+    analyze_crash_location(args.input, args.output, args.export_details, args.details_dir)
 
 
 if __name__ == "__main__":

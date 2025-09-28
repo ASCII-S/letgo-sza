@@ -33,10 +33,10 @@ prognames_supply = [
 ]
 #特殊名字后缀，默认为空
 #special =""
-special = "TargetedpopCheckParser"
+special = ""
 
 #应用名取自prognames_supply
-waittochangebyscrips = "gesummv"
+waittochangebyscrips = "correlation"
 progname = waittochangebyscrips
 
 #随机注错还是对目标类型注错
@@ -46,8 +46,9 @@ inject_random_or_targeted = "targeted"
 # 对目标类型注错,详细参数。请保持select_type不变，对不同progname批量进行实验!!!
 # all
 # | stack   |   mov |   integer |   float   |   call_ret    |   cmp
+# | div     |
 # data_transfer,logical,control_flow, other
-select_type = "stack"     
+select_type = "div"     
 only_memory = 1
 dynamic_analyze =  1 #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
 high_bit_fault = 0 #在寄存器高位进行注错

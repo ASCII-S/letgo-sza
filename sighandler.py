@@ -65,13 +65,13 @@ def is_hexnumber(s):
         return False
 
 def is_number(value):
-    return value.isdigit()  # 如果是整数返回 True
+    return value.isdigit()  # Returns True if the value is an integer
 
 class SigHandler:
     def __init__(self, insts, trial):
         self.insts = int(insts)
         self.trial = trial
-        self.verbose_gdb = configure.gdb_verbose  # 控制是否显示GDB交互信息，默认不显示
+        self.verbose_gdb = configure.gdb_verbose  # Controls whether to display GDB interaction info, default is False
         
         logname = os.path.join(log_path,('log_'+str(self.trial) ))
         self.log = open(str(logname), "w", buffering=1)
@@ -104,18 +104,18 @@ class SigHandler:
 
     def gdb_sendline_and_expect(self, process, command, description="", timeout=None, verbose=False):
         """
-        统一的GDB交互方法，发送命令并等待响应，使用统一的打印格式
+        Unified GDB interaction method, sends command and waits for response, using unified print format
         
         Args:
-            process: pexpect进程对象
-            command: 要发送给GDB的命令
-            description: 命令描述，用于日志
-            timeout: 超时时间，None表示使用默认值
-            verbose: 是否打印交互信息，默认False不打印
+            process: pexpect process object
+            command: Command to send to GDB
+            description: Command description for logging
+            timeout: Timeout duration, None means use default
+            verbose: Whether to print interaction info, default False
             
         Returns:
-            tuple: (返回码, 响应内容)
-            返回码: 0=超时, 1=成功, 2=EOF
+            tuple: (return code, response content)
+            return code: 0=timeout, 1=success, 2=EOF
         """
         if verbose:
             print(f"[send gdb] {command}" + (f" #{description}" if description else ""))
@@ -135,7 +135,7 @@ class SigHandler:
                 print(f"[gdb timeout] {response}")
             return 0, response
         elif i == 1:
-            # 只有当响应不为空且不等于命令本身时才打印响应
+            # Only print response when it's not empty and not equal to command itself
             if verbose and response.strip() and response.strip() != command.strip():
                 print(f"[gdb response] {response}")
             return 1, response
@@ -147,19 +147,19 @@ class SigHandler:
     def gdb_sendline_and_expect_extended(self, process, command, description="", timeout=None, 
                                        expect_patterns=None, pattern_names=None, verbose=False):
         """
-        扩展的GDB交互方法，支持自定义expect模式
+        Extended GDB interaction method, supports custom expect patterns
         
         Args:
-            process: pexpect进程对象
-            command: 要发送给GDB的命令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patterns: 自定义的expect模式列表
-            pattern_names: 对应的模式名称列表
-            verbose: 是否打印交互信息，默认False不打印
+            process: pexpect process object
+            command: Command to send to GDB
+            description: Command description
+            timeout: Timeout duration
+            expect_patterns: Custom expect pattern list
+            pattern_names: Corresponding pattern name list
+            verbose: Whether to print interaction info, default False
             
         Returns:
-            tuple: (匹配的模式索引, 响应内容)
+            tuple: (matched pattern index, response content)
         """
         if verbose:
             print(f"[send gdb] {command}" + (f" #{description}" if description else ""))
@@ -178,7 +178,7 @@ class SigHandler:
         response = process.before.decode('utf-8').strip()
         
         if pattern_names and i < len(pattern_names):
-            # 只有当响应不为空且不等于命令本身时才打印响应
+            # Only print response when it's not empty and not equal to command itself
             if verbose and response.strip() and response.strip() != command.strip():
                 print(f"[gdb {pattern_names[i].lower()}] {response}")
         else:
@@ -188,33 +188,33 @@ class SigHandler:
         return i, response
 
     def gdb_send(self, process, command, description="", timeout=None):
-        """简化的GDB交互方法，使用类的verbose设置"""
+        """Simplified GDB interaction method using class's verbose setting"""
         return self.gdb_sendline_and_expect(process, command, description, timeout, verbose=self.verbose_gdb)
     
     def gdb_send_extended(self, process, command, description="", timeout=None, expect_patterns=None, pattern_names=None):
-        """简化的扩展GDB交互方法，使用类的verbose设置"""
+        """Simplified extended GDB interaction method using class's verbose setting"""
         return self.gdb_sendline_and_expect_extended(process, command, description, timeout, expect_patterns, pattern_names, verbose=self.verbose_gdb)
     
     def enable_gdb_verbose(self):
-        """启用GDB交互信息显示"""
+        """Enable GDB interaction info display"""
         self.verbose_gdb = True
     
     def disable_gdb_verbose(self):
-        """禁用GDB交互信息显示"""
+        """Disable GDB interaction info display"""
         self.verbose_gdb = False
     
     def gdb_send_verbose(self, process, command, description="", timeout=None,verbose=True):
-        """强制GDB交互信息的方法"""
+        """Force GDB interaction info method"""
         return self.gdb_sendline_and_expect(process, command, description, timeout, verbose=verbose)
     
     def gdb_send_extended_force(self, process, command, description="", timeout=None, expect_patterns=None, pattern_names=None,verbose=True):
-        """强制GDB交互信息的扩展方法"""
+        """Force GDB interaction info extended method"""
         return self.gdb_sendline_and_expect_extended(process, command, description, timeout, expect_patterns, pattern_names, verbose=verbose)
 
     def inject_inst_by_breakpoint(self,process):
     # Prepare gdb run
-        ###  IMPORTANT: 以下输出格式由analyze.py解析，请勿随意修改关键字符串
-        ###  关键解析标记: "args ready for set breakpoint:", "display the inject inst start", "Fault injection is done"
+        ###  IMPORTANT: The following output format is parsed by analyze.py, please do not modify key strings arbitrarily
+        ###  Key parsing markers: "args ready for set breakpoint:", "display the inject inst start", "Fault injection is done"
         ori_reg = ""
 
         GDB_RUN = "run"
@@ -227,16 +227,16 @@ class SigHandler:
         fi = faultinject.FaultInjector(self.insts)
         if configure.inject_random_or_targeted == "random":
             try:
-                ##首先尝试从随机指令池中提取指令
+                ##First try to extract instructions from the random instruction pool
                 result = InstPoolMaker.readArgsFromPool()
-                # 检查 result 的长度是否为 5
+                # Check if result length is 5
                 if len(result) != 5:
-                    raise ValueError("Wrong return values! Exit!")  # 抛出异常跳转到 except 块
+                    raise ValueError("Wrong return values! Exit!")  # Throw exception to jump to except block
                 args = result[0:4]
                 randomnum = result[-1]
-                print("-randinst", randomnum)  ###  IMPORTANT: analyze.py解析此格式提取随机指令序号
+                print("-randinst", randomnum)  ###  IMPORTANT: analyze.py parses this format to extract random instruction number
             except:
-                ##指令池空，则直接随机找指令
+                ##If instruction pool is empty, then directly find random instructions
                 args = fi.getBreakpoint  # [regmm, reg, pc, iteration]
 
         if configure.inject_random_or_targeted == "targeted":
@@ -250,16 +250,13 @@ class SigHandler:
                 print("Finish all!!!\tindex start: {start}, index end: {end}")
                 sys.exit(1)
             result = InstPoolMaker.readArgsFromPool(pool_file)
-            #兼容原来的输出
+            #Compatible with original output
             args = result[0:4]
             randomnum = result[-1]
-            # random_number = random.randint(0, 128)
-            # args.append(str(random_number))
             print(args)
 
-
-        ##参数中包含的是在动态指令randomnum处的指令和寄存器信息.pc是该动态指令的ins值,regmm或reg是ins中随机挑选的寄存器
-        ##iteration表示的是在randomnum范围内,ins值和pc值相同的次数;也就是pc值在randomnum范围内的迭代次数
+        ##Parameters contain instruction and register information at dynamic instruction randomnum. pc is the ins value of that dynamic instruction, regmm or reg is randomly selected register from ins
+        ##iteration indicates the number of times ins value equals pc value within randomnum range; that is, the number of iterations of pc value within randomnum range
         if len(args) != 4:
             print("Wrong return values! Exit!")
             self.log.close()
@@ -272,12 +269,11 @@ class SigHandler:
         reg = args[1].rstrip("\n")
         pc = args[2].rstrip("\n")
         iteration = int(args[3].rstrip("\n"))
-        # next = hex(int(args[4]))
-        print('args ready for set breakpoint:\t',args)  ###  IMPORTANT: analyze.py解析此行提取注入参数
+        print('args ready for set breakpoint:\t',args)  ###  IMPORTANT: analyze.py parses this line to extract injection parameters
         hexpc = hex(int(pc))
         print('hexpc\t',hexpc)
         GDB_BREAKPOINT = "break *" + str(hexpc)
-        i, bp_response = self.gdb_send(process, GDB_BREAKPOINT, f"设置断点在地址{hexpc}")
+        i, bp_response = self.gdb_send(process, GDB_BREAKPOINT, f"Set breakpoint at address {hexpc}")
         if i == 0:
             print('ERROR! Could not set the breakpoint')
             print((str(process)))
@@ -293,7 +289,7 @@ class SigHandler:
         ##
 
 
-        i, output = self.gdb_send(process, GDB_RUN, "运行程序到断点")
+        i, output = self.gdb_send(process, GDB_RUN, "Run program to breakpoint")
         if i == 0:
             print('ERROR! Could not run the program')
             self.log.close()
@@ -333,7 +329,7 @@ class SigHandler:
                 while iteration > 0:
                     try:
                         i, continue_output = self.gdb_send_extended(
-                            process, GDB_CONTINUE, f"继续执行到断点(剩余{iteration}次)",
+                            process, GDB_CONTINUE, f"Continue to breakpoint (remaining {iteration} times)",
                             timeout=2, expect_patterns=[pexpect.TIMEOUT, GDB_PROMOPT, pexpect.EOF],
                             pattern_names=["TIMEOUT", "PROMPT", "EOF"])
                         
@@ -348,7 +344,7 @@ class SigHandler:
                         if i == 1:
                             iteration -= 1
 
-                        if i == 2:  # 如果是 pexpect.EOF，说明进程已退出
+                        if i == 2:  # If it's pexpect.EOF, it means the process has exited
                             print("Process has exited (iteration over runtime).")
                             return
                     except pexpect.ExceptionPexpect as e:
@@ -362,9 +358,9 @@ class SigHandler:
                 
                 #process.interact()
                 
-                i, response = self.gdb_send_verbose(process, GDB_SETPAGEOFF, "关闭分页")
+                i, response = self.gdb_send_verbose(process, GDB_SETPAGEOFF, "Disable pagination")
 
-                i, output = self.gdb_send_verbose(process, GDB_BEFOREPC, "显示注入点前的指令")
+                i, output = self.gdb_send_verbose(process, GDB_BEFOREPC, "Display instructions before injection point")
                 if i == 0:
                     print("ERROR when displaying the insts before inject place")
                     print((str(process)))
@@ -377,9 +373,9 @@ class SigHandler:
                     pass
 
     # No.iteration breakpoint
-                i, save_response = self.gdb_send_verbose(process, "set $saved_pc = $pc", "保存当前PC值")
+                i, save_response = self.gdb_send_verbose(process, "set $saved_pc = $pc", "Save current PC value")
                 i, inject_inst = self.gdb_send_extended(
-                    process, "x/i $saved_pc", "显示要注入的指令",
+                    process, "x/i $saved_pc", "Display instruction to be injected",
                     expect_patterns=[pexpect.TIMEOUT, GDB_PROMOPT, pexpect.EOF],
                     pattern_names=["TIMEOUT", "PROMPT", "EOF"])
                 if i == 0:
@@ -390,7 +386,7 @@ class SigHandler:
                     sys.stdout = sys.__stdout__
                     return
                 if i == 1:
-                    print("display the inject inst start:\n",inject_inst.strip(),"\ndisplay the inject inst end.")  ###  IMPORTANT: analyze.py解析此行提取注入指令
+                    print("display the inject inst start:\n",inject_inst.strip(),"\ndisplay the inject inst end.")  ###  IMPORTANT: analyze.py parses this line to extract injection instruction
                 if i == 2:
                     print("process end")
                     return
@@ -398,7 +394,7 @@ class SigHandler:
     # inject reg
                 if regmm == "":  # it means that it is a normal instruction and we need to inject the fault to the dest reg
                     print('Meet a normal instruction:')
-                    i, output = self.gdb_send(process, GDB_NEXT, "单步执行指令")
+                    i, output = self.gdb_send(process, GDB_NEXT, "Single step instruction")
                     print(output)
                     if i == 0:
                         print('ERROR! Can not step in')
@@ -408,7 +404,7 @@ class SigHandler:
                         sys.stdout = sys.__stdout__
                         return
                     if i == 1:
-                        i, reg_output = self.gdb_send_verbose(process, GDB_PRINT_REG + " $" + reg, f"获取寄存器{reg}的值")
+                        i, reg_output = self.gdb_send_verbose(process, GDB_PRINT_REG + " $" + reg, f"Get register {reg} value")
                         if i == 0:
                             print('ERROR while analyzing the content of the register')
                             print((str(process)))
@@ -431,7 +427,7 @@ class SigHandler:
                             content = content.lstrip("nan")
                             content = content.lstrip("-nan")
                             content = fi.generateFaults(content)
-                            i, set_output = self.gdb_send_verbose(process, GDB_SET_REG + " $" + reg + "=" + content, f"向寄存器{reg}注入故障值{content}")
+                            i, set_output = self.gdb_send_verbose(process, GDB_SET_REG + " $" + reg + "=" + content, f"Inject fault value {content} to register {reg}")
                             if i == 0:
                                 print('ERROR while waiting for changing the value')
                                 print((str(process)))
@@ -448,7 +444,7 @@ class SigHandler:
     # inject regmm                                    
                 if reg == "":  # it means that it is a memory instruction. Need to inject before it is executed.
                     print('Meet a memory instruction:')
-                    i, output = self.gdb_send_verbose(process, GDB_PRINT_REG + " $" + regmm, f"获取内存寄存器{regmm}的值")
+                    i, output = self.gdb_send_verbose(process, GDB_PRINT_REG + " $" + regmm, f"Get memory register {regmm} value")
                     if i == 0:
                         print('ERROR while analyzing the content of the register mem')
                         print((str(process)))
@@ -474,7 +470,7 @@ class SigHandler:
                             content = fi.generateFaults(content)
                         else:
                             print('error! content is null!')
-                        i, mem_output = self.gdb_send_verbose(process, GDB_SET_REG + " $" + regmm + "=" + content, f"向内存寄存器{regmm}注入故障值{content}")
+                        i, mem_output = self.gdb_send_verbose(process, GDB_SET_REG + " $" + regmm + "=" + content, f"Inject fault value {content} to memory register {regmm}")
                         if i == 0:
                             print('ERROR while waiting for changing the value mem')
                             print((str(process)))
@@ -496,7 +492,7 @@ class SigHandler:
                             print("inject_inst:\t",inject_inst)
                             sys.exit()
 
-                        ##对内存相关额寄存器注错后还原寄存器的值
+                        ##Restore register value after fault injection to memory-related register
                         # if 'j' not in inject_op:
                         #     process.sendline(GDB_NEXT)
                         #     i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
@@ -530,9 +526,9 @@ class SigHandler:
                         
     # del breakpoints
                 """print("GDB is now interactive. You can type GDB commands.")
-                process.interact()  # 交互模式，允许用户直接控制 GDB"""
+                process.interact()  # Interactive mode, allows user to control GDB directly"""
 
-                i, delete_response = self.gdb_send(process, GDB_DELETE_BP, "删除所有断点")
+                i, delete_response = self.gdb_send(process, GDB_DELETE_BP, "Delete all breakpoints")
                 if i == 0:
                     print("ERROR when deleting breakpoints")
                     print((str(process)))
@@ -546,16 +542,16 @@ class SigHandler:
 
 
     def inject_inst_by_faultinjection(self,process):
-        # process 进入状态：gdb只指定了可执行文件
-        # process 离开状态：pin对程序注错后保留调试端口，process通过远程端口调试用pin注错后的程序
-        ###  IMPORTANT: 以下输出格式由analyze.py解析，请勿随意修改关键字符串
-        ###  关键解析标记: "fi inject instance:", "Activated:", "bit location:"
+        # process entry state: gdb only specifies executable file
+        # process exit state: pin injects fault into program and keeps debug port, process debugs pin-injected program through remote port
+        ###  IMPORTANT: The following output format is parsed by analyze.py, please do not modify key strings arbitrarily
+        ###  Key parsing markers: "fi inject instance:", "Activated:", "bit location:"
         benchmark = configure.benchmark
         execlist = []
         if configure.MPI_SET == 1:
             execlist.extend(configure.mpi_cmd)
         if configure.progname in configure.OpenMpOutPutList:
-            execlist = ["env","OUTPUT=1"]  # 设置环境变量 OUTPUT=1
+            execlist = ["env","OUTPUT=1"]  # Set environment variable OUTPUT=1
         execlist.extend([
             'pin',
             '-appdebug',
@@ -583,7 +579,7 @@ class SigHandler:
             gdb_command = f"target remote :{port}"
             print("process cmd:",gdb_command)
 
-            i, response = self.gdb_send(process, gdb_command, f"连接到远程调试端口{port}")
+            i, response = self.gdb_send(process, gdb_command, f"Connect to remote debug port {port}")
             print("respone to 'target remote :' :\n",response)
 
             #print((process.before.decode('utf-8')))
@@ -595,42 +591,42 @@ class SigHandler:
 
     def print_file_to_log(self,file_path):
         sys.stdout = self.log
-        # 使用 with 打开文件，这样文件在读取后会自动关闭
+        # Use with to open file, so the file will be automatically closed after reading
         with open(file_path, 'r') as file:
-            # 读取文件的所有内容
+            # Read all content of the file
             file_content = file.read()
             
-            # 打印文件内容
+            # Print file content
             print(file_content)
 
     def capture_process_output(process, output_file_path):
         """
-        捕获pexpect进程的输出，并实时写入文件和控制台
+        Capture pexpect process output and write to file and console in real time
         """
         try:
-            # 打开文件用于写入
+            # Open file for writing
             with open(output_file_path, 'a') as output_file:
 
                 while True:
                     try:
-                        # 等待输出或结束符
+                        # Wait for output or termination
                         i = process.expect([pexpect.EOF, pexpect.TIMEOUT], timeout=1)
                         output = process.before.decode('utf-8').strip()
 
                         if output:
-                            # 实时写入文件和打印到控制台
+                            # Write to file and print to console in real time
                             output_file.write(output + '\n')
-                            output_file.flush()  # 确保内容立即写入文件
+                            output_file.flush()  # Ensure content is written to file immediately
                             print(output)
 
-                        if i == 0:  # EOF: 进程结束
+                        if i == 0:  # EOF: process terminated
                             break
 
                     except pexpect.TIMEOUT:
-                        # 捕获超时（非致命错误）
+                        # Catch timeout (non-fatal error)
                         continue
                     except pexpect.exceptions.ExceptionPexpect as e:
-                        # 捕获其他pexpect异常
+                        # Catch other pexpect exceptions
                         print("Error while capturing output:", e)
                         break
         except Exception as e:
@@ -638,44 +634,44 @@ class SigHandler:
 
     def print_process(self, process, max_timeout_retries=10):
         """
-        持续读取并打印进程输出，直到进程结束或达到最大超时次数。
+        Continuously read and print process output until process ends or maximum timeout count is reached.
 
-        :param process: pexpect 进程对象
-        :param max_timeout_retries: 最大超时重试次数
-        :return: 进程的全部输出
+        :param process: pexpect process object
+        :param max_timeout_retries: maximum timeout retry count
+        :return: complete output of the process
         """
         alloutput = ''
-        timeout_retries = 0  # 超时重试计数
+        timeout_retries = 0  # timeout retry counter
 
         while True:
             try:
-                output = process.read_nonblocking(size=1024, timeout=1)  # 每次读取 1024 字节
+                output = process.read_nonblocking(size=1024, timeout=1)  # Read 1024 bytes each time
                 if isinstance(output, bytes):
-                    output = output.decode('utf-8')  # 如果是bytes，进行解码
+                    output = output.decode('utf-8')  # Decode if it's bytes
                 if output:
                     alloutput = alloutput + ' ' + output.strip()
-                    timeout_retries = 0  # 重置超时计数器
+                    timeout_retries = 0  # Reset timeout counter
             except pexpect.TIMEOUT:
-                timeout_retries += 1  # 超时重试次数加1
+                timeout_retries += 1  # Increment timeout retry count
                 if timeout_retries >= max_timeout_retries:
-                    #print("进程无输出，超时次数达到上限。")
-                    break  # 达到最大重试次数时退出
+                    #print("Process has no output, timeout count reached limit.")
+                    break  # Exit when maximum retry count is reached
             except pexpect.EOF:
-                break  # 进程结束时退出
+                break  # Exit when process ends
 
         return alloutput.strip()
 
 
 
-    def error_spread(self,process,seq_casuse_signal):#此处的seq_casuse_signal是指错误引发点的序号,例如注错点是序号1,第一次修复则是2
-        ##出发点是错误引发点,即注错点或第一次修复点,逐步执行,终点是收到signal或程序结束;返回值rcv_sig表示是否出错,output
-        ##检查从注错/修复到出错的错误传播,只打印前MAX_ERROR_SPREAD长度的指令;当出现错误时,需要把signal打印,并且打印x/i $pc;当没有任何错误时;
-        ###  IMPORTANT: 以下输出格式由analyze.py解析，请勿随意修改关键字符串
-        ###  关键解析标记: "Valid Inj2Sig:", "Valid Fix2Sig:", "After Inject:", "After Fixed:"
+    def error_spread(self,process,seq_casuse_signal):#Here seq_casuse_signal refers to the sequence number of the error trigger point, e.g., injection point is sequence 1, first repair is sequence 2
+        ##Starting point is error trigger point, i.e., injection point or first repair point, execute step by step, end point is receiving signal or program end; return value rcv_sig indicates whether error occurred, output
+        ##Check error propagation from injection/repair to error, only print first MAX_ERROR_SPREAD length instructions; when error occurs, need to print signal and print x/i $pc; when no error occurs;
+        ###  IMPORTANT: The following output format is parsed by analyze.py, please do not modify key strings arbitrarily
+        ###  Key parsing markers: "Valid Inj2Sig:", "Valid Fix2Sig:", "After Inject:", "After Fixed:"
         ##i = process.expect([pexpect.TIMEOUT, GDB_PROMOPT])
         #print((process.before.decode('utf-8'), process.after))
         stepi_num = 0
-        output = 'NO OUTPUT'##用来保存出错类型,供接下来介入letgo_frame使用
+        output = 'NO OUTPUT'##Used to save error type for subsequent letgo_frame use
         rcv_sig = 0
 
         buffer_clear = self.print_process(process).strip()
@@ -687,11 +683,11 @@ class SigHandler:
         print("\nSite",seq_casuse_signal,"Ready to record error spread.\n")
         
         while stepi_num <= MAX_ERROR_SPREAD:
-            #打印前MAX_ERROR_SPREAD条指令
+            #Print first MAX_ERROR_SPREAD instructions
             try:
                 stepioutput = ""
                 i, stepioutput = self.gdb_send_extended(
-                    process, "stepi", f"单步执行第{stepi_num}条指令",
+                    process, "stepi", f"Single step execute instruction {stepi_num}",
                     expect_patterns=[pexpect.TIMEOUT, "(gdb)"],
                     pattern_names=["TIMEOUT", "PROMPT"])
 
@@ -699,9 +695,9 @@ class SigHandler:
                     print("error in stepi_in",seq_casuse_signal)
                     print("error stepioutput\t",stepioutput,"end error stepioutput")
                     break
-                # 打印当前指令
+                # Print current instruction
                 if "received signal" in stepioutput:
-                    rcv_sig = 1 #当前出错,不着急打印,等待判断附近之外出现signal后再一起打印
+                    rcv_sig = 1 #Current error occurred, don't rush to print, wait for judgment after signal appears nearby then print together
                     print("received signal during error spread:")
                     stepioutput = "stepioutput:\t" + stepioutput
                     print(stepioutput.strip())
@@ -712,7 +708,7 @@ class SigHandler:
                     break
                 
                 i, pc_output = self.gdb_send_extended(
-                    process, GDB_DISPLAY, "显示当前PC指令",
+                    process, GDB_DISPLAY, "Display current PC instruction",
                     timeout=5, expect_patterns=[pexpect.TIMEOUT, "(gdb)"],
                     pattern_names=["TIMEOUT", "PROMPT"])
                 if i == 0:
@@ -723,7 +719,7 @@ class SigHandler:
                     print("program stop!")
                     self.print_process(process)
                     return 0,'no crash'
-                print(re.sub(r'[\n()]', '', pc_output))  # 打印当前的 PC 状态
+                print(re.sub(r'[\n()]', '', pc_output))  # Print current PC status
 
             except pexpect.EOF:
                 print("GDB process ended.")
@@ -733,32 +729,32 @@ class SigHandler:
                 break
         #print(i)
         #print("OUTPUT\n",output)
-        ##结束打印MAX_ERROR_SPREAD指令
+        ##End printing MAX_ERROR_SPREAD instructions
         
-        if rcv_sig == 0:##附近没有出错,就继续运行直到出错或者结束
+        if rcv_sig == 0:##No error occurred nearby, continue running until error or end
             i, coutput = self.gdb_send_extended(
-                process, GDB_CONTINUE, "继续执行直到出错或结束",
+                process, GDB_CONTINUE, "Continue execution until error or end",
                 timeout=180, expect_patterns=[GDB_PROMOPT, pexpect.TIMEOUT],
                 pattern_names=["PROMPT", "TIMEOUT"])
             if "received signal" in coutput:
                 rcv_sig = 1
                 print(re.sub(r'[\n()]', '', coutput))
-            else:       #完美masked
+            else:       #Perfect masked
                 print(coutput)
-        if rcv_sig == 1:##此处gdb已经由于signal的存在而暂停,无论远近,采取同一个方法打印
-            i, output = self.gdb_send(process, GDB_DISPLAY, "显示崩溃点指令")
+        if rcv_sig == 1:##Here gdb has paused due to signal presence, regardless of distance, use same method to print
+            i, output = self.gdb_send(process, GDB_DISPLAY, "Display crash point instruction")
             print("print $pc:\t",output)
         buffer = self.print_process(process)
         if not buffer.strip() == '':
             print("clear buffer:",self.print_process(process),"end clear.")
 
 
-        if stepi_num < MAX_ERROR_SPREAD :#满足这个条件,必定在附近出现了signal，用于总结错误传播长度
+        if stepi_num < MAX_ERROR_SPREAD :#Meeting this condition, signal must have appeared nearby, used to summarize error propagation length
             if seq_casuse_signal == 0:
                 print(PRT_ERR_LEN_INJ_SIG,stepi_num)
             if seq_casuse_signal == 1:
                 print(PRT_ERR_LEN_FIX_SIG,stepi_num)
-        else:  #附近没有出错
+        else:  #No error occurred nearby
             if seq_casuse_signal == 0:
                 print(PTR_ERR_INJ_MAX)
             if seq_casuse_signal == 1:
@@ -766,17 +762,17 @@ class SigHandler:
         return rcv_sig,output
 
     def info_at_signal(self,process):
-        """#出错前手动调试
+        """#Manual debugging before error
         sys.__stdout__.write("interact")
         process.interact()"""
 
-        i, sigout = self.gdb_send(process, "stepi", "单步执行以获取信号信息")
+        i, sigout = self.gdb_send(process, "stepi", "Single step to get signal info")
         if "received signal" in sigout:
             print(sigout)
-            i, pc_info = self.gdb_send(process, "x/i $pc", "显示当前指令")
+            i, pc_info = self.gdb_send(process, "x/i $pc", "Display current instruction")
             print(pc_info.replace("\n", "").replace("\r", ""))
 
-            i, gdbout = self.gdb_send(process, "backtrace", "显示调用栈")
+            i, gdbout = self.gdb_send(process, "backtrace", "Display call stack")
             if i == 0:
                 print("ERROR when watching backtrace")
                 self.log.close()
@@ -793,28 +789,28 @@ class SigHandler:
         ######  call this when encoutering SIG and gdb pause
         ###  LetGo framework steps in
         #####
-        ###  IMPORTANT: 以下输出格式由analyze.py解析，请勿随意修改关键字符串
-        ###  关键解析标记: "Letgo in!", "parse the pc value", "h_1", "h_2", "h_3"
+        ###  IMPORTANT: The following output format is parsed by analyze.py, please do not modify key strings arbitrarily
+        ###  Key parsing markers: "Letgo in!", "parse the pc value", "h_1", "h_2", "h_3"
         print("="*60)
-        print("  子步骤 1/6: LetGo框架启动，开始故障修复")
+        print("  Step 1/6: LetGo framework started, beginning fault recovery")
         print("="*60)
         
         output = self.print_process(process)
         if output.strip():
             print("clear before:",output)
-        print('\nLetgo in!')  ###  IMPORTANT: analyze.py解析此标记识别LetGo框架启动
+        print('\nLetgo in!')  ###  IMPORTANT: analyze.py parses this marker to identify LetGo framework startup
         self.letgo_start_time = datetime.datetime.now()
         
-        print("\n  子步骤 1.1: 获取当前崩溃点的PC值")
-        i, pc_response = self.gdb_send(process, GDB_PRINT_PC, "获取当前崩溃点的PC值")
+        print("\n  Step 1.1: Getting current crash point PC value")
+        i, pc_response = self.gdb_send(process, GDB_PRINT_PC, "Getting current crash point PC value")
         if i != 1:
-            print("ERROR: 无法获取PC值，修复失败")
+            print("ERROR: Cannot get PC value, recovery failed")
             print("error entering letgo: cannot print pc")
             return 1
     
         # parse the pc value by regex 0x
         # send the pc to pin, and get all info we need
-        print('  子步骤 1.2: 解析PC值并获取指令信息')
+        print('  Step 1.2: Parsing PC value and getting instruction information')
         output = pc_response
         if "receiced signal" in output:
             try:
@@ -822,57 +818,57 @@ class SigHandler:
             except:
                 print(output)
         else:
-            print("parse the pc value by regex 0x")  ###  IMPORTANT: analyze.py解析此标记获取PC值
+            print("parse the pc value by regex 0x")  ###  IMPORTANT: analyze.py parses this marker to get PC value
             print(output)
         match = re.findall('0[xX]?[A-Fa-f0-9]+', pc_response)
         if len(match) == 0:
-            print("ERROR: 无法从输出中提取PC地址")
+            print("ERROR: Cannot extract PC address from output")
             print("Crash place getting no PC!")
             return 1
         
-        decpc = int(match[0], 0)    ##此处的match[0]是一个包含0x的十六进制地址,使用int将其转化为十进制
-        print(f"[信息] 解析得到崩溃点PC地址: {hex(decpc)}")
+        decpc = int(match[0], 0)    ##Here match[0] is a hexadecimal address containing 0x, using int to convert it to decimal
+        print(f"[Info] Parsed crash point PC address: {hex(decpc)}")
         
-        print("\n  子步骤 1.3: 通过Pin工具获取指令详细信息")
+        print("\n  Step 1.3: Getting detailed instruction information through Pin tool")
         try:
             fi = faultinject.FaultInjector(self.insts)
-            args = fi.getNextPC(decpc)  ## 此处要关注faultinjecion.cpp中的getNextPC函数
+            args = fi.getNextPC(decpc)  ## Need to pay attention to getNextPC function in faultinjecion.cpp here
             
             if len(args) != 8:
-                print("ERROR: Pin工具返回的指令信息不完整")
+                print("ERROR: Instruction information returned by Pin tool is incomplete")
                 print("No nextpc!")
                 return 1
         except Exception as process_error:
-            print("ERROR: 无法从Pin工具获取指令信息")
+            print("ERROR: Cannot get instruction information from Pin tool")
             print("No nextpc!\nOpen file failed...")
             return 1
         
-        print("[信息] Pin工具返回的指令信息:")
+        print("[Info] Instruction information returned by Pin tool:")
         print(args)
         
-        print("\n  子步骤 1.4: 解析指令信息参数")
+        print("\n  Step 1.4: Parsing instruction information parameters")
         thispc = decpc
-        nextpc = args[0]    ##ins的下一条指令的pc值
-        regwlist = args[1]  ##ins的所有写寄存器的列表
-        stack = args[2]     ##ins是栈操作则和base相同,否则为nostack
+        nextpc = args[0]    ##pc value of next instruction after ins
+        regwlist = args[1]  ##list of all write registers of ins
+        stack = args[2]     ##same as base if ins is stack operation, otherwise nostack
         flag = args[3]      ## stackw: 1, stackr: 2 , nostack: 3
-        base = args[4]      ##ins在内存中的基地址
-        index = args[5]     ##ins在内存中的索引寄存器值,基地址偏移
-        displacement = args[6]  ##指令中内存操作的位移量
-        scale = args[7]     ##内存因子,用来和index配合使用,实现复杂内存寻址
+        base = args[4]      ##base address of ins in memory
+        index = args[5]     ##index register value in memory of ins, base offset
+        displacement = args[6]  ##displacement amount of memory operation in instruction
+        scale = args[7]     ##memory factor, used with index to achieve complex memory addressing
         
-        print(f"  - 当前PC: {hex(thispc)}")
-        print(f"  - 下一条指令PC: {hex(nextpc) if isinstance(nextpc, int) else nextpc}")
-        print(f"  - 写寄存器列表: {regwlist}")
-        print(f"  - 栈操作标识: {stack}")
-        print(f"  - 指令类型标志: {flag} (1=栈写入, 2=栈读取, 3=非栈操作)")
-        print(f"  - 内存基地址寄存器: {base}")
-        print(f"  - 内存索引寄存器: {index}")
-        print(f"  - 内存偏移量: {displacement}")
-        print(f"  - 内存缩放因子: {scale}")
+        print(f"  - Current PC: {hex(thispc)}")
+        print(f"  - Next instruction PC: {hex(nextpc) if isinstance(nextpc, int) else nextpc}")
+        print(f"  - Write register list: {regwlist}")
+        print(f"  - Stack operation identifier: {stack}")
+        print(f"  - Instruction type flag: {flag} (1=stack write, 2=stack read, 3=non-stack operation)")
+        print(f"  - Memory base register: {base}")
+        print(f"  - Memory index register: {index}")
+        print(f"  - Memory displacement: {displacement}")
+        print(f"  - Memory scale factor: {scale}")
                     
         print("\n" + "="*60)
-        print("  子步骤 2/6: 开始寄存器修复操作")
+        print("  Step 2/6: Starting register recovery operation")
         print("="*60)
         
         do_recovery = 1
@@ -881,28 +877,28 @@ class SigHandler:
             #####
             # We can have multiple options here. For now, we feed the value (0) to the supposed-to-write register
             #####
-            print('  子步骤 2.1: 准备修复选项')
-            if set_reg_fake == 1:    ##处理写寄存器regw,set_reg_fake是手动开关
-                print(f"[信息] 需要修复的写寄存器列表: {regwlist}")
+            print('  Step 2.1: Preparing recovery options')
+            if set_reg_fake == 1:    ##Process write register regw, set_reg_fake is manual switch
+                print(f"[Info] Write register list to recover: {regwlist}")
                 for regw_idx, regw in enumerate(regwlist):
-                    print(f"\n--- 修复寄存器 {regw_idx+1}/{len(regwlist)}: {regw} ---")
-                    if flag == 2:   ##处理栈读相关的而寄存器, 重计算内存写的位置
-                        print("    子步骤 2.2: 栈读取指令修复 - 重新计算内存地址")
+                    print(f"\n--- Recovering register {regw_idx+1}/{len(regwlist)}: {regw} ---")
+                    if flag == 2:   ##Process stack read related registers, recalculate memory write position
+                        print("    Step 2.2: Stack read instruction recovery - Recalculating memory address")
                         print("h_1 start")
                         final_b = 0 ##base 
                         final_i = 0 ##index
                         final_d = 0 ##displacement
                         final_s = 0 ##scale
                         ## we can try to calculate a valid number for regw
-                        if base == "":                          ##开始解析base
-                            print("[警告] 没有基地址寄存器，跳过此寄存器修复")
+                        if base == "":                          ##Start parsing base
+                            print("[Warning] No base address register, skipping this register recovery")
                             print("no base")
                             continue
-                        print(f"    子步骤 2.2.1: 获取基地址寄存器 {base} 的值")
+                        print(f"    Sub-step 2.2.1: Get base address register {base} value")
                         print("base:\t",base)
-                        i, basestr = self.gdb_send(process, GDB_PRINT_REG + " $" + base, f"获取基地址寄存器{base}的值")
+                        i, basestr = self.gdb_send(process, GDB_PRINT_REG + " $" + base, f"Get base address register {base} value")
                         if i == 0:
-                            print("ERROR: 无法获取基地址寄存器值")
+                            print("ERROR: Cannot get base address register value")
                             print("ERROR when getting the base")
                             print((str(process)))
                             self.log.close()
@@ -922,17 +918,17 @@ class SigHandler:
                         content = content.lstrip("nan")
                         content = content.lstrip("-nan")
                         if "0x" in content:
-                            final_b = int(content, 16)   ## 修复之前的base和现在的这个Base一样吗
+                            final_b = int(content, 16)   ## Is the base before repair the same as the current base?
                         else:
-                            final_b = int(content)  ##base解析完毕,content保存了将basestr从16进制转化到10进制的结果
-                        print(f"    子步骤 2.2.2: 获取索引寄存器 {index} 的值")
-                        if index == "null":         ##开始解析index
-                            print("[信息] 没有索引寄存器")
+                            final_b = int(content)  ##Base parsing completed, content saved the result of converting basestr from hexadecimal to decimal
+                        print(f"    Sub-step 2.2.2: Get index register {index} value")
+                        if index == "null":         ##Start parsing index
+                            print("[Info] No index register")
                             print("no index")
                         else:
-                            i, indexstr = self.gdb_send(process, GDB_PRINT_REG + " $" + index, f"获取索引寄存器{index}的值")
+                            i, indexstr = self.gdb_send(process, GDB_PRINT_REG + " $" + index, f"Get index register {index} value")
                             if i == 0:
-                                print("ERROR: 无法获取索引寄存器值")
+                                print("ERROR: Cannot get index register value")
                                 print("ERROR when getting the index")
                                 print((str(process)))
                                 self.log.close()
@@ -954,35 +950,35 @@ class SigHandler:
                             if "0x" in content:
                                 final_i = int(content, 16)
                             else:
-                                final_i = int(content)  ##index解析完毕
+                                final_i = int(content)  ##Index parsing completed
 
                             final_d = int(displacement)
                             final_s = int(scale)
                             
-                            print("    子步骤 2.2.3: 计算有效内存地址")
-                            ##用base,displacement,index,scale综合确定修改后的地址值
-                            address = final_b + final_d + final_i * final_s   # 基地址、内存偏移量、基地址偏移、内存因子
-                            print(f"[计算] 有效地址 = base + displacement + index * scale")
+                            print("    Sub-step 2.2.3: Calculate effective memory address")
+                            ##Use base, displacement, index, scale to comprehensively determine modified address value
+                            address = final_b + final_d + final_i * final_s   # Base address, memory offset, base offset, memory factor
+                            print(f"[Calculation] Effective address = base + displacement + index * scale")
                             print("address: {0}, final_b: {1}, final_d: {2}, final_i: {3}, final_s: {4}".format(
-                                hex(address),  # 将address转换为十六进制
-                                hex(final_b),  # 将final_b转换为十六进制
-                                hex(final_d),           # 将final_d转换为十六进制
-                                hex(final_i),           # 将final_i转换为十六进制
-                                hex(final_s)            # 将final_s转换为十六进制
+                                hex(address),  # Convert address to hexadecimal
+                                hex(final_b),  # Convert final_b to hexadecimal
+                                hex(final_d),           # Convert final_d to hexadecimal
+                                hex(final_i),           # Convert final_i to hexadecimal
+                                hex(final_s)            # Convert final_s to hexadecimal
                             ))
-                            print(f"[结果] 计算得到的有效地址: {hex(address)}")
+                            print(f"[Result] Calculated effective address: {hex(address)}")
 
-                            print("    子步骤 2.2.4: 读取该地址处的数值")
-                            i, finalres = self.gdb_send(process, GDB_PRINT_REG + " *" + str(address), f"读取内存地址{hex(address)}处的值")
+                            print("    Sub-step 2.2.4: Read value at this address")
+                            i, finalres = self.gdb_send(process, GDB_PRINT_REG + " *" + str(address), f"Read value at memory address {hex(address)}")
                             if i == 0:
-                                print("ERROR: 无法读取内存地址处的值")
+                                print("ERROR: Cannot read value at memory address")
                                 print("ERROR when getting the final value")
                                 print((str(process)))
                                 self.log.close()
                                 process.close()
                                 sys.stdout = sys.__stdout__
                                 return
-                            # finalres是什么？
+                            # What is finalres?
                             content = ""
                             if "0x" in finalres:
                                 items = finalres.split(" ")
@@ -995,7 +991,7 @@ class SigHandler:
                             content = content.lstrip("nan")
                             content = content.lstrip("-nan")
 
-                            i, print_regw = self.gdb_send(process, GDB_PRINT_REG + " $" + regw, f"获取目标寄存器{regw}的当前值")
+                            i, print_regw = self.gdb_send(process, GDB_PRINT_REG + " $" + regw, f"Get current value of target register {regw}")
                             if i == 0:
                                 print("ERROR when getting the base")
                                 print((str(process)))
@@ -1004,13 +1000,13 @@ class SigHandler:
                                 sys.stdout = sys.__stdout__
                                 return
 
-                            print("    子步骤 2.2.5: 将读取的值设置到目标寄存器")
+                            print("    Sub-step 2.2.5: Set read value to target register")
                             print("change regw key:\t",regw.strip())   
                             print("unchanged regw value:\t",print_regw.strip())
                             print("change regw value to:\t",content.strip())
-                            i, set_response = self.gdb_send(process, GDB_SET_REG + " $" + regw + "=" + content, f"设置寄存器{regw}为{content}")
+                            i, set_response = self.gdb_send(process, GDB_SET_REG + " $" + regw + "=" + content, f"Set register {regw} to {content}")
                             if i == 0:
-                                print("ERROR: 无法设置寄存器值")
+                                print("ERROR: Cannot set register value")
                                 print("ERROR when setting the final value")
                                 print((str(process)))
                                 self.log.close()
@@ -1018,19 +1014,19 @@ class SigHandler:
                                 sys.stdout = sys.__stdout__
                                 return
                             if i == 1:
-                                print("[成功] 栈读取修复完成 - 已通过地址计算设置寄存器值")
-                                print("is stackr: have set reg with address calculation ")  ###  IMPORTANT: analyze.py解析此标记识别h_1修复策略
+                                print("[Success] Stack read repair completed - Register value set through address calculation")
+                                print("is stackr: have set reg with address calculation ")  ###  IMPORTANT: analyze.py parses this marker to identify h_1 repair strategy
                             print("h_1 end")
 
-                    else:   ##处理其他memory-load，用0代替读到的数据，原因是内存中有很多零
-                        print("    子步骤 2.3: 非栈读取指令修复 - 设置默认值0")
+                    else:   ##Handle other memory-load, replace read data with 0, because there are many zeros in memory
+                        print("    Sub-step 2.3: Non-stack read instruction repair - Set default value 0")
                         if "xmm" in regw:
                             regw = regw+".uint128"
-                            print(f"[信息] 检测到XMM寄存器，修改为 {regw}")
+                            print(f"[Info] XMM register detected, modified to {regw}")
                         print("h_2 start")
-                        i, fake_response = self.gdb_send(process, GDB_SET_REG + " $" + regw + "=" + GDB_FAKE, f"设置寄存器{regw}为默认值{GDB_FAKE}")
+                        i, fake_response = self.gdb_send(process, GDB_SET_REG + " $" + regw + "=" + GDB_FAKE, f"Set register {regw} to default value {GDB_FAKE}")
                         if i == 0:
-                            print("ERROR: 无法设置寄存器默认值")
+                            print("ERROR: Cannot set register default value")
                             print("ERROR when setting the reg value")
                             print((str(process)))
                             self.log.close()
@@ -1038,44 +1034,44 @@ class SigHandler:
                             sys.stdout = sys.__stdout__
                             return
                         if i == 1:
-                            print(f"[成功] 非栈读取修复完成 - 已设置寄存器 {regw} = {GDB_FAKE}")
-                            print("not stackr,so set fake:\t",regw)  ###  IMPORTANT: analyze.py解析此标记识别h_2修复策略
+                            print(f"[Success] Non-stack read repair completed - Set register {regw} = {GDB_FAKE}")
+                            print("not stackr,so set fake:\t",regw)  ###  IMPORTANT: analyze.py parses this marker to identify h_2 repair strategy
                         print("h_2 end")
 
             print("\n" + "="*60)
-            print("  子步骤 3/6: 栈指针修复操作")
+            print("  Step 3/6: Stack pointer recovery operation")
             print("="*60)
             
             # try to set the rbp and rsp to reasonable values
-            ##print('set rbp and rsp to reasonable values')  怎么判断
-            if is_rewind == 1 and (flag == 1 or flag == 2):    ##flag1表示栈的写入,这里flag和上面multiple options中的if冲突,也就是只有else执行时才执行此处;is_rewind是手动开关
-                print("  子步骤 3.1: 检测到栈操作指令，开始栈指针修复")
+            ##print('set rbp and rsp to reasonable values')  How to judge
+            if is_rewind == 1 and (flag == 1 or flag == 2):    ##flag1 indicates stack write, here flag conflicts with if in multiple options above, that is, only when else executes will this be executed; is_rewind is manual switch
+                print("  Step 3.1: Detected stack operation instruction, beginning stack pointer recovery")
                 print("h_3 start")
                 print('stackw, set rbp and rsp to reasonable values')
                 stackinfo = ["rbp", "rsp"]
                 print("stack:\t",stack)
                 if stack != "" or force_fix_rbp:
-                    print("  子步骤 3.2: 获取栈帧大小信息")
-                    size = fi.get_stack_size()  ##size保存的是ins所在函数初始为局部变量分配的空间大小,典型的函数栈帧设置的一部分
+                    print("  Step 3.2: Getting stack frame size information")
+                    size = fi.get_stack_size()  ##size saves the space size initially allocated for local variables in the function where ins is located, a typical part of function stack frame setup
                     if size == "":
                         size = "0"
                     if size != "":
-                        print(f"[信息] 获取到栈帧大小: {size}")
+                        print(f"[Info] Retrieved stack frame size: {size}")
                         print("size:\t",size)
-                        print("  子步骤 3.3: 确定需要修复的栈指针")
+                        print("  Step 3.3: Determining stack pointer to be fixed")
                         try:
                             stackinfo.remove(stack)
                         except:
                             stack = "rbp"
                             stackinfo.remove("rbp")
                         rxp = stackinfo[0]#rxp=rsp
-                        print(f"[信息] 栈操作寄存器: {stack}, 另一个栈指针: {rxp}")
+                        print(f"[Info] Stack operation register: {stack}, another stack pointer: {rxp}")
                         print("stack size != null, rxp=", rxp)
-                        print(f"  子步骤 3.4: 获取 {rxp} 寄存器的当前值")
-                        ##解析$rxp内容
-                        i, output = self.gdb_send(process, GDB_PRINT_REG + " $" + rxp, f"获取栈指针寄存器{rxp}的值")
+                        print(f"  Step 3.4: Getting current value of {rxp} register")
+                        ##Parse $rxp content
+                        i, output = self.gdb_send(process, GDB_PRINT_REG + " $" + rxp, f"Getting value of stack pointer register {rxp}")
                         if i == 0:
-                            print(f"ERROR: 无法获取 {rxp} 寄存器值")
+                            print(f"ERROR: Cannot get value of {rxp} register")
                             print("ERROR when getting the value of the rbp or rsp")
                             print((str(process)))
                             self.log.close()
@@ -1103,11 +1099,11 @@ class SigHandler:
                                 if is_number(content_rxp):
                                     size_rxp = int(content_rxp)
                             print("size_rxp:",rxp,size_rxp)
-                            print(f"  子步骤 3.5: 获取 {stack} 寄存器的当前值")
-                            ##解析$stack
-                            i, output = self.gdb_send(process, GDB_PRINT_REG + " $" + stack, f"获取栈指针寄存器{stack}的值")
+                            print(f"  Step 3.5: Getting current value of {stack} register")
+                            ##Parse $stack
+                            i, output = self.gdb_send(process, GDB_PRINT_REG + " $" + stack, f"Getting value of stack pointer register {stack}")
                             if i == 0:
-                                print(f"ERROR: 无法获取 {stack} 寄存器值")
+                                print(f"ERROR: Cannot get value of {stack} register")
                                 print("ERROR when getting the value of the rbp or rsp")
                                 print((str(process)))
                                 self.log.close()
@@ -1139,21 +1135,21 @@ class SigHandler:
                             size = int(size,16)
                             print("size:\t",size)
                             
-                            print("  子步骤 3.6: 检测栈溢出并修复栈指针")
-                            print(f"[检查] {rxp}值: {size_rxp}, {stack}值: {size_stack}, 栈帧大小: {size}")
-                            # if abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size:##检测是否栈溢出
+                            print("  Step 3.6: Detecting stack overflow and fixing stack pointer")
+                            print(f"[Check] {rxp} value: {size_rxp}, {stack} value: {size_stack}, stack frame size: {size}")
+                            # if abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size:##Check if stack overflow
                             #     process.sendline(GDB_SET_REG + " $" + stack + "=" + content_rxp)
-                            if (abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size) or (size_rxp-size_stack>0):##检测是否栈溢出
-                                print("[检测] 发现栈溢出，开始修复")
+                            if (abs(size_rxp - size_stack) > size and size_stack > size and size_rxp > size) or (size_rxp-size_stack>0):##Check if stack overflow
+                                print("[Detected] Stack overflow detected, beginning repair")
                                 if stack == "rbp":
                                     setback = str(size_rxp+size)
-                                    print(f"[计算] rbp修复值 = {rxp}值 + 栈帧大小 = {size_rxp} + {size} = {setback}")
+                                    print(f"[Calculation] rbp repair value = {rxp} value + stack frame size = {size_rxp} + {size} = {setback}")
                                 if stack == "rsp":
                                     setback = str(size_rxp-size)
-                                    print(f"[计算] rsp修复值 = {rxp}值 - 栈帧大小 = {size_rxp} - {size} = {setback}")
-                                i, stack_response = self.gdb_send(process, GDB_SET_REG + " $" + stack + "=" + setback, f"设置栈指针{stack}为修复值{setback}")
+                                    print(f"[Calculation] rsp repair value = {rxp} value - stack frame size = {size_rxp} - {size} = {setback}")
+                                i, stack_response = self.gdb_send(process, GDB_SET_REG + " $" + stack + "=" + setback, f"Setting stack pointer {stack} to repair value {setback}")
                                 if i == 0:
-                                    print(f"ERROR: 无法重置 {stack} 寄存器")
+                                    print(f"ERROR: Cannot reset {stack} register")
                                     print(("ERROR when resetting the " + stack))
                                     print((str(process)))
                                     self.log.close()
@@ -1162,32 +1158,32 @@ class SigHandler:
                                     return
 
                                 if i == 1:
-                                    print(f"[成功] 栈指针 {stack} 修复完成")
-                                    print(("Set the " + stack + " back! "))  ###  IMPORTANT: analyze.py解析此标记识别h_3修复策略
+                                    print(f"[Success] Stack pointer {stack} recovery complete")
+                                    print(("Set the " + stack + " back! "))  ###  IMPORTANT: analyze.py parses this marker to identify h_3 repair strategy
                                     print("h_3 end")
                                     nextpc = thispc
-                                    print("[信息] 设置重做当前指令")
+                                    print("[Info] Setting redo current instruction")
                                     print("redo:\t",nextpc)
                             else:
-                                print("[信息] 未检测到栈溢出，无需修复栈指针")
+                                print("[Info] Stack overflow not detected, no stack pointer repair needed")
                     
                 else:
-                    print("[警告] 无法获取当前栈帧大小，跳过栈指针修复")
+                    print("[Warning] Cannot get current stack frame size, skipping stack pointer recovery")
                     print("Cannot get the size of the current stack frame")
             else:
-                print("[信息] 非栈操作指令或栈修复功能已禁用，跳过栈指针修复")
+                print("[Info] Non-stack operation instruction or stack recovery disabled, skipping stack pointer recovery")
         
         print("\n" + "="*60)
-        print("  子步骤 4/6: 设置程序计数器到下一条指令")
+        print("  Step 4/6: Setting program counter to next instruction")
         print("="*60)
         
         #process.interact()
-        print(f"  子步骤 4.1: 设置PC寄存器到下一条指令地址")
+        print(f"  Step 4.1: Setting PC register to next instruction address")
         next_pc_hex = str(hex(int(nextpc)))
-        i, gdb_response = self.gdb_send(process, GDB_SET_REG + " $pc=" + next_pc_hex, f"设置PC寄存器为{next_pc_hex}")
+        i, gdb_response = self.gdb_send(process, GDB_SET_REG + " $pc=" + next_pc_hex, f"Setting PC register to {next_pc_hex}")
         print("nextpc:\t",gdb_response)
         if i == 0:
-            print("ERROR: 无法设置PC值")
+            print("ERROR: Cannot set PC value")
             print("ERROR when setting the pc value")
             print((str(process)))
             self.log.close()
@@ -1195,23 +1191,23 @@ class SigHandler:
             sys.stdout = sys.__stdout__
             return
         else:
-            print(f"[成功] PC寄存器已设置为: {next_pc_hex}")
+            print(f"[Success] PC register set to: {next_pc_hex}")
         self.disable_gdb_verbose()
         
         print("\n" + "="*60)
-        print("  子步骤 5/6: LetGo框架修复完成")
+        print("  Step 5/6: LetGo framework recovery complete")
         print("="*60)
-        print("[信息] 所有修复操作已完成，程序准备继续执行")
-        print(f"[总结] 修复的寄存器数量: {len(regwlist) if regwlist else 0}")
-        print(f"[总结] 修复的指令类型: {'栈读取' if flag == 2 else '栈写入' if flag == 1 else '非栈操作'}")
-        print(f"[总结] 程序将从地址 {next_pc_hex} 继续执行")
+        print("[Info] All recovery operations completed, program ready to continue execution")
+        print(f"[Summary] Number of registers fixed: {len(regwlist) if regwlist else 0}")
+        print(f"[Summary] Instruction type fixed: {'Stack read' if flag == 2 else 'Stack write' if flag == 1 else 'Non-stack operation'}")
+        print(f"[Summary] Program will continue execution from address {next_pc_hex}")
 
 
     def handle_after_injection(self,process):
         print("process continue...")
         
         index, after_continue = self.gdb_send_extended(
-            process, GDB_CONTINUE, "注入后继续执行程序",
+            process, GDB_CONTINUE, "Continue program execution",
             timeout=600, expect_patterns=[GDB_PROMOPT, pexpect.EOF, pexpect.TIMEOUT],
             pattern_names=["PROMPT", "EOF", "TIMEOUT"])
             
@@ -1225,54 +1221,54 @@ class SigHandler:
             process.terminate()
             process.close()
             sys.stdout = sys.__stdout__
-            raise Exception("Process timed out")  # 或者使用自定义异常
+            raise Exception("Process timed out")  # Or use custom exception
             return
         #print(after_continue)
         
         if "received signal" in after_continue:
             print("\n" + "="*60)
-            print("修改状态后验证和错误传播检测")
+            print("Modify state and error propagation detection")
             print("="*60)
             
             #print("after_continue:\t",after_continue)
-            rcv_sig = 0 #假设通过修复不会再收到信号
-            print("第1步: 获取信号详细信息")
+            rcv_sig = 0 #Assume no signal will be received after repair
+            print("Step 1: Getting signal details")
             self.info_at_signal(process)
             self.letgo_start_time = datetime.datetime.now()
-            print("第2步: 启动LetGo框架修复 (包含6个子步骤)")
+            print("Step 2: Starting LetGo framework recovery (including 6 sub-steps)")
             exit_code = self.letgo_frame(process)
             rcv_sig = 0
-            if exit_code == 1:#letgo执行失败了
-                print("[错误] LetGo框架修复失败")
+            if exit_code == 1:#letgo execution failed
+                print("[Error] LetGo framework recovery failed")
                 rcv_sig =1
             else:
-                print("[成功] LetGo框架修复完成")
+                print("[Success] LetGo framework recovery complete")
 
-            ##letgo_frame执行完毕,开始计算介入letgo_frame后的错误传播
-            print("第3步: 检测修复后的错误传播")
+            ##After letgo_frame execution, start error propagation detection
+            print("Step 3: Detecting error propagation after recovery")
             if rcv_sig==0:
                 rcv_sig,output= self.error_spread(process,1)
 
             if rcv_sig == 0:
-                print("[成功] 修复后无错误传播，程序可以继续执行")
+                print("[Success] No error propagation after repair, program can continue execution")
                 print("Process Continue!\n")
-                print("第4步: 继续执行程序")
-                i, continue_response = self.gdb_send(process, GDB_CONTINUE, "继续执行修复后的程序")
+                print("Step 4: Continue program execution")
+                i, continue_response = self.gdb_send(process, GDB_CONTINUE, "Continue program after repair")
                 print("Application output:\n")
                 #print(output)
             if rcv_sig == 1:
-                print("[失败] 修复后仍有错误传播，终止程序")
-                print("第4步: 终止程序执行")
+                print("[Failed] Error propagation still exists, terminating program")
+                print("Step 4: Terminate program execution")
                 self.info_at_signal(process)
-                i, kill_response = self.gdb_send(process, "kill", "终止程序执行")
-        else:   # 注错后没有收到信号
+                i, kill_response = self.gdb_send(process, "kill", "Terminate program execution")
+        else:   # No signal triggered after injection
             print("\n" + "="*60)
-            print("情况: 注错后无信号触发 - 可能是SDC（Silent Data Corruption）")
+            print("Case: No signal triggered after injection - possibly SDC (Silent Data Corruption)")
             print("="*60)
             
             if after_continue.strip():
                 print("after_continue:\t",after_continue)
-            print("\n[信息] 没有触发崩溃信号")
+            print("\n[Info] No crash signal triggered")
             print("No triggering crashes")
 
             output = self.print_process(process)
@@ -1281,7 +1277,7 @@ class SigHandler:
                 print(output)
                 print("end buffer clear")
             
-            print("[信息] 程序可能发生了静默数据损坏（SDC），需要进一步检查输出结果")
+            print("[Info] Program may have experienced silent data corruption (SDC), further check output results")
 
         
         try:
@@ -1308,9 +1304,9 @@ class SigHandler:
         self.handle_after_injection(process)
 
         print("app output:")
-        # 等待进程输出，直到超时或进程结束
-        result = self.process_remote_target.expect([pexpect.EOF, pexpect.TIMEOUT], timeout=300)  # 捕获EOF或超时
-        # 获取并打印进程输出
+        # Wait for process output until timeout or process ends
+        result = self.process_remote_target.expect([pexpect.EOF, pexpect.TIMEOUT], timeout=300)  # Catch EOF or timeout
+        # Get and print process output
         output = self.process_remote_target.before.decode('utf-8').strip()
         if output:
             if configure.progname in configure.PolyBenchOutPutList:
@@ -1344,16 +1340,16 @@ class SigHandler:
         if i == 1:
             temp = process.before.decode('utf-8')  ## just to flush the before buffer
 
-            self.gdb_send(process, GDB_HANDLE_BUS, "设置SIGBUS信号处理")
-            self.gdb_send(process, GDB_HANDLE_SEGV, "设置SIGSEGV信号处理") 
-            self.gdb_send(process, GDB_HANDLE_ABT, "设置SIGABRT信号处理")
-            self.gdb_send(process, GDB_HANDLE_FPE, "设置SIGFPE信号处理")
-            self.gdb_send(process, "set print demangle on", "开启符号名称显示")
-            self.gdb_send(process, "set confirm off", "关闭确认提示")
+            self.gdb_send(process, GDB_HANDLE_BUS, "Setting SIGBUS signal handler")
+            self.gdb_send(process, GDB_HANDLE_SEGV, "Setting SIGSEGV signal handler") 
+            self.gdb_send(process, GDB_HANDLE_ABT, "Setting SIGABRT signal handler")
+            self.gdb_send(process, GDB_HANDLE_FPE, "Setting SIGFPE signal handler")
+            self.gdb_send(process, "set print demangle on", "Enabling symbol name display")
+            self.gdb_send(process, "set confirm off", "Disabling confirmation prompt")
 
             if configure.progname in configure.OpenMpOutPutList:
                 GDB_ENV = "set env OUTPUT 1"
-                self.gdb_send(process, GDB_ENV, "设置环境变量OUTPUT=1")  
+                self.gdb_send(process, GDB_ENV, "Setting environment variable OUTPUT=1")  
 
         if configure.inject_tool == 'pinfi':
             self.inject_by_pinfi_and_recover(process)

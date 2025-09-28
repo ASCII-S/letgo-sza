@@ -493,7 +493,7 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
         print(df.loc[0,'result'])
     
     # 读取文件并提取所需内容
-    with open(input_file, 'r') as file:
+    with open(input_file, 'r', encoding='utf-8', errors='ignore') as file:
         values = ['null'] * 4
         SIGcount = 0
         Sig1byletgo_Flag = 0

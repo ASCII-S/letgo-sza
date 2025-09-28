@@ -5,6 +5,10 @@
 
 此脚本用于批量处理CSV目录下的所有CSV文件，分析原位崩溃和非原位崩溃的分布占比，
 并将所有结果汇总到一个CSV文件中。
+
+新增功能：
+- 支持批量导出每个文件中原位crash和非原位crash的具体条目到单独的CSV文件
+- 文件名格式：{原文件名}_samelocation.csv 和 {原文件名}_differentlocation.csv
 """
 
 import os
@@ -17,7 +21,7 @@ from tqdm import tqdm
 from analyze_crash_location import analyze_crash_location
 
 
-def batch_analyze_crash_location(input_dir, output_file, file_pattern="*.csv"):
+def batch_analyze_crash_location(input_dir, output_file, file_pattern="*.csv", export_details=False, details_output_dir=None):
     """
     批量分析CSV目录下的所有CSV文件中的原位崩溃和非原位崩溃的分布占比
     
@@ -25,6 +29,8 @@ def batch_analyze_crash_location(input_dir, output_file, file_pattern="*.csv"):
         input_dir (str): 输入CSV文件目录
         output_file (str): 输出CSV文件路径
         file_pattern (str, optional): 文件匹配模式，默认为"*.csv"
+        export_details (bool, optional): 是否导出具体条目，默认为False
+        details_output_dir (str, optional): 详细条目输出目录，默认为None
         
     返回:
         bool: 是否成功完成分析
@@ -45,7 +51,7 @@ def batch_analyze_crash_location(input_dir, output_file, file_pattern="*.csv"):
         
         # 使用tqdm显示进度
         for csv_file in tqdm(csv_files, desc="正在分析文件"):
-            result = analyze_crash_location(csv_file)
+            result = analyze_crash_location(csv_file, export_details=export_details, details_output_dir=details_output_dir)
             if result:
                 results.append(result)
         
@@ -74,6 +80,11 @@ def batch_analyze_crash_location(input_dir, output_file, file_pattern="*.csv"):
             print(f"原位崩溃数: {total_same_location} ({avg_same_percentage:.2f}%)")
             print(f"非原位崩溃数: {total_different_location} ({avg_diff_percentage:.2f}%)")
             
+            if export_details:
+                if details_output_dir is None:
+                    details_output_dir = "results/details"
+                print(f"详细条目已导出到目录: {details_output_dir}")
+            
             return True
         else:
             print("警告: 没有成功分析任何文件")
@@ -93,6 +104,10 @@ def main():
                         help='输出汇总CSV文件路径，默认为results/crash_location_summary.csv')
     parser.add_argument('--pattern', '-p', type=str, required=False, default='*.csv',
                         help='文件匹配模式，默认为*.csv')
+    parser.add_argument('--export-details', '-e', action='store_true',
+                        help='是否导出原位crash和非原位crash的具体条目到单独文件')
+    parser.add_argument('--details-dir', '-d', type=str, required=False, default='results/details',
+                        help='详细条目输出目录，默认为results/details')
     args = parser.parse_args()
     
     # 检查输入目录是否存在
@@ -101,7 +116,7 @@ def main():
         return False
     
     # 运行批量分析
-    batch_analyze_crash_location(args.input_dir, args.output, args.pattern)
+    batch_analyze_crash_location(args.input_dir, args.output, args.pattern, args.export_details, args.details_dir)
 
 
 if __name__ == "__main__":
