@@ -35,6 +35,9 @@ prognames_supply = [
 #special =""
 special = ""
 
+
+##############################config parameters###############################
+
 #应用名取自prognames_supply
 waittochangebyscrips = "correlation"
 progname = waittochangebyscrips
@@ -67,6 +70,8 @@ if inject_random_or_targeted == "targeted":
     inject_tool = 'breakpoint'
 if inject_random_or_targeted == "random":
     inject_tool = 'pinfi'
+
+##############################config parameters###############################
 
 #debugfile,用来生成sighandle中调试步骤,process.txt
 debugfile = 0

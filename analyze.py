@@ -1740,6 +1740,7 @@ def main():
         extract_values_and_append_to_csv(os.path.join(log_folder,str(args.file)),log_folder,args.file+'.csv',args.flag, args.sdc_flag)
         return
 
+    # 有bug
     if args.analyze_all:
         directory = os.path.join(configure.letgo_base_home,Result_folder_name)
         try:
