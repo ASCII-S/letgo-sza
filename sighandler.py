@@ -780,6 +780,39 @@ class SigHandler:
                 sys.stdout = sys.__stdout__
                 return
             print("\nat sig backtrace:\t",(gdbout))
+
+            # ====== Feature Collection: Call Stack Analysis ======
+            print("=== Call Stack Features ===")  # analyze.py parsing marker
+            try:
+                # Feature 1: Call depth
+                call_depth = gdbout.count('#')
+                print(f"CallDepth: {call_depth}")
+
+                # Feature 2: Complete call chain (top 8 frames)
+                frames = re.findall(r'#\d+\s+.*?in\s+(\w+)', gdbout)
+                if frames:
+                    call_chain = '->'.join(frames[:8])
+                    print(f"CallChain: {call_chain}")
+
+                    # Feature 3: Distance from main
+                    if 'main' in frames:
+                        dist_from_main = frames.index('main')
+                        print(f"DistFromMain: {dist_from_main}")
+                    else:
+                        print(f"DistFromMain: -1")
+
+                    # Feature 4: Is recursive
+                    is_recursive = len(frames) != len(set(frames))
+                    print(f"IsRecursive: {is_recursive}")
+
+                    # Feature 5: Caller function
+                    if len(frames) > 1:
+                        print(f"CallerFunc: {frames[1]}")
+            except Exception as e:
+                print(f"Error parsing backtrace: {e}")
+            print("=== End Call Stack Features ===")
+            # ====== End Feature Collection ======
+
             # if "return" in gdbout:
             #     process.sendline("return")
             #     print(process.expect([pexpect.TIMEOUT, "(gdb)"]))
@@ -866,7 +899,39 @@ class SigHandler:
         print(f"  - Memory index register: {index}")
         print(f"  - Memory displacement: {displacement}")
         print(f"  - Memory scale factor: {scale}")
-                    
+
+        # ====== Feature Collection: Register and Memory Features ======
+        print("\n=== Register and Memory Features ===")
+        try:
+            # Feature 6: Stack pointer state
+            i, rsp_val = self.gdb_send(process, "p/x $rsp", "Get RSP")
+            i, rbp_val = self.gdb_send(process, "p/x $rbp", "Get RBP")
+
+            if i == 1:
+                rsp_match = re.search(r'0x[0-9a-fA-F]+', rsp_val)
+                rbp_match = re.search(r'0x[0-9a-fA-F]+', rbp_val)
+                if rsp_match and rbp_match:
+                    rsp = int(rsp_match.group(), 16)
+                    rbp = int(rbp_match.group(), 16)
+                    rbp_rsp_delta = abs(rbp - rsp)
+                    print(f"RBP_RSP_Delta: {rbp_rsp_delta}")
+
+            # Feature 7: Stack frame size
+            i, frame_info = self.gdb_send(process, "info frame", "Get frame info")
+            if 'Stack level' in frame_info:
+                print("StackFrameInfo:", frame_info.split('\n')[0])  # First line contains key info
+
+            # Feature 8: Instruction operand features (from existing args)
+            print(f"InstrFlag: {flag}")  # 1=stackw, 2=stackr, 3=nostack
+            print(f"HasBase: {base != ''}")
+            print(f"HasIndex: {index != 'null'}")
+            print(f"HasDisplacement: {displacement != 0}")
+
+        except Exception as e:
+            print(f"Error collecting register features: {e}")
+        print("=== End Register and Memory Features ===")
+        # ====== End Feature Collection ======
+
         print("\n" + "="*60)
         print("  Step 2/6: Starting register recovery operation")
         print("="*60)

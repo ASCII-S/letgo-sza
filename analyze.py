@@ -460,7 +460,31 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
     """
 
     # 创建一个空的 DataFrame
-    df = pd.DataFrame(columns=['input_file','dynamicInstNum' ,'regmm','reg', 'injreg', 'inj_location', 'pc', 'iteration1','hexpc', 'ins', 'opcode', 'Func','result', 'Heuristic' ,'tolerance' ,'bias', 'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj', 'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix' ])
+    df = pd.DataFrame(columns=[
+        # Original fields
+        'input_file','dynamicInstNum','regmm','reg','injreg','inj_location','pc','iteration1',
+        'hexpc','ins','opcode','Func','result','Heuristic','tolerance','bias',
+        'Sig1','Sig1pc','Sig1Ins','Sig1Ope','Sig1Func','ErrSpd_Inj',
+        'Sig2','Sig2pc','Sig2Ins','Sig2Ope','Sig2Func','ErrSpd_Fix',
+
+        # === New Feature Fields ===
+        # Function-level features
+        'CallDepth',           # Call stack depth
+        'CallChain',           # Call chain path
+        'DistFromMain',        # Distance from main function
+        'IsRecursive',         # Whether in recursive call
+        'CallerFunc',          # Caller function name
+        'RBP_RSP_Delta',       # Stack pointer delta
+
+        # Instruction-level features (refined)
+        'InstrFlag',           # Instruction type flag (1/2/3)
+        'HasBase',             # Has base register
+        'HasIndex',            # Has index register
+        'HasDisplacement',     # Has displacement
+
+        # Program-level features
+        'ExecProgress',        # Execution progress (0-1)
+    ])
     
 
     if flag == 0:
@@ -647,6 +671,85 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
                 df.loc[0,'Heuristic'] = "h_3"
                 continue
 
+            # ====== Parse Call Stack Features ======
+            if "=== Call Stack Features ===" in line:
+                try:
+                    # Read feature block until end marker
+                    feature_lines = []
+                    for _ in range(10):  # Read up to 10 lines
+                        next_line = next(file, None)
+                        if next_line and "=== End Call Stack Features ===" in next_line:
+                            break
+                        if next_line:
+                            feature_lines.append(next_line)
+
+                    # Parse each feature
+                    feature_text = '\n'.join(feature_lines)
+
+                    match = re.search(r'CallDepth:\s*(\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'CallDepth'] = int(match.group(1))
+
+                    match = re.search(r'CallChain:\s*(.+)', feature_text)
+                    if match:
+                        df.loc[0, 'CallChain'] = match.group(1).strip()
+
+                    match = re.search(r'DistFromMain:\s*(-?\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'DistFromMain'] = int(match.group(1))
+
+                    match = re.search(r'IsRecursive:\s*(True|False)', feature_text)
+                    if match:
+                        df.loc[0, 'IsRecursive'] = match.group(1) == 'True'
+
+                    match = re.search(r'CallerFunc:\s*(\w+)', feature_text)
+                    if match:
+                        df.loc[0, 'CallerFunc'] = match.group(1)
+
+                except Exception as e:
+                    if debug_mode > 3:
+                        print(f"Error parsing call stack features in {input_file}: {e}")
+                continue
+
+            # ====== Parse Register and Memory Features ======
+            if "=== Register and Memory Features ===" in line:
+                try:
+                    feature_lines = []
+                    for _ in range(15):  # Read up to 15 lines
+                        next_line = next(file, None)
+                        if next_line and "=== End Register and Memory Features ===" in next_line:
+                            break
+                        if next_line:
+                            feature_lines.append(next_line)
+
+                    feature_text = '\n'.join(feature_lines)
+
+                    match = re.search(r'RBP_RSP_Delta:\s*(\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'RBP_RSP_Delta'] = int(match.group(1))
+
+                    match = re.search(r'InstrFlag:\s*(\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'InstrFlag'] = int(match.group(1))
+
+                    match = re.search(r'HasBase:\s*(True|False)', feature_text)
+                    if match:
+                        df.loc[0, 'HasBase'] = match.group(1) == 'True'
+
+                    match = re.search(r'HasIndex:\s*(True|False)', feature_text)
+                    if match:
+                        df.loc[0, 'HasIndex'] = match.group(1) == 'True'
+
+                    match = re.search(r'HasDisplacement:\s*(True|False)', feature_text)
+                    if match:
+                        df.loc[0, 'HasDisplacement'] = match.group(1) == 'True'
+
+                except Exception as e:
+                    if debug_mode > 3:
+                        print(f"Error parsing register features in {input_file}: {e}")
+                continue
+            # ====== End Feature Parsing ======
+
             if "Inj2Sig" in line.strip():
                 #print(line)
                 df.loc[0,'ErrSpd_Inj'] = int(line.split(':')[-1])
@@ -795,6 +898,24 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
             update_sdc_result(bias, sdc_tolerance, masked_tolerance, df)
     if debug == 1:
         print(df.loc[0,'result'])
+
+    # ====== Calculate Program-level Features ======
+    # Calculate execution progress
+    if pd.notna(df.loc[0, 'dynamicInstNum']):
+        try:
+            # Try to read total instruction count from pin.instcount.txt
+            instcount_file = os.path.join(one_batch_folder, 'pin.instcount.txt')
+            if os.path.exists(instcount_file):
+                with open(instcount_file, 'r') as f:
+                    total_count = int(f.read().strip())
+                    if total_count > 0:
+                        exec_progress = int(df.loc[0, 'dynamicInstNum']) / total_count
+                        df.loc[0, 'ExecProgress'] = round(exec_progress, 4)
+        except Exception as e:
+            if debug_mode > 3:
+                print(f"Error calculating ExecProgress: {e}")
+    # ====== End Feature Calculation ======
+
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)  # 如果目录不存在则创建
     # 构造输出文件路径
