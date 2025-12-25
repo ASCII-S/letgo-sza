@@ -71,6 +71,26 @@ if inject_random_or_targeted == "targeted":
 if inject_random_or_targeted == "random":
     inject_tool = 'pinfi'
 
+# ====== 影响力分析配置 ======
+# 是否启用影响力分析（基于数据流和控制流）
+use_influence_analysis = False
+
+# 影响力权重模式
+# 'high': 高影响力指令优先（用于测试崩溃和恢复）
+# 'low': 低影响力指令优先（用于测试 SDC）
+# 'balanced': 均匀分布
+influence_weight_mode = 'high'
+
+# 最低影响力分数阈值（0-30），低于此分数的指令将被过滤
+min_influence_score = 0.0
+
+# 是否排除死指令（定义后从未被使用的指令）
+exclude_dead_defs = True
+
+# 影响力 catalog 和 pool 文件名
+influence_catalog_name = "influence_catalog.csv"
+influence_pool_name = "influence_pool.csv"
+
 ##############################config parameters###############################
 
 #debugfile,用来生成sighandle中调试步骤,process.txt

@@ -543,6 +543,176 @@ def readArgsFromPool(filepath = os.path.join(configure.instpool_folder, poolname
     return args
 
 
+# ============ 影响力分析相关函数 ============
+
+# 影响力分析 Pin 工具路径
+instInfluence_lib = configure.toolbase + "/obj-intel64/instInfluence.so"
+
+def generate_influence_catalog(output_file=None):
+    """
+    运行 Pin 工具生成带影响力分数的指令 catalog
+
+    Args:
+        output_file: 输出文件路径，默认为 influence_catalog.csv
+
+    Returns:
+        生成的 catalog 文件路径
+    """
+    if output_file is None:
+        output_file = os.path.join(configure.one_batch_folder, "influence_catalog.csv")
+
+    # 构建 Pin 命令
+    execlist = [
+        configure.pin_home, "-t", instInfluence_lib,
+        "-o", output_file,
+        "-pc_start", configure.pcstart,
+        "-pc_end", configure.pcend,
+        "-only_memory", str(configure.only_memory) if hasattr(configure, 'only_memory') else "0",
+        "--", configure.benchmark
+    ]
+
+    # 添加程序参数
+    for item in configure.args:
+        execlist.append(item)
+
+    print("Generating influence catalog...")
+    print(' '.join(execlist))
+    execute(execlist)
+
+    if os.path.exists(output_file):
+        print(f"Influence catalog generated: {output_file}")
+        # 统计信息
+        df = pd.read_csv(output_file)
+        total = len(df)
+        dead_count = len(df[df['is_dead'] == 1])
+        loop_count = len(df[df['is_in_loop'] == 1])
+        avg_score = df['influence_score'].mean()
+        print(f"  Total instructions: {total}")
+        print(f"  Dead definitions: {dead_count} ({100.0*dead_count/total:.1f}%)")
+        print(f"  In loops: {loop_count} ({100.0*loop_count/total:.1f}%)")
+        print(f"  Average influence score: {avg_score:.2f}")
+    else:
+        print(f"Error: Influence catalog not generated!")
+
+    return output_file
+
+
+def generate_influence_weighted_pool(influence_catalog=None, pool_file=None, num_samples=2000,
+                                      weight_mode='high', min_score=0.0, exclude_dead=True):
+    """
+    基于影响力分数加权采样生成注入池
+
+    Args:
+        influence_catalog: 影响力 catalog 文件路径
+        pool_file: 输出的 pool 文件路径
+        num_samples: 采样数量
+        weight_mode: 权重模式
+            - 'high': 高影响力指令优先
+            - 'low': 低影响力指令优先
+            - 'balanced': 均匀分布
+        min_score: 最低影响力分数阈值
+        exclude_dead: 是否排除死指令
+
+    Returns:
+        生成的 pool 文件路径
+    """
+    if influence_catalog is None:
+        influence_catalog = os.path.join(configure.one_batch_folder, "influence_catalog.csv")
+
+    if pool_file is None:
+        pool_file = os.path.join(configure.one_batch_folder, "influence_pool.csv")
+
+    # 检查 catalog 是否存在
+    if not os.path.exists(influence_catalog):
+        print(f"Influence catalog not found: {influence_catalog}")
+        print("Generating influence catalog first...")
+        generate_influence_catalog(influence_catalog)
+
+    # 读取 catalog
+    df = pd.read_csv(influence_catalog)
+    original_count = len(df)
+
+    # 过滤死指令
+    if exclude_dead:
+        df = df[df['is_dead'] == 0]
+        print(f"Filtered dead definitions: {original_count} -> {len(df)}")
+
+    # 过滤低影响力指令
+    if min_score > 0:
+        df = df[df['influence_score'] >= min_score]
+        print(f"Filtered by min_score ({min_score}): {len(df)} remaining")
+
+    if len(df) == 0:
+        print("Error: No instructions remaining after filtering!")
+        return None
+
+    # 计算采样权重
+    if weight_mode == 'high':
+        # 高影响力优先：使用指数加权
+        import numpy as np
+        weights = np.exp(df['influence_score'].values / 5.0)
+    elif weight_mode == 'low':
+        # 低影响力优先：反向加权
+        import numpy as np
+        max_score = df['influence_score'].max()
+        weights = np.exp((max_score - df['influence_score'].values) / 5.0)
+    else:
+        # 均匀分布
+        import numpy as np
+        weights = np.ones(len(df))
+
+    # 归一化权重
+    weights = weights / weights.sum()
+
+    # 加权随机采样
+    selected_indices = np.random.choice(len(df), size=min(num_samples, len(df) * 10),
+                                        replace=True, p=weights)
+    selected_df = df.iloc[selected_indices]
+
+    # 生成 pool 格式: regmm, reg, pc(十进制), iteration(随机)
+    pool_data = []
+    for _, row in selected_df.iterrows():
+        regmm = row['regmm'] if pd.notna(row['regmm']) else ''
+        reg = row['reg'] if pd.notna(row['reg']) else ''
+        pc = str(int(row['pc']))  # 已经是十进制
+        iteration = str(random.randint(0, 1024))
+        pool_data.append([regmm, reg, pc, iteration])
+
+    # 保存 pool 文件
+    with open(pool_file, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(pool_data)
+
+    print(f"Generated {len(pool_data)} injection points based on influence analysis")
+    print(f"Weight mode: {weight_mode}")
+    print(f"Pool saved to: {pool_file}")
+
+    # 统计选中指令的影响力分布
+    selected_scores = selected_df['influence_score']
+    print(f"Selected instructions influence score:")
+    print(f"  Min: {selected_scores.min():.2f}")
+    print(f"  Max: {selected_scores.max():.2f}")
+    print(f"  Mean: {selected_scores.mean():.2f}")
+    print(f"  Median: {selected_scores.median():.2f}")
+
+    return pool_file
+
+
+def readArgsFromInfluencePool(filepath=None):
+    """
+    从影响力加权的 pool 中读取注入参数
+
+    Args:
+        filepath: pool 文件路径
+
+    Returns:
+        [regmm, reg, pc, iteration] 列表
+    """
+    if filepath is None:
+        filepath = os.path.join(configure.one_batch_folder, "influence_pool.csv")
+
+    return readArgsFromPool(filepath)
+
 
 if __name__ == "__main__":
     print("PoolMaker!")

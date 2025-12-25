@@ -484,6 +484,19 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
 
         # Program-level features
         'ExecProgress',        # Execution progress (0-1)
+
+        # === Influence Analysis Features ===
+        # Data flow metrics
+        'DefUseDist',          # Definition to first use distance (instruction count)
+        'UseCount',            # Number of uses
+        'IsDead',              # Whether it's a dead definition
+        'LiveRange',           # Live range (instruction span)
+        # Control flow metrics
+        'IsInLoop',            # Whether in a loop
+        'IsControlFlow',       # Whether it's a control flow instruction
+        'IsMemWrite',          # Whether it's a memory write operation
+        # Composite metric
+        'InfluenceScore',      # Comprehensive influence score (0-30)
     ])
     
 
@@ -747,6 +760,63 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
                 except Exception as e:
                     if debug_mode > 3:
                         print(f"Error parsing register features in {input_file}: {e}")
+                continue
+
+            # ====== Parse Influence Metrics ======
+            if "=== Influence Metrics ===" in line:
+                try:
+                    feature_lines = []
+                    for _ in range(15):  # Read up to 15 lines
+                        next_line = next(file, None)
+                        if next_line and "=== End Influence Metrics ===" in next_line:
+                            break
+                        if next_line:
+                            feature_lines.append(next_line)
+
+                    feature_text = '\n'.join(feature_lines)
+
+                    # Check if metrics were found
+                    if "NOT_FOUND" in feature_text:
+                        continue  # Skip if influence metrics not available
+
+                    # Data flow metrics
+                    match = re.search(r'DefUseDist:\s*(\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'DefUseDist'] = int(match.group(1))
+
+                    match = re.search(r'UseCount:\s*(\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'UseCount'] = int(match.group(1))
+
+                    match = re.search(r'IsDead:\s*(\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'IsDead'] = int(match.group(1))
+
+                    match = re.search(r'LiveRange:\s*(\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'LiveRange'] = int(match.group(1))
+
+                    # Control flow metrics
+                    match = re.search(r'IsInLoop:\s*(\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'IsInLoop'] = int(match.group(1))
+
+                    match = re.search(r'IsControlFlow:\s*(\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'IsControlFlow'] = int(match.group(1))
+
+                    match = re.search(r'IsMemWrite:\s*(\d+)', feature_text)
+                    if match:
+                        df.loc[0, 'IsMemWrite'] = int(match.group(1))
+
+                    # Composite metric
+                    match = re.search(r'InfluenceScore:\s*([\d.]+)', feature_text)
+                    if match:
+                        df.loc[0, 'InfluenceScore'] = float(match.group(1))
+
+                except Exception as e:
+                    if debug_mode > 3:
+                        print(f"Error parsing influence metrics in {input_file}: {e}")
                 continue
             # ====== End Feature Parsing ======
 

@@ -183,6 +183,38 @@ if __name__ == "__main__":
         else:
             print("Pool already exists, skip generating pool from catalog...")
 
+    # ====== 影响力分析集成 ======
+    if hasattr(configure, 'use_influence_analysis') and configure.use_influence_analysis:
+        print("\n=== Influence Analysis Mode Enabled ===")
+
+        # 影响力 catalog 和 pool 文件路径
+        influence_catalog = os.path.join(configure.one_batch_folder, configure.influence_catalog_name)
+        influence_pool = os.path.join(configure.one_batch_folder, configure.influence_pool_name)
+
+        # 检查影响力 catalog 是否存在
+        if not os.path.exists(influence_catalog):
+            print("Generating influence catalog (data flow + control flow analysis)...")
+            InstPoolMaker.generate_influence_catalog(influence_catalog)
+
+        # 检查影响力 pool 是否存在
+        if not os.path.exists(influence_pool) or os.path.getsize(influence_pool) == 0:
+            print("Generating influence-weighted pool...")
+            InstPoolMaker.generate_influence_weighted_pool(
+                influence_catalog=influence_catalog,
+                pool_file=influence_pool,
+                num_samples=configure.numFI,
+                weight_mode=configure.influence_weight_mode,
+                min_score=configure.min_influence_score,
+                exclude_dead=configure.exclude_dead_defs
+            )
+        else:
+            print(f"Influence pool already exists: {influence_pool}")
+
+        # 将影响力 pool 设置为当前使用的 pool
+        configure.pool_csv_file = influence_pool
+        print(f"Using influence-weighted pool: {configure.pool_csv_file}")
+        print("=== Influence Analysis Setup Complete ===\n")
+
     log_count = 0
 
     # 检查 log_path 是否存在，不存在则创建并初始化 log_count 为 0

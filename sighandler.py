@@ -13,6 +13,14 @@ import InstPoolMaker
 import sdcjudger
 import time
 
+# 影响力指标读取器
+try:
+    from influence_reader import print_influence_metrics, get_influence_metrics
+    INFLUENCE_READER_AVAILABLE = True
+except ImportError:
+    INFLUENCE_READER_AVAILABLE = False
+    print("[Warning] influence_reader module not available")
+
 GDB_PROMOPT = "\(gdb\)"
 GDB_RUN = "run"
 GDB_LAUNCH = "gdb " + configure.benchmark
@@ -272,6 +280,10 @@ class SigHandler:
         print('args ready for set breakpoint:\t',args)  ###  IMPORTANT: analyze.py parses this line to extract injection parameters
         hexpc = hex(int(pc))
         print('hexpc\t',hexpc)
+
+        # 输出影响力指标到日志（供 analyze.py 收集）
+        if INFLUENCE_READER_AVAILABLE and hasattr(configure, 'use_influence_analysis') and configure.use_influence_analysis:
+            print_influence_metrics(pc)
         GDB_BREAKPOINT = "break *" + str(hexpc)
         i, bp_response = self.gdb_send(process, GDB_BREAKPOINT, f"Set breakpoint at address {hexpc}")
         if i == 0:
@@ -1387,6 +1399,25 @@ class SigHandler:
         print("injection info:")
         self.print_file_to_log(configure.activate)
         print("end injection info.")
+
+        # 输出影响力指标到日志（PinFI 模式）
+        if INFLUENCE_READER_AVAILABLE and hasattr(configure, 'use_influence_analysis') and configure.use_influence_analysis:
+            try:
+                # 从 activate 文件读取 PC
+                if os.path.exists(configure.activate):
+                    with open(configure.activate, 'r') as f:
+                        for line in f:
+                            if 'Activated:' in line:
+                                # 格式: "Activated: <reg> in <pc>"
+                                pc_str = line.strip().split()[-1]
+                                if pc_str.startswith('0x'):
+                                    pc = int(pc_str, 16)
+                                else:
+                                    pc = int(pc_str)
+                                print_influence_metrics(pc)
+                                break
+            except Exception as e:
+                print(f"[InfluenceReader] Error reading activate file: {e}")
 
     def executeProgram(self,process):
         global GDB_LAUNCH, GDB_ARG, GDB_PROMOPT, GDB_RUN, GDB_HANDLE, GDB_ERROR, GDB_NEXT, GDB_CONTINUE, GDB_FAKE
