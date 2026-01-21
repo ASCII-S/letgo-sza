@@ -3,6 +3,7 @@ pin_home = "/home/tongshiyu/pin/pin"
 letgo_base_home = "/home/tongshiyu/pin/source/tools/letgo"
 toolbase = "/home/tongshiyu/pin/source/tools/pinfi"
 filib = toolbase + "/obj-intel64/faultinjection.so"
+targeted_fi_lib_path = toolbase + "/obj-intel64/targeted_fi/targeted_faultinjection.so"
 pin_tool_config = "/home/tongshiyu/pin/source/tools/pinfi/config_pintool.h"
 Rodinia_base = "/home/tongshiyu/programs/rodinia-master"
 PolyBench_base = "/home/tongshiyu/programs/PolyBenchC-4.2.1"
@@ -39,7 +40,7 @@ special = ""
 ##############################config parameters###############################
 
 #应用名取自prognames_supply
-waittochangebyscrips = "correlation"
+waittochangebyscrips = "kmeans"
 progname = waittochangebyscrips
 
 #随机注错还是对目标类型注错
@@ -51,7 +52,7 @@ inject_random_or_targeted = "targeted"
 # | stack   |   mov |   integer |   float   |   call_ret    |   cmp
 # | div     |
 # data_transfer,logical,control_flow, other
-select_type = "div"     
+select_type = "adaptive"     # adaptive用来指定适应性注错
 only_memory = 1
 dynamic_analyze =  1 #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
 high_bit_fault = 0 #在寄存器高位进行注错

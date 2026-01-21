@@ -320,8 +320,8 @@ def read_logs(progname, log_folder, output_dir, outputname):
 
                 if "Exit" in line:
                     unfinished = 1
-                if "Error" in line or "ERROR" in line: 
-                    unfinished = 1
+                # if "Error" in line or "ERROR" in line: 
+                #     unfinished = 1
                 if "Cannot insert breakpoint" in line:
                     unfinished = 1
 
