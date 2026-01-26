@@ -146,35 +146,54 @@ class PinGdbInjector:
         # 构建Pin命令
         pin_cmd = [
             configure.pin_home,
-            "-appdebug",                          # 启用GDB调试
-            "-debug_port", str(gdb_port),         # GDB端口
-            "-t", afi_config.targeted_fi_lib_path, # Pin工具路径
-            "-target_pc", hex(target_pc),         # 目标PC
-            "-target_reg", target_reg,            # 目标寄存器
-            "-target_kth", str(target_kth),       # 第K次执行
-            "-inject_bit", str(inject_bit),       # 翻转位
-            "-o", inject_info_path,               # 输出文件
+            "-appdebug",                            # 启用GDB调试
+            "-appdebug_server_port", str(gdb_port), # GDB调试端口
+            "-t", afi_config.targeted_fi_lib_path,  # Pin工具路径
+            "-target_pc", hex(target_pc),           # 目标PC
+            "-target_reg", target_reg,              # 目标寄存器
+            "-target_kth", str(target_kth),         # 第K次执行
+            "-inject_bit", str(inject_bit),         # 翻转位
+            "-o", inject_info_path,                 # 输出文件
             "--",
-            configure.benchmark                   # 被测程序
+            configure.benchmark                     # 被测程序
         ] + configure.args
 
         print(f"[Pin] 命令: {' '.join(pin_cmd)}")
         print(f"[Pin] GDB端口: {gdb_port}")
         print(f"[Pin] 注错信息输出: {inject_info_path}")
 
+        # 设置环境变量（确保程序输出文件）
+        env = os.environ.copy()
+        env['OUTPUT'] = '1'  # nn 等程序需要此环境变量才会输出文件
+
+        print(f"[Pin] 设置环境变量: OUTPUT=1")
+
         # 启动Pin进程（后台）
         self.pin_process = subprocess.Popen(
             pin_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True
+            text=True,
+            env=env
         )
 
         print(f"[Pin] 进程已启动 (PID: {self.pin_process.pid})")
 
-        # 等待GDB服务器就绪
-        print(f"[Pin] 等待GDB服务器就绪（2秒）...")
-        time.sleep(2)
+        # 等待GDB服务器就绪（增加到5秒）
+        print(f"[Pin] 等待GDB服务器就绪（5秒）...")
+        time.sleep(5)
+
+        # 检查 Pin 进程是否仍在运行
+        poll_result = self.pin_process.poll()
+        if poll_result is not None:
+            # Pin 进程已退出
+            stdout, stderr = self.pin_process.communicate(timeout=1)
+            print(f"[Pin] 错误: Pin进程已退出 (返回码: {poll_result})")
+            print(f"[Pin] stdout: {stdout}")
+            print(f"[Pin] stderr: {stderr}")
+            raise RuntimeError(f"Pin进程启动失败，返回码: {poll_result}")
+
+        print(f"[Pin] Pin进程运行正常")
 
         return inject_info_path
 
@@ -184,7 +203,7 @@ class PinGdbInjector:
 
         # 启动GDB
         gdb_cmd = f"gdb {configure.benchmark}"
-        self.gdb_process = pexpect.spawn(gdb_cmd)
+        self.gdb_process = pexpect.spawn(gdb_cmd, timeout=30)
 
         if self.verbose:
             self.gdb_process.logfile = sys.stdout.buffer
@@ -193,13 +212,64 @@ class PinGdbInjector:
         self.gdb_process.expect("\(gdb\)")
         print("[GDB] GDB已启动")
 
-        # 连接到Pin的调试端口
+        # 连接到Pin的调试端口（带重试）
         connect_cmd = f"target remote :{self.gdb_port}"
-        print(f"[GDB] 连接到Pin: {connect_cmd}")
-        self.gdb_process.sendline(connect_cmd)
-        self.gdb_process.expect("\(gdb\)")
+        max_retries = 3
+        connected = False
 
-        print("[GDB] 已连接到Pin")
+        for attempt in range(max_retries):
+            print(f"[GDB] 尝试连接到Pin: {connect_cmd} (尝试 {attempt + 1}/{max_retries})")
+            self.gdb_process.sendline(connect_cmd)
+
+            # 等待连接结果
+            patterns = [
+                "Remote debugging using",   # 成功
+                "Connection timed out",     # 超时
+                "Connection refused",       # 拒绝
+                "\(gdb\)"                   # GDB提示符
+            ]
+
+            try:
+                i = self.gdb_process.expect(patterns, timeout=15)
+                output = self.gdb_process.before.decode('utf-8', errors='ignore')
+
+                if i == 0:
+                    # 连接成功
+                    self.gdb_process.expect("\(gdb\)")
+                    connected = True
+                    print("[GDB] 已成功连接到Pin")
+                    break
+                elif i == 1 or i == 2:
+                    # 连接失败
+                    print(f"[GDB] 连接失败: {patterns[i]}")
+                    self.gdb_process.expect("\(gdb\)")
+                    if attempt < max_retries - 1:
+                        print("[GDB] 等待2秒后重试...")
+                        time.sleep(2)
+                else:
+                    # GDB 提示符，检查输出
+                    if "Remote debugging" in output:
+                        connected = True
+                        print("[GDB] 已连接到Pin")
+                        break
+                    else:
+                        print(f"[GDB] 连接状态不明，输出: {output}")
+                        if attempt < max_retries - 1:
+                            time.sleep(2)
+
+            except pexpect.TIMEOUT:
+                print(f"[GDB] 连接超时")
+                if attempt < max_retries - 1:
+                    time.sleep(2)
+
+        if not connected:
+            # 尝试检查 Pin 进程状态
+            poll_result = self.pin_process.poll()
+            if poll_result is not None:
+                stdout, stderr = self.pin_process.communicate(timeout=1)
+                print(f"[GDB] Pin进程已退出 (返回码: {poll_result})")
+                print(f"[Pin] stderr: {stderr}")
+            raise RuntimeError("无法连接到Pin调试端口")
 
     def _configure_signal_handling(self):
         """配置GDB信号处理"""

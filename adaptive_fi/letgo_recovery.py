@@ -63,7 +63,7 @@ class LetGoRecovery:
         self.flag = self._determine_flag()
 
         # FaultInjector实例（用于获取stack_size）
-        self.fi = faultinject.FaultInjector(insts=1000000)
+        self.fi = faultinject.FaultInjector(totalInst=1000000)
 
     def _parse_regw_list(self, regw_str: str) -> list:
         """解析写寄存器列表"""

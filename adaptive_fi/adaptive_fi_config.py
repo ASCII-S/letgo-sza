@@ -16,7 +16,7 @@ import configure
 # ============== 自适应注错核心参数 ==============
 
 # 崩溃率阈值：超过此值的目标被认为是"高效注错点"
-crash_threshold = 0.3
+crash_threshold = 0.1
 
 # 每个注错目标的测试次数
 injections_per_target = 10
@@ -76,7 +76,7 @@ sdcout_folder = os.path.join(configure.one_batch_folder, "sdcout")
 auto_run_tracer = True
 
 # unified_tracer.so 超时时间（秒）
-tracer_timeout = 600
+tracer_timeout = 1200
 
 # 是否在发现高效注错点后立即溯源（True=DFS深度优先，False=BFS广度优先）
 # 注意：我们使用的是混合策略，此参数保留用于调试

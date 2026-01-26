@@ -115,7 +115,7 @@ class AdaptiveFaultInjector:
         self.scenarios = all_scenarios[:afi_config.topp_initial]
 
         print(self.parser.summary())
-        print(f"TopP 筛选后: {len(self.scenarios)} %的崩溃场景")
+        print(f"TopP 筛选后: {len(self.scenarios)} 个崩溃场景")
 
     def get_total_insts(self) -> int:
         """获取程序总指令数"""
