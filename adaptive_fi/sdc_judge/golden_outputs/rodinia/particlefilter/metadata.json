@@ -1,0 +1,27 @@
+{
+  "app_name": "particlefilter",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/particle_filter",
+  "args": [
+    "-x",
+    "64",
+    "-y",
+    "64",
+    "-z",
+    "5",
+    "-np",
+    "1000"
+  ],
+  "pc_start": "4009c0",
+  "pc_end": "4030a0",
+  "is_mpi": false,
+  "tolerance": 0.1,
+  "compare_method": "strong",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/particle_filter -x 64 -y 64 -z 5 -np 1000",
+  "generated_at": "2026-02-02T01:20:49.974520",
+  "outputs": [
+    "stdout.txt",
+    "output.txt"
+  ]
+}

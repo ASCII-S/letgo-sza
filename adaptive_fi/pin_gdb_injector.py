@@ -7,6 +7,7 @@ Pin+GDB联合注错模块
 import os
 import sys
 import time
+import datetime
 import subprocess
 import pexpect
 from typing import Optional
@@ -51,6 +52,13 @@ class PinGdbInjector:
         # 日志文件
         self.log = None
 
+        # 时间戳记录（微秒级精度，ISO 8601格式）
+        self.ts_exp_start: Optional[datetime.datetime] = None      # 实验开始
+        self.ts_inject_done: Optional[datetime.datetime] = None    # 注错完成
+        self.ts_letgo_start: Optional[datetime.datetime] = None    # LetGo修复开始
+        self.ts_letgo_end: Optional[datetime.datetime] = None      # LetGo修复结束
+        self.ts_exp_end: Optional[datetime.datetime] = None        # 实验结束
+
     def inject_and_recover(self, target_pc: int, target_reg: str,
                           target_kth: int, inject_bit: int = -1) -> str:
         """
@@ -76,6 +84,10 @@ class PinGdbInjector:
         sys.stderr = self.log
 
         try:
+            # 记录实验开始时间
+            self.ts_exp_start = datetime.datetime.now()
+            print(f"[时间戳] 实验开始: {self.ts_exp_start.isoformat()}")
+
             print("="*60)
             print(f"Pin+GDB联合注错实验 #{self.log_index}")
             print("="*60)
@@ -118,6 +130,24 @@ class PinGdbInjector:
             return "error"
 
         finally:
+            # 记录实验结束时间
+            self.ts_exp_end = datetime.datetime.now()
+            print(f"[时间戳] 实验结束: {self.ts_exp_end.isoformat()}")
+
+            # 打印时间统计汇总
+            print("\n" + "="*60)
+            print("时间统计汇总")
+            print("="*60)
+            if self.ts_exp_start:
+                print(f"[时间戳] 实验总耗时: {self.ts_exp_end - self.ts_exp_start}")
+            if self.ts_exp_start and self.ts_inject_done:
+                print(f"[时间戳] 启动到注错: {self.ts_inject_done - self.ts_exp_start}")
+            if self.ts_letgo_start and self.ts_letgo_end:
+                print(f"[时间戳] LetGo修复耗时: {self.ts_letgo_end - self.ts_letgo_start}")
+            if self.ts_inject_done and self.ts_exp_end:
+                print(f"[时间戳] 注错到结束: {self.ts_exp_end - self.ts_inject_done}")
+            print("="*60)
+
             # 清理资源
             self._cleanup()
 
@@ -134,18 +164,20 @@ class PinGdbInjector:
         print("[Pin] 启动Pin注错进程...")
 
         # 生成inject_info文件路径
+        import adaptive_fi_config as afi_config
+        inject_info_folder = afi_config.inject_info_folder
+        os.makedirs(inject_info_folder, exist_ok=True)
         inject_info_path = os.path.join(
-            self.log_folder, f"inject_info_{self.log_index}.txt"
+            inject_info_folder, f"inject_info_{self.log_index}.txt"
         )
 
         # GDB调试端口（避免冲突）
-        import adaptive_fi_config as afi_config
         gdb_port = afi_config.gdb_port_base + (self.log_index % 1000)
         self.gdb_port = gdb_port
 
         # 构建Pin命令
         pin_cmd = [
-            configure.pin_home,
+            configure.pin_binary,
             "-appdebug",                            # 启用GDB调试
             "-appdebug_server_port", str(gdb_port), # GDB调试端口
             "-t", afi_config.targeted_fi_lib_path,  # Pin工具路径
@@ -325,6 +357,10 @@ class PinGdbInjector:
         timeout = 300  # 5分钟超时
         i = self.gdb_process.expect(patterns, timeout=timeout)
 
+        # 记录注错完成时间（程序执行到此说明注错已完成）
+        self.ts_inject_done = datetime.datetime.now()
+        print(f"[时间戳] 注错完成: {self.ts_inject_done.isoformat()}")
+
         output = self.gdb_process.before.decode('utf-8', errors='ignore')
 
         if i == 0:
@@ -375,6 +411,10 @@ class PinGdbInjector:
         print("LetGo崩溃恢复框架启动")
         print("="*60)
 
+        # 记录LetGo修复开始时间
+        self.ts_letgo_start = datetime.datetime.now()
+        print(f"[时间戳] LetGo修复开始: {self.ts_letgo_start.isoformat()}")
+
         # Step 1: 读取inject_info.txt
         if not os.path.exists(inject_info_path):
             print(f"[错误] inject_info.txt不存在: {inject_info_path}")
@@ -399,6 +439,11 @@ class PinGdbInjector:
         try:
             recovery_success = self.recovery.letgo_frame()
 
+            # 记录LetGo修复结束时间
+            self.ts_letgo_end = datetime.datetime.now()
+            print(f"[时间戳] LetGo修复结束: {self.ts_letgo_end.isoformat()}")
+            print(f"[时间戳] LetGo修复耗时: {self.ts_letgo_end - self.ts_letgo_start}")
+
             if not recovery_success:
                 print("[修复失败] LetGo修复失败")
                 return "Crash"
@@ -406,6 +451,9 @@ class PinGdbInjector:
             print("[修复成功] LetGo修复完成")
 
         except Exception as e:
+            # 即使异常也记录结束时间
+            self.ts_letgo_end = datetime.datetime.now()
+            print(f"[时间戳] LetGo修复结束(异常): {self.ts_letgo_end.isoformat()}")
             print(f"[修复异常] {e}")
             import traceback
             traceback.print_exc()
@@ -447,15 +495,12 @@ class PinGdbInjector:
             except:
                 pass
 
-        # Step 6: SDC检测
-        print("\n[SDC检测] 检查程序输出...")
+        # Step 6: SDC检测（静默执行，不输出日志）
         has_sdc = self._check_sdc()
 
         if has_sdc:
-            print("[SDC检测] 检测到静默数据损坏 (C-SDC)")
             return "C-SDC"
         else:
-            print("[SDC检测] 未检测到数据损坏 (C-Masked)")
             return "C-Masked"
 
     def _handle_normal_completion(self) -> str:
@@ -465,16 +510,14 @@ class PinGdbInjector:
         Returns:
             结果类型：Masked 或 SDC
         """
-        print("\n[正常完成] 程序未崩溃，进行SDC检测...")
+        print("\n[正常完成] 程序正常退出")
 
-        # SDC检测
+        # SDC检测（静默执行，不输出日志）
         has_sdc = self._check_sdc()
 
         if has_sdc:
-            print("[SDC检测] 检测到静默数据损坏 (SDC)")
             return "SDC"
         else:
-            print("[SDC检测] 未检测到数据损坏 (Masked)")
             return "Masked"
 
     def _parse_inject_info(self, inject_info_path: str) -> InjectionInfo:
@@ -514,10 +557,16 @@ class PinGdbInjector:
         Returns:
             True if SDC detected, False otherwise
         """
-        # 调用sdcjudger进行SDC检测
+        # 调用sdcjudger进行SDC检测（静默执行）
         try:
-            # 保存SDC检测结果
+            # 保存SDC检测结果（重定向输出避免污染日志）
+            import io
+            old_stdout = sys.stdout
+            sys.stdout = io.StringIO()
+
             sdcjudger.SDC_saver(index=str(self.log_index))
+
+            sys.stdout = old_stdout
 
             # 读取日志判断SDC
             with open(self.log_path, 'r') as f:
@@ -539,14 +588,67 @@ class PinGdbInjector:
             return False
 
         except Exception as e:
-            print(f"[SDC检测异常] {e}")
-            import traceback
-            traceback.print_exc()
+            # 恢复stdout
+            if 'old_stdout' in locals():
+                sys.stdout = old_stdout
             return False
 
     def _cleanup(self):
         """清理资源"""
         print("\n[清理] 清理资源...")
+
+        # 读取Pin进程的stdout/stderr输出
+        if self.pin_process:
+            try:
+                # 等待Pin进程结束并读取输出（设置超时）
+                stdout, stderr = self.pin_process.communicate(timeout=10)
+
+                # 输出程序的stdout（如果有）
+                if stdout and stdout.strip():
+                    print("\n" + "="*60)
+                    print("程序输出 (stdout):")
+                    print("="*60)
+                    print(stdout)
+                    print("="*60)
+
+                # 输出程序的stderr（如果有且不为空）
+                if stderr and stderr.strip():
+                    # 过滤掉Pin的调试信息，只保留程序本身的stderr
+                    stderr_lines = stderr.split('\n')
+                    filtered_stderr = []
+                    for line in stderr_lines:
+                        # 过滤Pin的调试信息
+                        if not line.startswith('[') and line.strip():
+                            filtered_stderr.append(line)
+
+                    if filtered_stderr:
+                        print("\n" + "="*60)
+                        print("程序错误输出 (stderr):")
+                        print("="*60)
+                        print('\n'.join(filtered_stderr))
+                        print("="*60)
+
+                print("[清理] Pin进程已结束")
+            except subprocess.TimeoutExpired:
+                # 超时则强制终止
+                print("[清理] Pin进程超时，强制终止")
+                self.pin_process.kill()
+                try:
+                    stdout, stderr = self.pin_process.communicate(timeout=2)
+                    if stdout and stdout.strip():
+                        print("\n程序输出 (stdout):\n", stdout)
+                except:
+                    pass
+            except Exception as e:
+                print(f"[清理] 读取Pin输出时出错: {e}")
+                try:
+                    self.pin_process.terminate()
+                    self.pin_process.wait(timeout=5)
+                except:
+                    try:
+                        self.pin_process.kill()
+                    except:
+                        pass
 
         # 关闭GDB
         if self.gdb_process:
@@ -556,18 +658,6 @@ class PinGdbInjector:
                 print("[清理] GDB进程已关闭")
             except:
                 pass
-
-        # 终止Pin进程
-        if self.pin_process:
-            try:
-                self.pin_process.terminate()
-                self.pin_process.wait(timeout=5)
-                print("[清理] Pin进程已终止")
-            except:
-                try:
-                    self.pin_process.kill()
-                except:
-                    pass
 
 
 def inject_once(target_pc: int, target_reg: str, target_kth: int,

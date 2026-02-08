@@ -1,0 +1,20 @@
+{
+  "app_name": "lavaMD",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/lavaMD/lavaMD",
+  "args": [
+    "-boxes1d",
+    "10"
+  ],
+  "pc_start": "400a40",
+  "pc_end": "401890",
+  "is_mpi": false,
+  "tolerance": 0.1,
+  "compare_method": "common",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/lavaMD/lavaMD -boxes1d 10",
+  "generated_at": "2026-02-02T01:20:46.229585",
+  "outputs": [
+    "stdout.txt"
+  ]
+}

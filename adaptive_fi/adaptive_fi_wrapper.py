@@ -57,7 +57,7 @@ class AdaptiveFaultInjector:
             raise FileNotFoundError(f"unified_tracer.so 不存在: {tracer_lib}")
 
         execlist = [
-            configure.pin_home,
+            configure.pin_binary,
             "-t", tracer_lib,
             "-o", output_path,
             "-depth", str(afi_config.max_depth),

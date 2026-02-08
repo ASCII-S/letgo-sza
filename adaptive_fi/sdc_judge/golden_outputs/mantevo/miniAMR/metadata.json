@@ -1,0 +1,22 @@
+{
+  "app_name": "miniAMR",
+  "suite": "mantevo",
+  "binpath": "/home/tongshiyu/programs/mantevo/miniAMR/ref/miniAMR.x",
+  "args": [
+    "--npx 1 --npy 1 --npz 1",
+    "--report_diffusion",
+    "--checksum_freq",
+    "10"
+  ],
+  "pc_start": "401110",
+  "pc_end": "43a2c0",
+  "is_mpi": true,
+  "tolerance": 0.1,
+  "compare_method": "common",
+  "returncode": 255,
+  "command": "mpirun -np 1 /home/tongshiyu/programs/mantevo/miniAMR/ref/miniAMR.x --npx 1 --npy 1 --npz 1 --report_diffusion --checksum_freq 10",
+  "generated_at": "2026-02-02T01:20:54.762496",
+  "outputs": [
+    "stdout.txt"
+  ]
+}

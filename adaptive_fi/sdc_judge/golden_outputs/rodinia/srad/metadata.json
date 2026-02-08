@@ -1,0 +1,23 @@
+{
+  "app_name": "srad",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/srad_v1/srad",
+  "args": [
+    "15",
+    "0.5",
+    "285",
+    "250",
+    "1"
+  ],
+  "pc_start": "400910",
+  "pc_end": "401ddc",
+  "is_mpi": false,
+  "tolerance": 0.1,
+  "compare_method": "common",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/srad_v1/srad 15 0.5 285 250 1",
+  "generated_at": "2026-02-02T01:20:49.925868",
+  "outputs": [
+    "stdout.txt"
+  ]
+}

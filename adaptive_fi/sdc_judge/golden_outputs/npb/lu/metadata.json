@@ -1,0 +1,20 @@
+{
+  "app_name": "lu",
+  "suite": "npb",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/lud/lud",
+  "args": [
+    "-s512"
+  ],
+  "pc_start": "400df0",
+  "pc_end": "401d30",
+  "is_mpi": false,
+  "tolerance": 0.0001,
+  "compare_method": "lu",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/lud/lud -s512",
+  "generated_at": "2026-02-02T01:20:45.496176",
+  "outputs": [
+    "stdout.txt",
+    "lu_matrix_512.txt"
+  ]
+}

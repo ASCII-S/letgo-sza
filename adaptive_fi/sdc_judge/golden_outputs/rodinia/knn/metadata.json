@@ -1,0 +1,22 @@
+{
+  "app_name": "knn",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn",
+  "args": [
+    "/home/tongshiyu/programs/rodinia-master/openmp/nn/cane10k.db",
+    "5",
+    "30",
+    "90"
+  ],
+  "pc_start": null,
+  "pc_end": null,
+  "is_mpi": false,
+  "tolerance": 0.1,
+  "compare_method": "common",
+  "returncode": 1,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn /home/tongshiyu/programs/rodinia-master/openmp/nn/cane10k.db 5 30 90",
+  "generated_at": "2026-02-02T01:20:45.422185",
+  "outputs": [
+    "stdout.txt"
+  ]
+}

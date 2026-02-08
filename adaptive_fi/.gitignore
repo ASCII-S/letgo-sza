@@ -1,0 +1,27 @@
+# 结果文件
+results/**/*.csv
+results/**/*.log
+results/**/SUMMARY.md
+
+# Python缓存
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 测试
+.pytest_cache/
+*.cover
+.coverage
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 临时文件
+*.tmp
+*.bak
+warnings.log

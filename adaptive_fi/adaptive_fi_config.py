@@ -66,6 +66,9 @@ keep_all_logs = True
 # 日志文件夹路径（继承自 configure.py）
 log_folder = configure.log_folder
 
+# 注错信息文件夹路径（inject_info_*.txt）
+inject_info_folder = os.path.join(configure.one_batch_folder, "inject_info")
+
 # SDC 输出文件夹路径
 sdcout_folder = os.path.join(configure.one_batch_folder, "sdcout")
 
@@ -159,6 +162,7 @@ def print_config():
     print(f"溯源 JSON 路径:     {trace_json_path}")
     print(f"输出 JSON 路径:     {output_json_path}")
     print(f"日志文件夹:         {log_folder}")
+    print(f"注错信息文件夹:     {inject_info_folder}")
     print(f"程序名称:           {configure.progname}")
     print(f"程序路径:           {configure.benchmark}")
     print("=" * 60)

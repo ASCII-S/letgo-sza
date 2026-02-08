@@ -1,0 +1,20 @@
+{
+  "app_name": "bfs",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/bfs/bfs",
+  "args": [
+    "/home/tongshiyu/programs/rodinia-master/data/bfs/inputGen/graph64k.txt"
+  ],
+  "pc_start": "400720",
+  "pc_end": "400e80",
+  "is_mpi": false,
+  "tolerance": 0.1,
+  "compare_method": "strong",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/bfs/bfs /home/tongshiyu/programs/rodinia-master/data/bfs/inputGen/graph64k.txt",
+  "generated_at": "2026-02-02T01:20:34.819132",
+  "outputs": [
+    "stdout.txt",
+    "output.txt"
+  ]
+}

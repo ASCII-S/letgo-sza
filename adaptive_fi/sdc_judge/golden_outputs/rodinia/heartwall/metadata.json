@@ -1,0 +1,21 @@
+{
+  "app_name": "heartwall",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/heartwall/heartwall",
+  "args": [
+    "/home/tongshiyu/programs/rodinia-master/data/heartwall/test.avi",
+    "20"
+  ],
+  "pc_start": "400f00",
+  "pc_end": "407440",
+  "is_mpi": false,
+  "tolerance": 0.1,
+  "compare_method": "common",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/heartwall/heartwall /home/tongshiyu/programs/rodinia-master/data/heartwall/test.avi 20",
+  "generated_at": "2026-02-02T01:20:40.043714",
+  "outputs": [
+    "stdout.txt",
+    "output.txt"
+  ]
+}

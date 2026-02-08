@@ -1,0 +1,28 @@
+{
+  "app_name": "streamcluster",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/streamcluster/streamcluster",
+  "args": [
+    "10",
+    "20",
+    "256",
+    "4096",
+    "4096",
+    "100",
+    "none",
+    "output.txt",
+    "1"
+  ],
+  "pc_start": "4011e0",
+  "pc_end": "403e30",
+  "is_mpi": false,
+  "tolerance": 0.1,
+  "compare_method": "common",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/streamcluster/streamcluster 10 20 256 4096 4096 100 none output.txt 1",
+  "generated_at": "2026-02-02T01:20:52.830435",
+  "outputs": [
+    "stdout.txt",
+    "output.txt"
+  ]
+}

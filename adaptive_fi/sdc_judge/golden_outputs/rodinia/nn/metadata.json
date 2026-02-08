@@ -1,0 +1,23 @@
+{
+  "app_name": "nn",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn",
+  "args": [
+    "/home/tongshiyu/programs/rodinia-master/openmp/nn/filelist.txt",
+    "5",
+    "30",
+    "90"
+  ],
+  "pc_start": "400aa0",
+  "pc_end": "401390",
+  "is_mpi": false,
+  "tolerance": 0.1,
+  "compare_method": "strong",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn /home/tongshiyu/programs/rodinia-master/openmp/nn/filelist.txt 5 30 90",
+  "generated_at": "2026-02-08T00:40:46.534930",
+  "outputs": [
+    "stdout.txt",
+    "output.txt"
+  ]
+}

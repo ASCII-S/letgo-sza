@@ -1,0 +1,26 @@
+{
+  "app_name": "hotspot",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/hotspot",
+  "args": [
+    "64",
+    "64",
+    "2",
+    "1",
+    "/home/tongshiyu/programs/rodinia-master/data/hotspot/temp_64",
+    "/home/tongshiyu/programs/rodinia-master/data/hotspot/power_64",
+    "output.txt"
+  ],
+  "pc_start": "400920",
+  "pc_end": "401fd0",
+  "is_mpi": false,
+  "tolerance": 1e-06,
+  "compare_method": "hotspot",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/hotspot 64 64 2 1 /home/tongshiyu/programs/rodinia-master/data/hotspot/temp_64 /home/tongshiyu/programs/rodinia-master/data/hotspot/power_64 output.txt",
+  "generated_at": "2026-02-02T01:20:40.053039",
+  "outputs": [
+    "stdout.txt",
+    "output.txt"
+  ]
+}

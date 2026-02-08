@@ -1,0 +1,19 @@
+{
+  "app_name": "miniFE",
+  "suite": "mantevo",
+  "binpath": "/home/tongshiyu/programs/mantevo/miniFE/openmp/basic/miniFE.x",
+  "args": [
+    "nx=20"
+  ],
+  "pc_start": "402ba0",
+  "pc_end": "41de90",
+  "is_mpi": true,
+  "tolerance": 1e-06,
+  "compare_method": "miniFE",
+  "returncode": 0,
+  "command": "mpirun -np 1 /home/tongshiyu/programs/mantevo/miniFE/openmp/basic/miniFE.x nx=20",
+  "generated_at": "2026-02-02T01:20:53.695997",
+  "outputs": [
+    "stdout.txt"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "app_name": "2mm",
+  "suite": "polybench",
+  "binpath": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/2mm_ref",
+  "args": [],
+  "pc_start": "4011a0",
+  "pc_end": "49359b",
+  "is_mpi": false,
+  "tolerance": 0.1,
+  "compare_method": "polybench",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/2mm_ref",
+  "generated_at": "2026-02-02T01:20:56.341672",
+  "outputs": [
+    "stdout.txt"
+  ]
+}

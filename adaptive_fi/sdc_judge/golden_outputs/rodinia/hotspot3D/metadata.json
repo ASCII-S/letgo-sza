@@ -1,0 +1,25 @@
+{
+  "app_name": "hotspot3D",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/hotspot3D/3D",
+  "args": [
+    "512",
+    "8",
+    "100",
+    "/home/tongshiyu/programs/rodinia-master/data/hotspot3D/power_512x8",
+    "/home/tongshiyu/programs/rodinia-master/data/hotspot3D/temp_512x8",
+    "output.txt"
+  ],
+  "pc_start": "400ce0",
+  "pc_end": "401d80",
+  "is_mpi": false,
+  "tolerance": 0.01,
+  "compare_method": "hotspot",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/hotspot3D/3D 512 8 100 /home/tongshiyu/programs/rodinia-master/data/hotspot3D/power_512x8 /home/tongshiyu/programs/rodinia-master/data/hotspot3D/temp_512x8 output.txt",
+  "generated_at": "2026-02-02T01:20:44.741132",
+  "outputs": [
+    "stdout.txt",
+    "output.txt"
+  ]
+}

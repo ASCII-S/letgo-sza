@@ -1,0 +1,21 @@
+{
+  "app_name": "needle",
+  "suite": "rodinia",
+  "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/nw/needle",
+  "args": [
+    "2048",
+    "10",
+    "2"
+  ],
+  "pc_start": "400c30",
+  "pc_end": "401980",
+  "is_mpi": false,
+  "tolerance": 0.1,
+  "compare_method": "common",
+  "returncode": 0,
+  "command": "/home/tongshiyu/programs/rodinia-master/openmp/nw/needle 2048 10 2",
+  "generated_at": "2026-02-02T01:20:49.883167",
+  "outputs": [
+    "stdout.txt"
+  ]
+}
