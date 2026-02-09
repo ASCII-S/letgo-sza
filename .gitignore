@@ -33,6 +33,7 @@ pin.log
 *~
 .*.swp
 *.bak
+**/__pycache__
 
 # 系统文件
 .DS_Store
@@ -102,7 +103,7 @@ graph64.txt
 HPL.dat
 iteration
 image_out.pgm
-instruction*
+# instruction*
 *.txt
 sample*
 
