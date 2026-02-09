@@ -1,0 +1,131 @@
+{
+  "tool_info": {
+    "name": "Application Profiler",
+    "version": "2.0",
+    "main_image": "bt.S.x"
+  },
+  "instruction_distribution": {
+    "total": {
+      "static_count": 52806,
+      "exec_count": 539043440
+    },
+    "by_category": {
+      "int_arithmetic": {
+        "static_count": 3709,
+        "exec_count": 21728091
+      },
+      "float": {
+        "static_count": 8274,
+        "exec_count": 322330890
+      },
+      "memory": {
+        "static_count": 6550,
+        "exec_count": 8041682
+      },
+      "control_flow": {
+        "static_count": 8353,
+        "exec_count": 12303769
+      },
+      "logic": {
+        "static_count": 2389,
+        "exec_count": 897359
+      },
+      "mov": {
+        "static_count": 12850,
+        "exec_count": 7868549
+      },
+      "simd": {
+        "static_count": 5567,
+        "exec_count": 155086642
+      },
+      "other": {
+        "static_count": 5114,
+        "exec_count": 10786458
+      }
+    },
+    "int_arithmetic_details": {
+      "add": { "static_count": 2269, "exec_count": 19856989 },
+      "sub": { "static_count": 1309, "exec_count": 1578557 },
+      "mul": { "static_count": 116, "exec_count": 292290 },
+      "div": { "static_count": 15, "exec_count": 255 }
+    },
+    "memory_details": {
+      "load": { "static_count": 4136, "exec_count": 7978148 },
+      "store": { "static_count": 46, "exec_count": 6858 },
+      "stack": { "static_count": 2368, "exec_count": 56676 }
+    },
+    "control_flow_details": {
+      "jmp": { "static_count": 963, "exec_count": 25098 },
+      "jcc": { "static_count": 5541, "exec_count": 10911637 },
+      "call": { "static_count": 1239, "exec_count": 683519 },
+      "ret": { "static_count": 610, "exec_count": 683515 }
+    },
+    "logic_details": {
+      "bitwise": { "static_count": 1733, "exec_count": 38728 },
+      "shift": { "static_count": 656, "exec_count": 858631 }
+    },
+    "simd_details": {
+      "sse": { "static_count": 4650, "exec_count": 155068941 },
+      "avx": { "static_count": 917, "exec_count": 17701 },
+      "avx512": { "static_count": 0, "exec_count": 0 }
+    }
+  },
+  "numeric_sensitivity": {
+    "float_inst_static": 8274,
+    "float_inst_exec": 322330890,
+    "operation_distribution": {
+      "add_sub": 100487583,
+      "mul": 124647093,
+      "div": 1355195,
+      "sqrt": 10,
+      "fma": 0,
+      "cmp": 148,
+      "cvt": 11474
+    },
+    "precision_distribution": {
+      "single": 3273,
+      "double": 322327579,
+      "x87": 38,
+      "simd": 95829349
+    }
+  },
+  "error_absorption": {
+    "cmp_inst_exec": 10727530,
+    "test_inst_exec": 161088,
+    "saturate_inst_exec": 0,
+    "minmax_inst_exec": 1084,
+    "abs_inst_exec": 79,
+    "round_inst_exec": 0
+  },
+  "library_calls": {
+    "total_lib_calls": 5731,
+    "user_func_calls": 668877,
+    "by_category": {
+      "memory_lib": {
+        "call_count": 290,
+        "unique_funcs": 7,
+        "functions": ["brk", "calloc", "free", "malloc", "mmap", "realloc", "sbrk"]
+      },
+      "io_lib": {
+        "call_count": 590,
+        "unique_funcs": 26,
+        "functions": ["_IO_default_finish", "_IO_default_uflow", "_IO_default_xsputn", "_IO_doallocbuf", "_IO_fclose", "_IO_fflush", "_IO_file_close", "_IO_file_close_it", "_IO_file_doallocate", "_IO_file_finish", "_IO_file_fopen", "_IO_file_open", "_IO_file_read", "_IO_file_stat", "_IO_file_sync", "_IO_file_underflow", "_IO_fopen", "_IO_getline", "_IO_getline_info", "_IO_link_in", "_IO_padn", "_IO_setb", "_IO_switch_to_get_mode", "_IO_un_link", "_IO_unsave_markers", "__printf_fp"]
+      },
+      "string_lib": {
+        "call_count": 38,
+        "unique_funcs": 2,
+        "functions": ["strdup", "strtoll"]
+      },
+      "other_lib": {
+        "call_count": 4813,
+        "unique_funcs": 113,
+        "functions": [".fini", ".plt", ".plt.got", ".plt.sec", ".text", "__call_tls_dtors", "__close_nocancel", "__cpu_indicator_init", "__ctype_b_loc", "__ctype_b_loc@plt", "__ctype_init", "__ctype_toupper_loc", "__ctype_toupper_loc@plt", "__cxa_atexit", "__cxa_finalize", "__dcgettext", "__default_morecore", "__errno_location", "__errno_location@plt", "__freelocale", "__fxstat64", "__fxstat@plt", "__getpagesize", "__libc_alloca_cutoff", "__libc_malloc", "__libc_scratch_buffer_set_array_size", "__libc_start_main", "__open64_nocancel", "__read_nocancel", "__secure_getenv", "__sigaction", "__sigsetjmp", "__snprintf_chk", "__snprintf_chk@plt", "__strdup@plt", "__strndup", "__strndup@plt", "__sysconf", "__tfind", "__tunable_get_val", "__udivti3", "__udivti3@plt", "__uflow", "__umodti3", "__umodti3@plt", "__uselocale", "__vdso_gettimeofday", "__write", "__xstat", "__xstat@plt", "_dl_addr", "_dl_allocate_tls_init", "_dl_catch_exception", "_dl_debug_state", "_dl_find_dso_for_object", "_exit", "_gfortran_generate_error", "_gfortran_random_seed_i4", "_gfortran_set_args", "_gfortran_set_options", "_gfortran_st_open", "_gfortran_st_write", "_gfortran_st_write_done", "_gfortran_store_exe_path", "_gfortran_store_exe_path@plt", "_gfortran_transfer_character", "_gfortran_transfer_character@plt", "_gfortran_transfer_character_write", "_gfortran_transfer_integer", "_gfortran_transfer_integer@plt", "_gfortran_transfer_integer_write", "_gfortran_transfer_real", "_gfortran_transfer_real@plt", "_gfortran_transfer_real_write", "_init", "_setjmp", "access", "access@plt", "bsd_signal", "calloc@plt", "exit", "fflush@plt", "fgets_unlocked", "free@plt", "freelocale@plt", "getenv", "getenv@plt", "malloc@plt", "memcpy@plt", "memmem", "memset@plt", "newlocale", "newlocale@plt", "open64", "open@plt", "qsort", "qsort_r", "readlink", "readlink@plt", "register_printf_modifier", "register_printf_specifier", "register_printf_type", "secure_getenv@plt", "signal@plt", "strerror_l", "strerror_l@plt", "strlen@plt", "strncasecmp@plt", "strncmp@plt", "strtol@plt", "uselocale@plt", "wmemcpy", "write@plt"]
+      }
+    }
+  },
+  "global_stats": {
+    "total_inst_static": 52806,
+    "total_inst_exec": 539043440,
+    "total_func_calls": 674608
+  }
+}

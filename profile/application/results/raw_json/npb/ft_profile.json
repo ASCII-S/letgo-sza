@@ -1,0 +1,136 @@
+{
+  "tool_info": {
+    "name": "Application Profiler",
+    "version": "2.0",
+    "main_image": "ft.S.x"
+  },
+  "instruction_distribution": {
+    "total": {
+      "static_count": 38210,
+      "exec_count": 904309621
+    },
+    "by_category": {
+      "int_arithmetic": {
+        "static_count": 2883,
+        "exec_count": 123111169
+      },
+      "float": {
+        "static_count": 1063,
+        "exec_count": 284892217
+      },
+      "memory": {
+        "static_count": 5478,
+        "exec_count": 74339635
+      },
+      "control_flow": {
+        "static_count": 7785,
+        "exec_count": 36118940
+      },
+      "logic": {
+        "static_count": 2401,
+        "exec_count": 99002732
+      },
+      "mov": {
+        "static_count": 11775,
+        "exec_count": 47818627
+      },
+      "simd": {
+        "static_count": 2101,
+        "exec_count": 202821313
+      },
+      "other": {
+        "static_count": 4724,
+        "exec_count": 36204988
+      }
+    },
+    "int_arithmetic_details": {
+      "add": { "static_count": 1615, "exec_count": 108251668 },
+      "sub": { "static_count": 1138, "exec_count": 12034708 },
+      "mul": { "static_count": 97, "exec_count": 2804425 },
+      "div": { "static_count": 33, "exec_count": 20368 }
+    },
+    "memory_details": {
+      "load": { "static_count": 3036, "exec_count": 74247491 },
+      "store": { "static_count": 50, "exec_count": 6591 },
+      "stack": { "static_count": 2392, "exec_count": 85553 }
+    },
+    "control_flow_details": {
+      "jmp": { "static_count": 985, "exec_count": 608720 },
+      "jcc": { "static_count": 5042, "exec_count": 34414262 },
+      "call": { "static_count": 1152, "exec_count": 547981 },
+      "ret": { "static_count": 606, "exec_count": 547977 }
+    },
+    "logic_details": {
+      "bitwise": { "static_count": 1745, "exec_count": 1611975 },
+      "shift": { "static_count": 656, "exec_count": 97390757 }
+    },
+    "simd_details": {
+      "sse": { "static_count": 1186, "exec_count": 201756213 },
+      "avx": { "static_count": 915, "exec_count": 1065100 },
+      "avx512": { "static_count": 0, "exec_count": 0 }
+    }
+  },
+  "numeric_sensitivity": {
+    "float_inst_static": 1063,
+    "float_inst_exec": 284892217,
+    "operation_distribution": {
+      "add_sub": 116933022,
+      "mul": 83628033,
+      "div": 55,
+      "sqrt": 6,
+      "fma": 2097144,
+      "cmp": 524786,
+      "cvt": 1335990
+    },
+    "precision_distribution": {
+      "single": 2715,
+      "double": 284872788,
+      "x87": 18,
+      "simd": 79586734
+    }
+  },
+  "error_absorption": {
+    "cmp_inst_exec": 32580032,
+    "test_inst_exec": 1306578,
+    "saturate_inst_exec": 0,
+    "minmax_inst_exec": 1029,
+    "abs_inst_exec": 262961,
+    "round_inst_exec": 16696
+  },
+  "library_calls": {
+    "total_lib_calls": 266713,
+    "user_func_calls": 273972,
+    "by_category": {
+      "math_lib": {
+        "call_count": 262144,
+        "unique_funcs": 1,
+        "functions": ["exp"]
+      },
+      "memory_lib": {
+        "call_count": 266,
+        "unique_funcs": 7,
+        "functions": ["brk", "calloc", "free", "malloc", "mmap", "realloc", "sbrk"]
+      },
+      "io_lib": {
+        "call_count": 384,
+        "unique_funcs": 26,
+        "functions": ["_IO_default_finish", "_IO_default_uflow", "_IO_default_xsputn", "_IO_doallocbuf", "_IO_fclose", "_IO_fflush", "_IO_file_close", "_IO_file_close_it", "_IO_file_doallocate", "_IO_file_finish", "_IO_file_fopen", "_IO_file_open", "_IO_file_read", "_IO_file_stat", "_IO_file_sync", "_IO_file_underflow", "_IO_fopen", "_IO_getline", "_IO_getline_info", "_IO_link_in", "_IO_padn", "_IO_setb", "_IO_switch_to_get_mode", "_IO_un_link", "_IO_unsave_markers", "__printf_fp"]
+      },
+      "string_lib": {
+        "call_count": 19,
+        "unique_funcs": 2,
+        "functions": ["strdup", "strtoll"]
+      },
+      "other_lib": {
+        "call_count": 3900,
+        "unique_funcs": 120,
+        "functions": [".fini", ".plt", ".plt.got", ".plt.sec", ".text", "__call_tls_dtors", "__close_nocancel", "__cpu_indicator_init", "__ctype_b_loc", "__ctype_b_loc@plt", "__ctype_init", "__ctype_toupper_loc", "__ctype_toupper_loc@plt", "__cxa_atexit", "__cxa_finalize", "__dcgettext", "__default_morecore", "__errno_location", "__errno_location@plt", "__freelocale", "__fxstat64", "__fxstat@plt", "__getpagesize", "__hypot_finite", "__libc_alloca_cutoff", "__libc_malloc", "__libc_scratch_buffer_set_array_size", "__libc_start_main", "__open64_nocancel", "__read_nocancel", "__secure_getenv", "__sigaction", "__sigsetjmp", "__snprintf_chk", "__snprintf_chk@plt", "__strdup@plt", "__strndup", "__strndup@plt", "__sysconf", "__tfind", "__tunable_get_val", "__udivti3", "__udivti3@plt", "__uflow", "__umodti3", "__umodti3@plt", "__uselocale", "__vdso_gettimeofday", "__write", "__xstat", "__xstat@plt", "_dl_addr", "_dl_allocate_tls_init", "_dl_catch_exception", "_dl_debug_state", "_dl_find_dso_for_object", "_exit", "_gfortran_generate_error", "_gfortran_random_seed_i4", "_gfortran_set_args", "_gfortran_set_options", "_gfortran_st_open", "_gfortran_st_write", "_gfortran_st_write_done", "_gfortran_store_exe_path", "_gfortran_store_exe_path@plt", "_gfortran_transfer_character", "_gfortran_transfer_character@plt", "_gfortran_transfer_character_write", "_gfortran_transfer_complex", "_gfortran_transfer_complex@plt", "_gfortran_transfer_complex_write", "_gfortran_transfer_integer", "_gfortran_transfer_integer@plt", "_gfortran_transfer_integer_write", "_gfortran_transfer_real", "_gfortran_transfer_real@plt", "_gfortran_transfer_real_write", "_init", "_setjmp", "access", "access@plt", "bsd_signal", "cabs", "calloc@plt", "exit", "fflush@plt", "fgets_unlocked", "free@plt", "freelocale@plt", "getenv", "getenv@plt", "hypotf64", "malloc@plt", "memcpy@plt", "memmem", "memset@plt", "newlocale", "newlocale@plt", "open64", "open@plt", "qsort", "qsort_r", "readlink", "readlink@plt", "register_printf_modifier", "register_printf_specifier", "register_printf_type", "secure_getenv@plt", "signal@plt", "sincosf32x", "strerror_l", "strerror_l@plt", "strlen@plt", "strncasecmp@plt", "strncmp@plt", "strtol@plt", "uselocale@plt", "wmemcpy", "write@plt"]
+      }
+    }
+  },
+  "global_stats": {
+    "total_inst_static": 38210,
+    "total_inst_exec": 904309621,
+    "total_func_calls": 540685
+  }
+}

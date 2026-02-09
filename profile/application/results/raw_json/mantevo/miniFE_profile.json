@@ -1,0 +1,146 @@
+{
+  "tool_info": {
+    "name": "Application Profiler",
+    "version": "2.0",
+    "main_image": "miniFE.x"
+  },
+  "instruction_distribution": {
+    "total": {
+      "static_count": 100103,
+      "exec_count": 1948568901
+    },
+    "by_category": {
+      "int_arithmetic": {
+        "static_count": 8459,
+        "exec_count": 195479249
+      },
+      "float": {
+        "static_count": 1091,
+        "exec_count": 85585985
+      },
+      "memory": {
+        "static_count": 16247,
+        "exec_count": 244076237
+      },
+      "control_flow": {
+        "static_count": 18885,
+        "exec_count": 235085404
+      },
+      "logic": {
+        "static_count": 6162,
+        "exec_count": 93979577
+      },
+      "mov": {
+        "static_count": 36364,
+        "exec_count": 880671972
+      },
+      "simd": {
+        "static_count": 3578,
+        "exec_count": 140385089
+      },
+      "other": {
+        "static_count": 9317,
+        "exec_count": 73305388
+      }
+    },
+    "int_arithmetic_details": {
+      "add": { "static_count": 4339, "exec_count": 155244536 },
+      "sub": { "static_count": 3922, "exec_count": 38530301 },
+      "mul": { "static_count": 162, "exec_count": 1636407 },
+      "div": { "static_count": 36, "exec_count": 68005 }
+    },
+    "memory_details": {
+      "load": { "static_count": 8626, "exec_count": 121635684 },
+      "store": { "static_count": 112, "exec_count": 7294 },
+      "stack": { "static_count": 7509, "exec_count": 122433259 }
+    },
+    "control_flow_details": {
+      "jmp": { "static_count": 2585, "exec_count": 31351615 },
+      "jcc": { "static_count": 9376, "exec_count": 63881617 },
+      "call": { "static_count": 5111, "exec_count": 69926088 },
+      "ret": { "static_count": 1813, "exec_count": 69926084 }
+    },
+    "logic_details": {
+      "bitwise": { "static_count": 4192, "exec_count": 29954985 },
+      "shift": { "static_count": 1970, "exec_count": 64024592 }
+    },
+    "simd_details": {
+      "sse": { "static_count": 2935, "exec_count": 140361933 },
+      "avx": { "static_count": 643, "exec_count": 23156 },
+      "avx512": { "static_count": 0, "exec_count": 0 }
+    }
+  },
+  "numeric_sensitivity": {
+    "float_inst_static": 1091,
+    "float_inst_exec": 85585985,
+    "operation_distribution": {
+      "add_sub": 35927543,
+      "mul": 43962890,
+      "div": 160635,
+      "sqrt": 61,
+      "fma": 0,
+      "cmp": 304,
+      "cvt": 169120
+    },
+    "precision_distribution": {
+      "single": 16489,
+      "double": 85569445,
+      "x87": 48,
+      "simd": 5365279
+    }
+  },
+  "error_absorption": {
+    "cmp_inst_exec": 49052622,
+    "test_inst_exec": 13023880,
+    "saturate_inst_exec": 0,
+    "minmax_inst_exec": 1065,
+    "abs_inst_exec": 57,
+    "round_inst_exec": 6
+  },
+  "library_calls": {
+    "total_lib_calls": 441487,
+    "user_func_calls": 69834005,
+    "by_category": {
+      "math_lib": {
+        "call_count": 122,
+        "unique_funcs": 2,
+        "functions": ["__sqrt_finite", "sqrtf64"]
+      },
+      "memory_lib": {
+        "call_count": 10525,
+        "unique_funcs": 11,
+        "functions": ["_ZdaPv", "_ZdlPv", "_Znam", "_Znwm", "brk", "calloc", "free", "malloc", "mmap", "realloc", "sbrk"]
+      },
+      "io_lib": {
+        "call_count": 1053,
+        "unique_funcs": 41,
+        "functions": ["_IO_default_finish", "_IO_default_uflow", "_IO_default_xsputn", "_IO_do_write", "_IO_doallocbuf", "_IO_fclose", "_IO_fflush", "_IO_file_close", "_IO_file_close_it", "_IO_file_doallocate", "_IO_file_finish", "_IO_file_fopen", "_IO_file_open", "_IO_file_overflow", "_IO_file_read", "_IO_file_seek", "_IO_file_seekoff", "_IO_file_setbuf", "_IO_file_stat", "_IO_file_sync", "_IO_file_underflow", "_IO_file_write", "_IO_file_xsputn", "_IO_fopen", "_IO_getline", "_IO_getline_info", "_IO_link_in", "_IO_padn", "_IO_putc", "_IO_setb", "_IO_sgetn", "_IO_sprintf", "_IO_sputbackc", "_IO_str_underflow", "_IO_switch_to_get_mode", "_IO_un_link", "_IO_unsave_markers", "__printf_fp", "fseek", "fwrite", "snprintf"]
+      },
+      "string_lib": {
+        "call_count": 184,
+        "unique_funcs": 3,
+        "functions": ["strdup", "strtoll", "strtoul"]
+      },
+      "mpi_lib": {
+        "call_count": 195,
+        "unique_funcs": 8,
+        "functions": ["MPI_Allgather", "MPI_Allreduce", "MPI_Comm_size", "MPI_Finalize", "PMPI_Allgatherv", "PMPI_Bcast", "PMPI_Comm_rank", "PMPI_Init"]
+      },
+      "pthread_lib": {
+        "call_count": 321,
+        "unique_funcs": 17,
+        "functions": ["pthread_mutex_destroy", "pthread_mutex_destroy@plt", "pthread_mutex_init", "pthread_mutex_init@plt", "pthread_mutex_lock", "pthread_mutex_unlock", "pthread_mutexattr_destroy", "pthread_mutexattr_destroy@plt", "pthread_mutexattr_init", "pthread_mutexattr_init@plt", "pthread_mutexattr_setkind_np", "pthread_mutexattr_setpshared", "pthread_mutexattr_setpshared@plt", "pthread_mutexattr_settype@plt", "pthread_once", "pthread_self", "pthread_self@plt"]
+      },
+      "other_lib": {
+        "call_count": 429087,
+        "unique_funcs": 640,
+        "functions": [".fini", ".plt", ".plt.got", ".plt.sec", ".text", "GetResponse", "GetResponse.part.0", "LOOKUP_CVAR_BY_NAME", "MPIDI_CH3I_BCInit", "MPIDI_CH3I_BCInit@plt", "MPIDI_CH3I_Comm_create_hook", "MPIDI_CH3I_Comm_create_hook@plt", "MPIDI_CH3I_Comm_destroy_hook", "MPIDI_CH3I_Comm_destroy_hook@plt", "MPIDI_CH3I_Comm_init", "MPIDI_CH3I_Comm_init@plt", "MPIDI_CH3I_Progress_finalize", "MPIDI_CH3I_Progress_finalize@plt", "MPIDI_CH3I_Progress_init", "MPIDI_CH3I_Progress_init@plt", "MPIDI_CH3I_Seg_alloc", "MPIDI_CH3I_Seg_alloc@plt", "MPIDI_CH3I_Seg_commit", "MPIDI_CH3I_Seg_commit@plt", "MPIDI_CH3I_Seg_destroy", "MPIDI_CH3I_Seg_destroy@plt", "MPIDI_CH3I_Shm_supported", "MPIDI_CH3I_Shm_supported@plt", "MPIDI_CH3I_comm_create", "MPIDI_CH3I_comm_destroy", "MPIDI_CH3U_Comm_register_create_hook", "MPIDI_CH3U_Comm_register_create_hook@plt", "MPIDI_CH3U_Comm_register_destroy_hook", "MPIDI_CH3U_Comm_register_destroy_hook@plt", "MPIDI_CH3U_Recvq_init", "MPIDI_CH3U_Recvq_init@plt", "MPIDI_CH3U_VC_WaitForClose", "MPIDI_CH3U_VC_WaitForClose@plt", "MPIDI_CH3_Finalize", "MPIDI_CH3_Finalize@plt", "MPIDI_CH3_FreeParentPort", "MPIDI_CH3_FreeParentPort@plt", "MPIDI_CH3_Init", "MPIDI_CH3_Init@plt", "MPIDI_CH3_InitCompleted", "MPIDI_CH3_InitCompleted@plt", "MPIDI_CH3_PG_Destroy", "MPIDI_CH3_PG_Destroy@plt", "MPIDI_CH3_PG_Init", "MPIDI_CH3_PG_Init@plt", "MPIDI_CH3_PktHandler_Init", "MPIDI_CH3_PktHandler_Init@plt", "MPIDI_CH3_VC_Destroy", "MPIDI_CH3_VC_Destroy@plt", "MPIDI_CH3_VC_Init", "MPIDI_CH3_VC_Init@plt", "MPIDI_CH3_Win_fns_init", "MPIDI_CH3_Win_fns_init@plt", "MPIDI_CH3_Win_hooks_init", "MPIDI_CH3_Win_hooks_init@plt", "MPIDI_CH3_Win_pkt_orderings_init", "MPIDI_CH3_Win_pkt_orderings_init@plt", "MPIDI_PG_Close_VCs", "MPIDI_PG_Close_VCs@plt", "MPIDI_PG_Create", "MPIDI_PG_Create@plt", "MPIDI_PG_Destroy", "MPIDI_PG_Destroy@plt", "MPIDI_PG_Finalize", "MPIDI_PG_Finalize@plt", "MPIDI_PG_Init", "MPIDI_PG_Init@plt", "MPIDI_PG_InitConnKVS", "MPIDI_PG_InitConnKVS@plt", "MPIDI_PG_SetConnInfo", "MPIDI_PG_SetConnInfo@plt", "MPIDI_Populate_vc_node_ids", "MPIDI_Populate_vc_node_ids@plt", "MPIDI_RMA_finalize", "MPIDI_RMA_finalize@plt", "MPIDI_RMA_init", "MPIDI_RMA_init@plt", "MPIDI_VCRT_Add_ref", "MPIDI_VCRT_Add_ref@plt", "MPIDI_VCRT_Create", "MPIDI_VCRT_Create@plt", "MPIDI_VCRT_Release", "MPIDI_VCRT_Release@plt", "MPIDI_VCR_Dup", "MPIDI_VCR_Dup@plt", "MPIDI_VC_Init", "MPIDI_VC_Init@plt", "MPIDI_Win_fns_init", "MPIDI_Win_fns_init@plt", "MPID_Dataloop_alloc", "MPID_Dataloop_alloc@plt", "MPID_Dataloop_alloc_and_copy", "MPID_Dataloop_alloc_and_copy@plt", "MPID_Dataloop_copy", "MPID_Dataloop_copy@plt", "MPID_Dataloop_create_contiguous", "MPID_Dataloop_create_contiguous@plt", "MPID_Dataloop_create_indexed", "MPID_Dataloop_create_indexed@plt", "MPID_Dataloop_create_pairtype", "MPID_Dataloop_create_pairtype@plt", "MPID_Dataloop_create_struct", "MPID_Dataloop_create_struct@plt", "MPID_Dataloop_free", "MPID_Dataloop_free@plt", "MPID_Dataloop_struct_alloc", "MPID_Dataloop_struct_alloc@plt", "MPID_Dataloop_update", "MPID_Dataloop_update@plt", "MPID_Datatype_free", "MPID_Datatype_free@plt", "MPID_Finalize", "MPID_Finalize@plt", "MPID_Get_max_node_id", "MPID_Get_max_node_id@plt", "MPID_Get_node_id", "MPID_Get_node_id@plt", "MPID_Init", "MPID_Init@plt", "MPID_InitCompleted", "MPID_InitCompleted@plt", "MPID_Type_create_pairtype", "MPID_Type_create_pairtype@plt", "MPID_Type_indexed_count_contig", "MPID_Type_indexed_count_contig@plt", "MPID_nem_barrier", "MPID_nem_barrier@plt", "MPID_nem_barrier_init", "MPID_nem_barrier_init@plt", "MPID_nem_barrier_vars_init", "MPID_nem_barrier_vars_init@plt", "MPID_nem_choose_netmod", "MPID_nem_choose_netmod@plt", "MPID_nem_coll_init", "MPID_nem_coll_init@plt", "MPID_nem_finalize", "MPID_nem_finalize@plt", "MPID_nem_init", "MPID_nem_init@plt", "MPID_nem_lmt_pkthandler_init", "MPID_nem_lmt_pkthandler_init@plt", "MPID_nem_mpich_init", "MPID_nem_mpich_init@plt", "MPID_nem_tcp_bind", "MPID_nem_tcp_bind@plt", "MPID_nem_tcp_finalize", "MPID_nem_tcp_get_business_card", "MPID_nem_tcp_get_business_card@plt", "MPID_nem_tcp_get_ordering", "MPID_nem_tcp_init", "MPID_nem_tcp_send_finalize", "MPID_nem_tcp_send_finalize@plt", "MPID_nem_tcp_send_init", "MPID_nem_tcp_send_init@plt", "MPID_nem_tcp_set_sockopts", "MPID_nem_tcp_set_sockopts@plt", "MPID_nem_tcp_sm_finalize", "MPID_nem_tcp_sm_finalize@plt", "MPID_nem_tcp_sm_init", "MPID_nem_tcp_sm_init@plt", "MPIR_Add_finalize", "MPIR_Add_finalize@plt", "MPIR_Allgather", "MPIR_Allgather@plt", "MPIR_Allgather_impl", "MPIR_Allgather_impl@plt", "MPIR_Allgather_intra", "MPIR_Allgather_intra@plt", "MPIR_Allgatherv", "MPIR_Allgatherv@plt", "MPIR_Allgatherv_impl", "MPIR_Allgatherv_impl@plt", "MPIR_Allgatherv_intra", "MPIR_Allgatherv_intra@plt", "MPIR_Allreduce_impl", "MPIR_Allreduce_impl@plt", "MPIR_Allreduce_intra", "MPIR_Allreduce_intra@plt", "MPIR_Bcast_binomial", "MPIR_Bcast_impl", "MPIR_Bcast_impl@plt", "MPIR_Bcast_intra", "MPIR_Bcast_intra@plt", "MPIR_Call_finalize_callbacks", "MPIR_Comm_commit", "MPIR_Comm_commit@plt", "MPIR_Comm_delete_internal", "MPIR_Comm_delete_internal@plt", "MPIR_Comm_init", "MPIR_Comm_init@plt", "MPIR_Comm_is_node_aware", "MPIR_Comm_is_node_aware@plt", "MPIR_Comm_map_free", "MPIR_Comm_map_free@plt", "MPIR_Comm_register_hint", "MPIR_Comm_register_hint@plt", "MPIR_Comm_release_always", "MPIR_Comm_release_always@plt", "MPIR_Datatype_finalize", "MPIR_Datatype_init", "MPIR_Datatype_init@plt", "MPIR_Err_init", "MPIR_Err_init@plt", "MPIR_Free_contextid", "MPIR_Free_contextid@plt", "MPIR_Group_init", "MPIR_Group_init@plt", "MPIR_Init_thread", "MPIR_Init_thread@plt", "MPIR_Localcopy", "MPIR_Localcopy@plt", "MPIR_MAXF_check_dtype", "MPIR_SUM_check_dtype", "MPIR_T_CVAR_REGISTER_impl", "MPIR_T_CVAR_REGISTER_impl@plt", "MPIR_T_cat_add_cvar", "MPIR_T_cat_add_cvar@plt", "MPIR_T_cat_add_desc", "MPIR_T_cat_add_desc@plt", "MPIR_T_cat_create", "MPIR_T_cvar_finalize", "MPIR_T_cvar_finalize@plt", "MPIR_T_cvar_init", "MPIR_T_cvar_init@plt", "MPIR_T_env_finalize", "MPIR_T_env_finalize@plt", "MPIR_T_env_init", "MPIR_T_env_init@plt", "MPIR_Thread_CS_Finalize", "MPIR_Thread_CS_Finalize@plt", "MPIR_Type_get_true_extent_impl", "MPIR_Type_get_true_extent_impl@plt", "MPIR_Type_get_true_extent_x_impl", "MPIR_Type_get_true_extent_x_impl@plt", "MPIU_Find_local_and_external", "MPIU_Find_local_and_external@plt", "MPIU_Handle_direct_init", "MPIU_Handle_direct_init@plt", "MPIU_Handle_finalize", "MPIU_Handle_obj_alloc_complete", "MPIU_Handle_obj_alloc_complete@plt", "MPIU_Handle_obj_alloc_unsafe", "MPIU_Handle_obj_alloc_unsafe@plt", "MPIU_Handle_obj_free", "MPIU_Handle_obj_free@plt", "MPIU_Str_add_int_arg", "MPIU_Str_add_int_arg@plt", "MPIU_Str_add_string_arg", "MPIU_Str_add_string_arg@plt", "MPIU_Strncpy", "MPIU_Strncpy@plt", "MPIU_Wtime", "MPIU_Wtime@plt", "MPIU_Wtime_diff", "MPIU_Wtime_diff@plt", "MPIU_Wtime_init", "MPIU_Wtime_init@plt", "MPIU_dbg_init", "MPIU_dbg_init@plt", "MPL_env2bool", "MPL_env2bool@plt", "MPL_env2int", "MPL_env2int@plt", "MPL_env2range", "MPL_env2range@plt", "MPL_env2str", "MPL_env2str@plt", "PMII_getmaxes.constprop.4", "PMIU_Set_rank", "PMIU_Set_rank@plt", "PMIU_getval", "PMIU_getval@plt", "PMIU_parse_keyvals", "PMIU_parse_keyvals@plt", "PMIU_readline", "PMIU_readline@plt", "PMIU_writeline", "PMIU_writeline@plt", "PMI_Barrier", "PMI_Barrier@plt", "PMI_Finalize", "PMI_Finalize@plt", "PMI_Get_appnum", "PMI_Get_appnum@plt", "PMI_Get_rank", "PMI_Get_rank@plt", "PMI_Get_size", "PMI_Get_size@plt", "PMI_Init", "PMI_Init@plt", "PMI_KVS_Commit", "PMI_KVS_Commit@plt", "PMI_KVS_Get_my_name", "PMI_KVS_Get_my_name@plt", "PMI_KVS_Get_name_length_max", "PMI_KVS_Get_name_length_max@plt", "PMI_KVS_Get_value_length_max", "PMI_KVS_Get_value_length_max@plt", "PMI_KVS_Put", "PMI_KVS_Put@plt", "_ZN9__gnu_cxx18stdio_sync_filebufIcSt11char_traitsIcEE4syncEv", "_ZN9__gnu_cxx18stdio_sync_filebufIcSt11char_traitsIcEE6xsputnEPKcl", "_ZN9__gnu_cxx18stdio_sync_filebufIcSt11char_traitsIcEE8overflowEi", "_ZN9__gnu_cxx18stdio_sync_filebufIwSt11char_traitsIwEE4syncEv", "_ZNK10__cxxabiv120__si_class_type_info12__do_dyncastElNS_17__class_type_info10__sub_kindEPKS1_PKvS4_S6_RNS1_16__dyncast_resultE", "_ZNK10__cxxabiv121__vmi_class_type_info12__do_dyncastElNS_17__class_type_info10__sub_kindEPKS1_PKvS4_S6_RNS1_16__dyncast_resultE", "_ZNKSt12__basic_fileIcE7is_openEv", "_ZNKSt5ctypeIcE13_M_widen_initEv", "_ZNKSt5ctypeIwE19_M_convert_to_wmaskEt", "_ZNKSt6locale2id5_M_idEv", "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4dataEv", "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4findEPKcmm", "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4findERKS4_m", "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4sizeEv", "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE5c_strEv", "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE6substrEmm", "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE7compareEPKc", "_ZNKSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEixEm", "_ZNKSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEE3strEv", "_ZNKSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEE3strEv", "_ZNKSt7codecvtIcc11__mbstate_tE16do_always_noconvEv", "_ZNKSt7num_getIcSt19istreambuf_iteratorIcSt11char_traitsIcEEE14_M_extract_intIlEES3_S3_S3_RSt8ios_baseRSt12_Ios_IostateRT_", "_ZNKSt7num_getIcSt19istreambuf_iteratorIcSt11char_traitsIcEEE6do_getES3_S3_RSt8ios_baseRSt12_Ios_IostateRl", "_ZNKSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE13_M_insert_intIlEES3_S3_RSt8ios_basecT_", "_ZNKSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE13_M_insert_intImEES3_S3_RSt8ios_basecT_", "_ZNKSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE15_M_insert_floatIdEES3_S3_RSt8ios_baseccT_", "_ZNKSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE6_M_padEclRSt8ios_basePcPKcRi", "_ZNKSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE6do_putES3_RSt8ios_basecd", "_ZNKSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE6do_putES3_RSt8ios_basecl", "_ZNKSt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEE6do_putES3_RSt8ios_basecm", "_ZNKSt9basic_iosIcSt11char_traitsIcEEntEv", "_ZNSaIcEC1Ev", "_ZNSaIcED1Ev", "_ZNSi6sentryC1ERSib", "_ZNSirsERi", "_ZNSo3putEc", "_ZNSo5flushEv", "_ZNSo6sentryC2ERSo", "_ZNSo9_M_insertIdEERSoT_", "_ZNSo9_M_insertIlEERSoT_", "_ZNSo9_M_insertImEERSoT_", "_ZNSolsEPFRSoS_E", "_ZNSolsEd", "_ZNSolsEi", "_ZNSolsEm", "_ZNSt10__num_base15_S_format_floatERKSt8ios_basePcc", "_ZNSt10moneypunctIcLb0EE24_M_initialize_moneypunctEP15__locale_structPKc", "_ZNSt10moneypunctIcLb1EE24_M_initialize_moneypunctEP15__locale_structPKc", "_ZNSt10moneypunctIwLb0EE24_M_initialize_moneypunctEP15__locale_structPKc", "_ZNSt10moneypunctIwLb1EE24_M_initialize_moneypunctEP15__locale_structPKc", "_ZNSt11__timepunctIcE23_M_initialize_timepunctEP15__locale_struct", "_ZNSt11__timepunctIcEC1EPSt17__timepunct_cacheIcEm", "_ZNSt11__timepunctIwE23_M_initialize_timepunctEP15__locale_struct", "_ZNSt11__timepunctIwEC2EPSt17__timepunct_cacheIwEm", "_ZNSt12__basic_fileIcE2fdEv", "_ZNSt12__basic_fileIcE4openEPKcSt13_Ios_Openmodei", "_ZNSt12__basic_fileIcE5closeEv", "_ZNSt12__basic_fileIcE8xsputn_2EPKclS2_l", "_ZNSt12__basic_fileIcEC1EP15pthread_mutex_t", "_ZNSt12__basic_fileIcED1Ev", "_ZNSt13basic_filebufIcSt11char_traitsIcEE19_M_terminate_outputEv", "_ZNSt13basic_filebufIcSt11char_traitsIcEE26_M_destroy_internal_bufferEv", "_ZNSt13basic_filebufIcSt11char_traitsIcEE27_M_allocate_internal_bufferEv", "_ZNSt13basic_filebufIcSt11char_traitsIcEE4openEPKcSt13_Ios_Openmode", "_ZNSt13basic_filebufIcSt11char_traitsIcEE5closeEv", "_ZNSt13basic_filebufIcSt11char_traitsIcEE6xsputnEPKcl", "_ZNSt13basic_filebufIcSt11char_traitsIcEEC1Ev", "_ZNSt13basic_ostreamIwSt11char_traitsIwEE5flushEv", "_ZNSt14basic_ofstreamIcSt11char_traitsIcEE4openEPKcSt13_Ios_Openmode", "_ZNSt14basic_ofstreamIcSt11char_traitsIcEE5closeEv", "_ZNSt14basic_ofstreamIcSt11char_traitsIcEEC1Ev", "_ZNSt14basic_ofstreamIcSt11char_traitsIcEED1Ev", "_ZNSt14error_categoryC2Ev", "_ZNSt14error_categoryD1Ev", "_ZNSt15basic_streambufIcSt11char_traitsIcEE6xsputnEPKcl", "_ZNSt3_V214error_categoryD2Ev", "_ZNSt5ctypeIcEC2EPKtbm", "_ZNSt5ctypeIwE19_M_initialize_ctypeEv", "_ZNSt5ctypeIwEC1Em", "_ZNSt6locale5_Impl16_M_install_facetEPKNS_2idEPKNS_5facetE", "_ZNSt6locale5_ImplC1Em", "_ZNSt6locale5facet13_S_get_c_nameEv", "_ZNSt6locale5facet15_S_get_c_localeEv", "_ZNSt6locale5facet18_S_create_c_localeERP15__locale_structPKcS2_", "_ZNSt6localeC1EPNS_5_ImplE", "_ZNSt6localeC2Ev", "_ZNSt6localeD2Ev", "_ZNSt6localeaSERKS_", "_ZNSt7__cxx1110moneypunctIcLb0EE24_M_initialize_moneypunctEP15__locale_structPKc", "_ZNSt7__cxx1110moneypunctIcLb1EE24_M_initialize_moneypunctEP15__locale_structPKc", "_ZNSt7__cxx1110moneypunctIwLb0EE24_M_initialize_moneypunctEP15__locale_structPKc", "_ZNSt7__cxx1110moneypunctIwLb1EE24_M_initialize_moneypunctEP15__locale_structPKc", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE10_M_replaceEmmPKcm", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_M_constructIPKcEEvT_S8_St20forward_iterator_tag", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_M_constructIPcEEvT_S7_St20forward_iterator_tag", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE4swapERS4_", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE6appendEPKc", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE6appendEPKcm", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE6appendERKS4_", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE7reserveEm", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_appendEPKcm", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_assignERKS4_", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_createERmm", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_mutateEmmPKcm", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1EPKcRKS3_", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1Ev", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC2ERKS4_", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEED1Ev", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEaSEPKc", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEaSERKS4_", "_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEpLERKS4_", "_ZNSt7__cxx1115basic_stringbufIcSt11char_traitsIcESaIcEE7_M_syncEPcmm", "_ZNSt7__cxx1115basic_stringbufIcSt11char_traitsIcESaIcEE8_M_pbumpEPcS5_l", "_ZNSt7__cxx1115basic_stringbufIcSt11char_traitsIcESaIcEE8overflowEi", "_ZNSt7__cxx1115basic_stringbufIcSt11char_traitsIcESaIcEE9underflowEv", "_ZNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEC1ESt13_Ios_Openmode", "_ZNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEED1Ev", "_ZNSt7__cxx1119basic_istringstreamIcSt11char_traitsIcESaIcEEC1ERKNS_12basic_stringIcS2_S3_EESt13_Ios_Openmode", "_ZNSt7__cxx1119basic_istringstreamIcSt11char_traitsIcESaIcEED1Ev", "_ZNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEEC1ESt13_Ios_Openmode", "_ZNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEED1Ev", "_ZNSt7__cxx118messagesIcEC2Em", "_ZNSt7__cxx118messagesIwEC2Em", "_ZNSt7__cxx118numpunctIcE22_M_initialize_numpunctEP15__locale_struct", "_ZNSt7__cxx118numpunctIwE22_M_initialize_numpunctEP15__locale_struct", "_ZNSt7codecvtIcc11__mbstate_tEC1Em", "_ZNSt7codecvtIwc11__mbstate_tEC2Em", "_ZNSt8ios_base17_M_call_callbacksENS_5eventE", "_ZNSt8ios_base20_M_dispose_callbacksEv", "_ZNSt8ios_base4InitC1Ev", "_ZNSt8ios_base4InitD1Ev", "_ZNSt8ios_base7_M_initEv", "_ZNSt8ios_baseC2Ev", "_ZNSt8ios_baseD1Ev", "_ZNSt8messagesIcEC2Em", "_ZNSt8messagesIwEC1Em", "_ZNSt8numpunctIcE22_M_initialize_numpunctEP15__locale_struct", "_ZNSt8numpunctIwE22_M_initialize_numpunctEP15__locale_struct", "_ZNSt9basic_iosIcSt11char_traitsIcEE15_M_cache_localeERKSt6locale", "_ZNSt9basic_iosIcSt11char_traitsIcEE4fillEc", "_ZNSt9basic_iosIcSt11char_traitsIcEE4initEPSt15basic_streambufIcS1_E", "_ZNSt9basic_iosIcSt11char_traitsIcEE5clearESt12_Ios_Iostate", "_ZNSt9basic_iosIwSt11char_traitsIwEE15_M_cache_localeERKSt6locale", "_ZNSt9basic_iosIwSt11char_traitsIwEE4initEPSt15basic_streambufIwS1_E", "_ZSt15future_categoryv", "_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l", "_ZSt18_Rb_tree_decrementPKSt18_Rb_tree_node_base", "_ZSt18_Rb_tree_decrementPSt18_Rb_tree_node_base", "_ZSt18_Rb_tree_incrementPKSt18_Rb_tree_node_base", "_ZSt29_Rb_tree_insert_and_rebalancebPSt18_Rb_tree_node_baseS0_RS_", "_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_", "_ZSt9has_facetISt5ctypeIcEEbRKSt6locale", "_ZSt9has_facetISt5ctypeIwEEbRKSt6locale", "_ZSt9has_facetISt7codecvtIcc11__mbstate_tEEbRKSt6locale", "_ZSt9has_facetISt7num_getIcSt19istreambuf_iteratorIcSt11char_traitsIcEEEEbRKSt6locale", "_ZSt9has_facetISt7num_getIwSt19istreambuf_iteratorIwSt11char_traitsIwEEEEbRKSt6locale", "_ZSt9has_facetISt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEEEbRKSt6locale", "_ZSt9has_facetISt7num_putIwSt19ostreambuf_iteratorIwSt11char_traitsIwEEEEbRKSt6locale", "_ZSt9use_facetISt5ctypeIcEERKT_RKSt6locale", "_ZSt9use_facetISt5ctypeIwEERKT_RKSt6locale", "_ZSt9use_facetISt7codecvtIcc11__mbstate_tEERKT_RKSt6locale", "_ZSt9use_facetISt7num_getIcSt19istreambuf_iteratorIcSt11char_traitsIcEEEERKT_RKSt6locale", "_ZSt9use_facetISt7num_getIwSt19istreambuf_iteratorIwSt11char_traitsIwEEEERKT_RKSt6locale", "_ZSt9use_facetISt7num_putIcSt19ostreambuf_iteratorIcSt11char_traitsIcEEEERKT_RKSt6locale", "_ZSt9use_facetISt7num_putIwSt19ostreambuf_iteratorIwSt11char_traitsIwEEEERKT_RKSt6locale", "_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc", "_ZStlsIcSt11char_traitsIcESaIcEERSt13basic_ostreamIT_T0_ES7_RKNSt7__cxx1112basic_stringIS4_S5_T1_EE", "__call_tls_dtors", "__close", "__close_nocancel", "__cpu_indicator_init", "__ctype_b_loc", "__ctype_init", "__cxa_atexit", "__cxa_finalize", "__cxa_guard_acquire", "__cxa_guard_release", "__default_morecore", "__do_global_dtors_aux", "__dynamic_cast", "__fcntl", "__fxstat64", "__inet_aton_exact", "__isoc99_sscanf", "__libc_alloc_buffer_alloc_array", "__libc_alloc_buffer_allocate", "__libc_alloca_cutoff", "__libc_dlopen_mode", "__libc_dlsym", "__libc_dynarray_emplace_enlarge", "__libc_malloc", "__libc_pthread_init", "__libc_readline_unlocked", "__libc_sigaction", "__libc_start_main", "__memcpy_chk@plt", "__munmap", "__nss_database_lookup2", "__nss_hostname_digits_dots", "__nss_hosts_lookup2", "__nss_lookup", "__nss_lookup_function", "__nss_next2", "__open64_nocancel", "__overflow", "__pthread_initialize_minimal", "__pthread_mutex_destroy", "__pthread_once_slow", "__pthread_tunables_init", "__read", "__read_nocancel", "__register_atfork", "__resolv_context_get", "__resolv_context_put", "__sigaction", "__sigsetjmp", "__snprintf_chk", "__snprintf_chk@plt", "__strdup@plt", "__strtoull_internal", "__tsearch", "__tunable_get_val", "__uflow", "__underflow", "__uselocale", "__vdso_gettimeofday", "__vdso_time", "__wctype_l", "__write", "__xstat", "_dl_addr", "_dl_allocate_tls_init", "_dl_catch_error", "_dl_catch_exception", "_dl_debug_state", "_dl_find_dso_for_object", "_dl_get_tls_static_info", "_dl_mcount_wrapper_check", "_exit", "_fini", "_init", "_nss_files_gethostbyname3_r", "_nss_files_gethostbyname_r", "_pthread_cleanup_pop", "_pthread_cleanup_pop_restore", "_pthread_cleanup_push", "_pthread_cleanup_push_defer", "_setjmp", "bind", "bind@plt", "bsd_signal", "btowc", "calloc@plt", "cleanup_default_collops", "clock_gettime", "clock_gettime@plt", "close@plt", "comm_created", "comm_destroyed", "connFreeKVS", "connect", "dbg_init", "deregister_tm_clones", "elision_init", "exit", "fcntl@plt", "fgets_unlocked", "fileno", "finalize_failed_procs_group", "find_free_entry", "frame_dummy", "fread_unlocked", "free@plt", "free_hint_handles", "ftello64", "getdelim", "getenv", "getenv@plt", "gethostbyname", "gethostbyname@plt", "gethostbyname_r", "gethostname", "gethostname@plt", "getline", "getrlimit64", "getsockname", "getsockname@plt", "getsockopt", "getsockopt@plt", "inet_pton", "listen", "listen@plt", "llseek", "localtime", "malloc@plt", "memcmp@plt", "memcpy@plt", "memset@plt", "mpirinitc2_", "mpirinitc2_@plt", "mpirinitc_", "mpirinitc_@plt", "mpirinitf_", "mpirinitf_@plt", "nem_coll_finalize", "newlocale", "open64", "pg_destroy", "read@plt", "realloc@plt", "register_hook_finalize", "register_tm_clones", "set_collops.part.0", "setbuf", "setbuf@plt", "setbuffer", "setsockopt", "setsockopt@plt", "shutdown", "shutdown@plt", "signal@plt", "snprintf@plt", "socket", "socket@plt", "strchr@plt", "strcmp@plt", "strcpy@plt", "strlen@plt", "strncpy@plt", "strtol@plt", "uname", "vsnprintf", "wctob", "write@plt", "writev"]
+      }
+    }
+  },
+  "global_stats": {
+    "total_inst_static": 100103,
+    "total_inst_exec": 1948568901,
+    "total_func_calls": 70275492
+  }
+}

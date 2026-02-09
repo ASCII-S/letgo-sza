@@ -49,11 +49,17 @@ python3 profile_batch.py --suite rodinia --parallel 4
 # 剖析所有应用
 python3 profile_batch.py --all --parallel 4
 
-# 指定应用列表
+# 指定应用列表（空格分隔）
 python3 profile_batch.py --apps backprop bfs hotspot --parallel 3
 
-# 排除部分应用
+# 指定应用列表（逗号分隔）
+python3 profile_batch.py --apps backprop,bfs,hotspot --parallel 3
+
+# 排除部分应用（空格分隔）
 python3 profile_batch.py --all --exclude hpl miniAMR
+
+# 排除部分应用（逗号分隔）
+python3 profile_batch.py --all --exclude hpl,miniAMR,miniMD
 
 # Dry-run预览
 python3 profile_batch.py --suite mantevo --dry-run
@@ -90,10 +96,10 @@ python3 list_applications.py
 **应用选择（互斥）:**
 - `--all` - 剖析所有应用
 - `--suite <name>` - 剖析指定套件（rodinia/mantevo/npb/polybench）
-- `--apps <list>` - 指定应用列表
+- `--apps <list>` - 指定应用列表（支持空格或逗号分隔）
 
 **执行参数:**
-- `--exclude <list>` - 排除指定应用
+- `--exclude <list>` - 排除指定应用（支持空格或逗号分隔）
 - `--parallel, -p` - 并行任务数（1-4，默认1）
 - `--timeout, -t` - 每应用超时（秒，默认3600）
 - `--retries, -r` - 失败重试次数（默认2）

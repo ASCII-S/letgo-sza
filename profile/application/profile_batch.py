@@ -309,7 +309,13 @@ def parse_app_list(args):
 
     # 如果指定了具体的应用名
     if args.apps:
-        apps = args.apps
+        # 支持逗号分隔的应用名
+        apps = []
+        for app in args.apps:
+            if ',' in app:
+                apps.extend([a.strip() for a in app.split(',')])
+            else:
+                apps.append(app)
 
     # 如果指定了套件
     elif args.suite:
@@ -327,9 +333,15 @@ def parse_app_list(args):
     else:
         apps = DEFAULT_PROFILE_APPS
 
-    # 排除指定的应用
+    # 排除指定的应用（支持逗号分隔）
     if args.exclude:
-        apps = [app for app in apps if app not in args.exclude]
+        exclude_list = []
+        for item in args.exclude:
+            if ',' in item:
+                exclude_list.extend([a.strip() for a in item.split(',')])
+            else:
+                exclude_list.append(item)
+        apps = [app for app in apps if app not in exclude_list]
 
     return apps
 
@@ -346,11 +358,17 @@ def main():
   # 剖析Rodinia套件
   python profile_batch.py --suite rodinia
 
-  # 剖析指定应用
+  # 剖析指定应用（空格分隔）
   python profile_batch.py --apps backprop bfs hotspot
 
-  # 剖析所有但排除某些应用
+  # 剖析指定应用（逗号分隔）
+  python profile_batch.py --apps backprop,bfs,hotspot
+
+  # 剖析所有但排除某些应用（空格分隔）
   python profile_batch.py --all --exclude hpl miniAMR
+
+  # 剖析所有但排除某些应用（逗号分隔）
+  python profile_batch.py --all --exclude hpl,miniAMR
 
   # 使用4个并行任务
   python profile_batch.py --suite mantevo --parallel 4
@@ -367,10 +385,10 @@ def main():
     app_group.add_argument('--suite', type=str, choices=list(APP_SUITES.keys()),
                           help='剖析指定套件的所有应用')
     app_group.add_argument('--apps', nargs='+', type=str,
-                          help='指定要剖析的应用列表')
+                          help='指定要剖析的应用列表（空格或逗号分隔）')
 
     parser.add_argument('--exclude', nargs='+', type=str, default=[],
-                       help='排除指定的应用')
+                       help='排除指定的应用（空格或逗号分隔）')
 
     # 执行参数
     parser.add_argument('--parallel', '-p', type=int, default=1,

@@ -1,0 +1,136 @@
+{
+  "tool_info": {
+    "name": "Application Profiler",
+    "version": "2.0",
+    "main_image": "ua.S.x"
+  },
+  "instruction_distribution": {
+    "total": {
+      "static_count": 58885,
+      "exec_count": 4490897151
+    },
+    "by_category": {
+      "int_arithmetic": {
+        "static_count": 5560,
+        "exec_count": 730172451
+      },
+      "float": {
+        "static_count": 2683,
+        "exec_count": 1311924744
+      },
+      "memory": {
+        "static_count": 8988,
+        "exec_count": 189126829
+      },
+      "control_flow": {
+        "static_count": 10585,
+        "exec_count": 571871247
+      },
+      "logic": {
+        "static_count": 2507,
+        "exec_count": 993158
+      },
+      "mov": {
+        "static_count": 17932,
+        "exec_count": 423122937
+      },
+      "simd": {
+        "static_count": 4112,
+        "exec_count": 705256306
+      },
+      "other": {
+        "static_count": 6518,
+        "exec_count": 558429479
+      }
+    },
+    "int_arithmetic_details": {
+      "add": { "static_count": 4050, "exec_count": 727256548 },
+      "sub": { "static_count": 1353, "exec_count": 2390405 },
+      "mul": { "static_count": 135, "exec_count": 515585 },
+      "div": { "static_count": 22, "exec_count": 9913 }
+    },
+    "memory_details": {
+      "load": { "static_count": 6134, "exec_count": 186577344 },
+      "store": { "static_count": 48, "exec_count": 33138 },
+      "stack": { "static_count": 2806, "exec_count": 2516347 }
+    },
+    "control_flow_details": {
+      "jmp": { "static_count": 1249, "exec_count": 700269 },
+      "jcc": { "static_count": 7088, "exec_count": 569807578 },
+      "call": { "static_count": 1525, "exec_count": 681702 },
+      "ret": { "static_count": 723, "exec_count": 681698 }
+    },
+    "logic_details": {
+      "bitwise": { "static_count": 1763, "exec_count": 201802 },
+      "shift": { "static_count": 744, "exec_count": 791356 }
+    },
+    "simd_details": {
+      "sse": { "static_count": 3180, "exec_count": 705133497 },
+      "avx": { "static_count": 932, "exec_count": 122809 },
+      "avx512": { "static_count": 0, "exec_count": 0 }
+    }
+  },
+  "numeric_sensitivity": {
+    "float_inst_static": 2683,
+    "float_inst_exec": 1311924744,
+    "operation_distribution": {
+      "add_sub": 471621552,
+      "mul": 561944895,
+      "div": 854516,
+      "sqrt": 26268,
+      "fma": 165521,
+      "cmp": 4674951,
+      "cvt": 3239
+    },
+    "precision_distribution": {
+      "single": 4057,
+      "double": 1311919083,
+      "x87": 12,
+      "simd": 272347002
+    }
+  },
+  "error_absorption": {
+    "cmp_inst_exec": 565109604,
+    "test_inst_exec": 650266,
+    "saturate_inst_exec": 0,
+    "minmax_inst_exec": 1091,
+    "abs_inst_exec": 48219,
+    "round_inst_exec": 1592
+  },
+  "library_calls": {
+    "total_lib_calls": 7292,
+    "user_func_calls": 668487,
+    "by_category": {
+      "math_lib": {
+        "call_count": 1596,
+        "unique_funcs": 2,
+        "functions": ["__powidf2", "log"]
+      },
+      "memory_lib": {
+        "call_count": 296,
+        "unique_funcs": 7,
+        "functions": ["brk", "calloc", "free", "malloc", "mmap", "realloc", "sbrk"]
+      },
+      "io_lib": {
+        "call_count": 346,
+        "unique_funcs": 26,
+        "functions": ["_IO_default_finish", "_IO_default_uflow", "_IO_default_xsputn", "_IO_doallocbuf", "_IO_fclose", "_IO_fflush", "_IO_file_close", "_IO_file_close_it", "_IO_file_doallocate", "_IO_file_finish", "_IO_file_fopen", "_IO_file_open", "_IO_file_read", "_IO_file_stat", "_IO_file_sync", "_IO_file_underflow", "_IO_fopen", "_IO_getline", "_IO_getline_info", "_IO_link_in", "_IO_padn", "_IO_setb", "_IO_switch_to_get_mode", "_IO_un_link", "_IO_unsave_markers", "__printf_fp"]
+      },
+      "string_lib": {
+        "call_count": 12,
+        "unique_funcs": 2,
+        "functions": ["strdup", "strtoll"]
+      },
+      "other_lib": {
+        "call_count": 5042,
+        "unique_funcs": 113,
+        "functions": [".fini", ".plt", ".plt.got", ".plt.sec", ".text", "__call_tls_dtors", "__close_nocancel", "__cpu_indicator_init", "__ctype_b_loc", "__ctype_b_loc@plt", "__ctype_init", "__ctype_toupper_loc", "__ctype_toupper_loc@plt", "__cxa_atexit", "__cxa_finalize", "__dcgettext", "__default_morecore", "__errno_location", "__errno_location@plt", "__freelocale", "__fxstat64", "__fxstat@plt", "__getpagesize", "__libc_alloca_cutoff", "__libc_malloc", "__libc_scratch_buffer_set_array_size", "__libc_start_main", "__open64_nocancel", "__read_nocancel", "__secure_getenv", "__sigaction", "__sigsetjmp", "__snprintf_chk", "__snprintf_chk@plt", "__strdup@plt", "__strndup", "__strndup@plt", "__sysconf", "__tfind", "__tunable_get_val", "__udivti3", "__udivti3@plt", "__uflow", "__umodti3", "__umodti3@plt", "__uselocale", "__vdso_gettimeofday", "__write", "__xstat", "__xstat@plt", "_dl_addr", "_dl_allocate_tls_init", "_dl_catch_exception", "_dl_debug_state", "_dl_find_dso_for_object", "_exit", "_gfortran_generate_error", "_gfortran_random_seed_i4", "_gfortran_set_args", "_gfortran_set_options", "_gfortran_st_open", "_gfortran_st_write", "_gfortran_st_write_done", "_gfortran_store_exe_path", "_gfortran_store_exe_path@plt", "_gfortran_transfer_character", "_gfortran_transfer_character@plt", "_gfortran_transfer_character_write", "_gfortran_transfer_integer", "_gfortran_transfer_integer@plt", "_gfortran_transfer_integer_write", "_gfortran_transfer_real", "_gfortran_transfer_real@plt", "_gfortran_transfer_real_write", "_init", "_setjmp", "access", "access@plt", "bsd_signal", "calloc@plt", "exit", "fflush@plt", "fgets_unlocked", "free@plt", "freelocale@plt", "getenv", "getenv@plt", "malloc@plt", "memcpy@plt", "memmem", "memset@plt", "newlocale", "newlocale@plt", "open64", "open@plt", "qsort", "qsort_r", "readlink", "readlink@plt", "register_printf_modifier", "register_printf_specifier", "register_printf_type", "secure_getenv@plt", "signal@plt", "strerror_l", "strerror_l@plt", "strlen@plt", "strncasecmp@plt", "strncmp@plt", "strtol@plt", "uselocale@plt", "wmemcpy", "write@plt"]
+      }
+    }
+  },
+  "global_stats": {
+    "total_inst_static": 58885,
+    "total_inst_exec": 4490897151,
+    "total_func_calls": 675779
+  }
+}

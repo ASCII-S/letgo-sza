@@ -1,0 +1,112 @@
+{
+  "tool_info": {
+    "name": "Application Profiler",
+    "version": "2.0",
+    "main_image": "2mm_ref"
+  },
+  "instruction_distribution": {
+    "total": {
+      "static_count": 11014,
+      "exec_count": 1747698
+    },
+    "by_category": {
+      "int_arithmetic": {
+        "static_count": 860,
+        "exec_count": 272004
+      },
+      "float": {
+        "static_count": 75,
+        "exec_count": 50201
+      },
+      "memory": {
+        "static_count": 1667,
+        "exec_count": 135114
+      },
+      "control_flow": {
+        "static_count": 2264,
+        "exec_count": 205552
+      },
+      "logic": {
+        "static_count": 744,
+        "exec_count": 147620
+      },
+      "mov": {
+        "static_count": 3603,
+        "exec_count": 679563
+      },
+      "simd": {
+        "static_count": 307,
+        "exec_count": 70707
+      },
+      "other": {
+        "static_count": 1494,
+        "exec_count": 186937
+      }
+    },
+    "int_arithmetic_details": {
+      "add": { "static_count": 484, "exec_count": 208778 },
+      "sub": { "static_count": 340, "exec_count": 55887 },
+      "mul": { "static_count": 21, "exec_count": 4241 },
+      "div": { "static_count": 15, "exec_count": 3098 }
+    },
+    "memory_details": {
+      "load": { "static_count": 967, "exec_count": 67958 },
+      "store": { "static_count": 14, "exec_count": 477 },
+      "stack": { "static_count": 686, "exec_count": 66679 }
+    },
+    "control_flow_details": {
+      "jmp": { "static_count": 265, "exec_count": 22586 },
+      "jcc": { "static_count": 1533, "exec_count": 153812 },
+      "call": { "static_count": 287, "exec_count": 14579 },
+      "ret": { "static_count": 179, "exec_count": 14575 }
+    },
+    "logic_details": {
+      "bitwise": { "static_count": 544, "exec_count": 42529 },
+      "shift": { "static_count": 200, "exec_count": 105091 }
+    },
+    "simd_details": {
+      "sse": { "static_count": 110, "exec_count": 60164 },
+      "avx": { "static_count": 197, "exec_count": 10543 },
+      "avx512": { "static_count": 0, "exec_count": 0 }
+    }
+  },
+  "numeric_sensitivity": {
+    "float_inst_static": 75,
+    "float_inst_exec": 50201,
+    "operation_distribution": {
+      "add_sub": 13248,
+      "mul": 19968,
+      "div": 1564,
+      "sqrt": 0,
+      "fma": 0,
+      "cmp": 768,
+      "cvt": 3128
+    },
+    "precision_distribution": {
+      "single": 4036,
+      "double": 45781,
+      "x87": 384,
+      "simd": 11141
+    }
+  },
+  "error_absorption": {
+    "cmp_inst_exec": 87900,
+    "test_inst_exec": 49619,
+    "saturate_inst_exec": 0,
+    "minmax_inst_exec": 14,
+    "abs_inst_exec": 384,
+    "round_inst_exec": 0
+  },
+  "library_calls": {
+    "total_lib_calls": 0,
+    "user_func_calls": 15420,
+    "by_category": {
+
+    }
+  },
+  "global_stats": {
+    "total_inst_static": 11014,
+    "total_inst_exec": 1747698,
+    "total_func_calls": 15420
+  }
+}
