@@ -4,6 +4,10 @@
 
 对已有的实验结果进行批量SDC判断，将结果保存为JSON。
 
+支持两种输出类型：
+- stdout/stderr: 从 log/log_N 日志文件中提取程序输出
+- file: 从 sdcout/log_N_output.xxx 文件中获取输出
+
 用法:
     python -m sdc_judge.judge.batch_judge_sdc <one_batch_folder> <app_name> [选项]
 
@@ -25,6 +29,7 @@ import re
 from typing import Tuple, Optional
 
 from .sdc_judge import SDCJudge, SDCJudgeResult
+from .output_extractor import OutputExtractor
 
 
 class BatchSDCJudge:
@@ -49,6 +54,17 @@ class BatchSDCJudge:
         # 初始化SDC判断器
         self.judge = SDCJudge()
 
+        # 初始化输出提取器
+        self.output_extractor = OutputExtractor()
+
+        # 获取应用配置
+        self._app_config = self.output_extractor.config_mgr.get_app(app_name)
+        if self._app_config is None:
+            raise ValueError(f"应用不存在: {app_name}")
+
+        # 输出类型
+        self.output_type = self._app_config.output_type
+
         # 统计信息
         self.total = 0
         self.sdc_count = 0
@@ -56,9 +72,34 @@ class BatchSDCJudge:
         self.error_count = 0
         self.skipped_count = 0
 
+    def get_test_output(self, log_index: int) -> Optional[str]:
+        """
+        获取测试输出（统一接口）
+
+        根据应用的 output_type 从正确位置获取输出：
+        - stdout/stderr: 从日志文件提取
+        - file: 从 sdcout 目录获取
+
+        Args:
+            log_index: 日志序号
+
+        Returns:
+            输出文件路径或内容，失败返回 None
+        """
+        result = self.output_extractor.extract(
+            app_name=self.app_name,
+            log_index=log_index,
+            experiment_dir=self.one_batch_folder
+        )
+
+        if result.error:
+            return None
+
+        return result.content
+
     def find_output_file(self, log_index: int) -> Optional[str]:
         """
-        查找log_N对应的输出文件
+        查找log_N对应的输出文件（向后兼容）
 
         规则：在sdcout/目录中查找log_N_output.*或log_N.*
 
@@ -112,16 +153,24 @@ class BatchSDCJudge:
         # 获取golden路径
         golden_dir = generator.capturer.get_golden_path(app_config)
 
+        # 根据 output_type 决定使用哪个 golden 文件
+        if app_config.output_type in ('stdout', 'stderr'):
+            # stdout/stderr 应用使用 stdout.txt
+            golden_output = os.path.join(golden_dir, 'stdout.txt')
+            if os.path.exists(golden_output):
+                return golden_output
+
         # 在golden_dir中查找输出文件
         if app_config.output_name and app_config.output_name != 'none':
             golden_output = os.path.join(golden_dir, app_config.output_name)
             if os.path.exists(golden_output):
                 return golden_output
 
-        # 尝试在golden_dir中查找第一个文件
+        # 尝试在golden_dir中查找第一个非metadata文件
         if os.path.exists(golden_dir):
             files = [f for f in os.listdir(golden_dir)
-                    if os.path.isfile(os.path.join(golden_dir, f))]
+                    if os.path.isfile(os.path.join(golden_dir, f))
+                    and f != 'metadata.json']
             if files:
                 return os.path.join(golden_dir, files[0])
 
@@ -147,11 +196,11 @@ class BatchSDCJudge:
             self.skipped_count += 1
             return True  # 已有结果，跳过
 
-        # 查找输出文件
-        test_output = self.find_output_file(log_index)
+        # 获取测试输出（使用统一接口）
+        test_output = self.get_test_output(log_index)
         if test_output is None:
             if verbose:
-                print(f"  log_{log_index}: 找不到输出文件，跳过")
+                print(f"  log_{log_index}: 找不到输出，跳过")
             self.error_count += 1
             return False
 
@@ -248,6 +297,7 @@ class BatchSDCJudge:
         print(f"{'='*60}")
         print(f"实验目录: {self.one_batch_folder}")
         print(f"应用名称: {self.app_name}")
+        print(f"输出类型: {self.output_type}")
         print(f"扫描范围: log_{log_indices[0]} 到 log_{log_indices[-1]}")
         print(f"总计: {len(log_indices)} 个实验")
         print()
@@ -274,6 +324,9 @@ class BatchSDCJudge:
         print(f"错误: {self.error_count}")
         print(f"\n结果保存在: {self.sdcresult_folder}")
         print()
+
+        # 清理临时文件
+        self.output_extractor.cleanup()
 
 
 def parse_log_range(range_str: str) -> Tuple[int, int]:
@@ -319,8 +372,11 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:
-  # 对bicg/adaptive所有实验进行SDC判断
+  # 对bicg/adaptive所有实验进行SDC判断（stderr类型，从日志提取）
   %(prog)s /path/to/TargetedBenchmarkResult/bicg/adaptive bicg
+
+  # 对backprop/adaptive所有实验进行SDC判断（file类型，从sdcout获取）
+  %(prog)s /path/to/TargetedBenchmarkResult/backprop/adaptive backprop
 
   # 仅对log_0到log_99进行判断
   %(prog)s /path/to/result/hotspot/adaptive hotspot --range 0-99

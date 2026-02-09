@@ -77,8 +77,14 @@ class OutputCapturer:
 
         outputs = {}
 
-        # 1. 保存stdout
-        if app_config.needs_stdout:
+        # 1. 根据output_type保存输出
+        if app_config.output_type == 'stderr' or app_config.needs_stderr:
+            # 保存stderr作为主要输出
+            stderr_path = os.path.join(golden_dir, 'stdout.txt')  # 仍然命名为stdout.txt以保持兼容
+            self._save_stdout(exec_result.stderr, stderr_path)
+            outputs['stdout.txt'] = stderr_path
+        elif app_config.needs_stdout:
+            # 保存stdout
             stdout_path = os.path.join(golden_dir, 'stdout.txt')
             self._save_stdout(exec_result.stdout, stdout_path)
             outputs['stdout.txt'] = stdout_path

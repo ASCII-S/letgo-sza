@@ -21,8 +21,12 @@ COMPARE_METHOD_MAP = {
     'miniFE': ['miniFE'],
     'HPCCG': ['HPCCG'],
     'lu': ['lu'],
+    'hpl': ['hpl'],
+    'amg': ['amg'],
     # PolyBench
     'polybench': ['2mm', 'fdtd-2d', 'bicg', 'correlation', 'gesummv', 'syr2k', 'gaussian', 'convolution', 'mvt'],
+    # NPB (NAS Parallel Benchmarks)
+    'npb': ['bt', 'cg', 'ep', 'ft', 'is', 'mg', 'sp', 'ua'],
 }
 
 # 应用容差配置
@@ -33,6 +37,8 @@ TOLERANCE_MAP = {
     'miniMD': 1e-6,
     'miniFE': 1e-6,
     'HPCCG': 1e-6,
+    'hpl': 16.0,  # HPL 使用阈值判定
+    'amg': 1e-6,
     # PolyBench应用使用相对误差
     '2mm': 0.1,
     'fdtd-2d': 0.1,
@@ -43,10 +49,53 @@ TOLERANCE_MAP = {
     'gaussian': 0.1,
     'convolution': 0.1,
     'mvt': 0.1,
+    # NPB应用使用内置验证，epsilon为精度阈值
+    'bt': 1e-7,
+    'cg': 1e-7,
+    'ep': 1e-7,
+    'ft': 1e-7,
+    'is': 1e-7,
+    'mg': 1e-7,
+    'sp': 1e-7,
+    'ua': 1e-7,
 }
 
-# 应用输出文件名配置
+# 容差类型配置: 'absolute' (绝对误差) 或 'relative' (相对误差) 或 'threshold' (阈值判定)
+TOLERANCE_TYPE_MAP = {
+    # 绝对误差
+    'hotspot': 'absolute',
+    'hotspot3D': 'absolute',
+    'lu': 'absolute',
+    'miniMD': 'absolute',
+    'miniFE': 'absolute',
+    'HPCCG': 'absolute',
+    # 阈值判定
+    'hpl': 'threshold',
+    # 相对误差
+    '2mm': 'relative',
+    'fdtd-2d': 'relative',
+    'bicg': 'relative',
+    'correlation': 'relative',
+    'gesummv': 'relative',
+    'syr2k': 'relative',
+    'gaussian': 'relative',
+    'convolution': 'relative',
+    'mvt': 'relative',
+    'amg': 'relative',
+    # NPB应用使用内置验证（threshold类型，但验证逻辑在比较器内部）
+    'bt': 'threshold',
+    'cg': 'threshold',
+    'ep': 'threshold',
+    'ft': 'threshold',
+    'is': 'threshold',
+    'mg': 'threshold',
+    'sp': 'threshold',
+    'ua': 'threshold',
+}
+
+# 应用输出文件名配置（仅用于 output_type='file' 的应用）
 OUTPUT_NAME_MAP = {
+    # Rodinia file 类型应用
     'backprop': 'output.dat',
     'hotspot': 'output.txt',
     'hotspot3D': 'output.txt',
@@ -55,23 +104,11 @@ OUTPUT_NAME_MAP = {
     'bfs': 'output.txt',
     'heartwall': 'output.txt',
     'kmeans': 'output.txt',
-    'lavaMD': 'output.txt',
     'leukocyte': 'result.txt',
     'nn': 'output.txt',
     'particlefilter': 'output.txt',
     'streamcluster': 'output.txt',
-    'amg': 'output.txt',
-    'needle': 'output.txt',
-    'srad': 'output.txt',
-    'knn': 'output.txt',
-    'myocyte': 'output.txt',
-    # MPI应用无文件输出
-    'miniMD': 'none',
-    'miniFE': 'none',
-    'HPCCG': 'none',
-    'miniAMR': 'none',
-    'hpl': 'none',
-    # PolyBench应用
+    # PolyBench应用 (stderr 类型，但有对应的输出文件名用于 golden 比较)
     '2mm': 'output_2mm.txt',
     'fdtd-2d': 'output_fdtd-2d.txt',
     'bicg': 'output_bicg.txt',
@@ -106,7 +143,10 @@ class ApplicationConfig:
     output_files: List[str] = field(default_factory=list)
     output_name: Optional[str] = None  # 应用输出文件名（如output.dat）
     needs_stdout: bool = True
+    needs_stderr: bool = False  # 是否需要捕获stderr作为输出
+    output_type: str = 'stdout'  # 输出类型: 'stdout', 'stderr', 'file'
     tolerance: float = DEFAULT_TOLERANCE
+    tolerance_type: str = 'absolute'  # 容差类型: 'absolute' (绝对误差) 或 'relative' (相对误差)
     compare_method: str = 'common'
     working_dir: Optional[str] = None  # 工作目录（默认为应用所在目录）
 
@@ -117,6 +157,7 @@ class ApplicationConfig:
         self.output_files = self._extract_output_files()
         self.needs_stdout = self._needs_stdout_capture()
         self.tolerance = self._get_tolerance()
+        self.tolerance_type = self._get_tolerance_type()
         self.compare_method = self._determine_compare_method()
         self.working_dir = self._determine_working_dir()
 
@@ -213,6 +254,15 @@ class ApplicationConfig:
     def _get_tolerance(self) -> float:
         """获取容差配置"""
         return TOLERANCE_MAP.get(self.name, DEFAULT_TOLERANCE)
+
+    def _get_tolerance_type(self) -> str:
+        """
+        获取容差类型
+
+        Returns:
+            'absolute' (绝对误差) 或 'relative' (相对误差)
+        """
+        return TOLERANCE_TYPE_MAP.get(self.name, 'absolute')
 
     def _determine_compare_method(self) -> str:
         """确定SDC比较方法"""
@@ -317,6 +367,33 @@ class ConfigManager:
                     app_config.output_name = app_data['output_name']
                     # 重新计算output_files
                     app_config.output_files = app_config._extract_output_files()
+
+                # 如果applications.json中指定了output_type，覆盖默认值
+                # output_type: 'stdout' | 'stderr' | 'file'
+                if 'output_type' in app_data:
+                    app_config.output_type = app_data['output_type']
+                    # 根据output_type设置needs_stdout和needs_stderr
+                    if app_config.output_type == 'stderr':
+                        app_config.needs_stdout = False
+                        app_config.needs_stderr = True
+                    elif app_config.output_type == 'file':
+                        app_config.needs_stdout = False
+                        app_config.needs_stderr = False
+                    else:  # stdout
+                        app_config.needs_stdout = True
+                        app_config.needs_stderr = False
+
+                # 如果applications.json中指定了compare_method，覆盖自动推断的
+                if 'compare_method' in app_data and app_data['compare_method']:
+                    app_config.compare_method = app_data['compare_method']
+
+                # 如果applications.json中指定了tolerance，覆盖自动推断的
+                if 'tolerance' in app_data and app_data['tolerance'] is not None:
+                    app_config.tolerance = app_data['tolerance']
+
+                # 如果applications.json中指定了tolerance_type，覆盖自动推断的
+                if 'tolerance_type' in app_data and app_data['tolerance_type']:
+                    app_config.tolerance_type = app_data['tolerance_type']
 
                 self._apps[app_name] = app_config
 

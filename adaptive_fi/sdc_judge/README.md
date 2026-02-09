@@ -409,12 +409,37 @@ print(f"错误: {batch_judge.error_count}")
 - **args**: 命令行参数列表
 - **pc_start/pc_end**: 指令范围（可选）
 - **is_mpi**: 是否MPI应用（可选）
+- **output_type**: 输出类型（可选，见下文）
+- **working_dir**: 工作目录（可选）
 
 配置管理器自动推断：
 - **output_files**: 输出文件列表（从args提取）
 - **needs_stdout**: 是否捕获stdout
+- **needs_stderr**: 是否捕获stderr
 - **tolerance**: 容差值（根据应用类型）
 - **compare_method**: 比较方法（根据应用类型）
+
+### output_type 配置
+
+用于指定应用的输出类型，决定 Golden 生成时捕获哪种输出：
+
+| output_type | 说明 | 示例应用 |
+|-------------|------|----------|
+| `"stdout"` | 捕获标准输出（默认） | 大多数应用 |
+| `"stderr"` | 捕获标准错误输出 | PolyBench 套件 |
+| `"file"` | 仅捕获指定的输出文件 | hotspot 等 |
+
+**配置示例**：
+
+```json
+"2mm": {
+  "binpath": "/path/to/2mm_ref",
+  "args": [],
+  "output_type": "stderr"
+}
+```
+
+**说明**：PolyBench 套件的应用通过 stderr 输出计算结果（`==BEGIN DUMP_ARRAYS==`），因此需要配置 `"output_type": "stderr"`。
 
 ## 容差配置
 

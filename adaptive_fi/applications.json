@@ -17,7 +17,10 @@
             "5"
           ],
           "pc_start": "401cb8",
-          "pc_end": "49877c"
+          "pc_end": "49877c",
+          "output_type": "stdout",
+          "compare_method": "amg",
+          "tolerance": 1e-6
         },
         "b+tree": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/b+tree/b+tree",
@@ -28,7 +31,9 @@
             "/home/tongshiyu/programs/rodinia-master/data/b+tree/command.txt"
           ],
           "pc_start": "400f90",
-          "pc_end": "405510"
+          "pc_end": "405510",
+          "output_type": "file",
+          "output_name": "output.txt"
         },
         "backprop": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/backprop/backprop",
@@ -36,7 +41,9 @@
             "65536"
           ],
           "pc_start": "400ad0",
-          "pc_end": "4024d0"
+          "pc_end": "4024d0",
+          "output_type": "file",
+          "output_name": "output.dat"
         },
         "bfs": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/bfs/bfs",
@@ -44,7 +51,9 @@
             "/home/tongshiyu/programs/rodinia-master/data/bfs/inputGen/graph64k.txt"
           ],
           "pc_start": "400720",
-          "pc_end": "400e80"
+          "pc_end": "400e80",
+          "output_type": "file",
+          "output_name": "output.txt"
         },
         "heartwall": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/heartwall/heartwall",
@@ -53,7 +62,9 @@
             "20"
           ],
           "pc_start": "400f00",
-          "pc_end": "407440"
+          "pc_end": "407440",
+          "output_type": "file",
+          "output_name": "output.txt"
         },
         "hotspot": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/hotspot/hotspot",
@@ -67,7 +78,9 @@
             "output.txt"
           ],
           "pc_start": "400920",
-          "pc_end": "401fd0"
+          "pc_end": "401fd0",
+          "output_type": "file",
+          "output_name": "output.txt"
         },
         "hotspot3D": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/hotspot3D/3D",
@@ -80,7 +93,9 @@
             "output.txt"
           ],
           "pc_start": "400ce0",
-          "pc_end": "401d80"
+          "pc_end": "401d80",
+          "output_type": "file",
+          "output_name": "output.txt"
         },
         "hpl": {
           "binpath": "/home/tongshiyu/programs/hpl-2.3/testing/xhpl",
@@ -88,7 +103,11 @@
             ""
           ],
           "pc_start": "4013d0",
-          "pc_end": "41fbd0"
+          "pc_end": "41fbd0",
+          "output_type": "stdout",
+          "compare_method": "hpl",
+          "tolerance": 16.0,
+          "tolerance_type": "threshold"
         },
         "kmeans": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/kmeans/kmeans",
@@ -97,7 +116,9 @@
             "/home/tongshiyu/programs/rodinia-master/data/kmeans/inputGen/1000_34.txt"
           ],
           "pc_start": "400d20",
-          "pc_end": "402110"
+          "pc_end": "402110",
+          "output_type": "file",
+          "output_name": "output.txt"
         },
         "knn": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn",
@@ -106,15 +127,8 @@
             "5",
             "30",
             "90"
-          ]
-        },
-        "lu": {
-          "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/lud/lud",
-          "args": [
-            "-s512"
           ],
-          "pc_start": "400df0",
-          "pc_end": "401d30"
+          "output_type": "stdout"
         },
         "lavaMD": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/lavaMD/lavaMD",
@@ -123,7 +137,8 @@
             "10"
           ],
           "pc_start": "400a40",
-          "pc_end": "401890"
+          "pc_end": "401890",
+          "output_type": "stdout"
         },
         "leukocyte": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/leukocyte/leukocyte",
@@ -133,7 +148,9 @@
             "/home/tongshiyu/programs/rodinia-master/data/leukocyte/testfile.avi"
           ],
           "pc_start": "401540",
-          "pc_end": "41fc90"
+          "pc_end": "41fc90",
+          "output_type": "file",
+          "output_name": "result.txt"
         },
         "myocyte": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/myocyte/myocyte",
@@ -142,7 +159,8 @@
             "1",
             "0",
             "4"
-          ]
+          ],
+          "output_type": "stdout"
         },
         "needle": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/nw/needle",
@@ -152,7 +170,8 @@
             "2"
           ],
           "pc_start": "400c30",
-          "pc_end": "401980"
+          "pc_end": "401980",
+          "output_type": "stdout"
         },
         "srad": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/srad_v1/srad",
@@ -164,7 +183,8 @@
             "1"
           ],
           "pc_start": "400910",
-          "pc_end": "401ddc"
+          "pc_end": "401ddc",
+          "output_type": "stdout"
         },
         "nn": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/nn/nn",
@@ -175,7 +195,9 @@
             "90"
           ],
           "pc_start": "400aa0",
-          "pc_end": "401390"
+          "pc_end": "401390",
+          "output_type": "file",
+          "output_name": "output.txt"
         },
         "particlefilter": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/particlefilter/particle_filter",
@@ -190,7 +212,9 @@
             "1000"
           ],
           "pc_start": "4009c0",
-          "pc_end": "4030a0"
+          "pc_end": "4030a0",
+          "output_type": "file",
+          "output_name": "output.txt"
         },
         "streamcluster": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/streamcluster/streamcluster",
@@ -206,7 +230,9 @@
             "1"
           ],
           "pc_start": "4011e0",
-          "pc_end": "403e30"
+          "pc_end": "403e30",
+          "output_type": "file",
+          "output_name": "output.txt"
         }
       }
     },
@@ -222,7 +248,8 @@
           ],
           "pc_start": "4021a0",
           "pc_end": "40b550",
-          "is_mpi": true
+          "is_mpi": true,
+          "output_type": "stdout"
         },
         "miniFE": {
           "binpath": "/home/tongshiyu/programs/mantevo/miniFE/openmp/basic/miniFE.x",
@@ -231,14 +258,16 @@
           ],
           "pc_start": "402ba0",
           "pc_end": "41de90",
-          "is_mpi": true
+          "is_mpi": true,
+          "output_type": "stdout"
         },
         "miniMD": {
           "binpath": "/home/tongshiyu/programs/mantevo/miniMD/ref/miniMD",
           "args": [],
           "pc_start": "401930",
           "pc_end": "416650",
-          "is_mpi": true
+          "is_mpi": true,
+          "output_type": "stdout"
         },
         "miniAMR": {
           "binpath": "/home/tongshiyu/programs/mantevo/miniAMR/ref/miniAMR.x",
@@ -250,7 +279,8 @@
           ],
           "pc_start": "401110",
           "pc_end": "43a2c0",
-          "is_mpi": true
+          "is_mpi": true,
+          "output_type": "stdout"
         }
       }
     },
@@ -261,23 +291,28 @@
           "binpath": "/home/tongshiyu/programs/NPB3.3.1/NPB3.3-SER/bin/bt.S.x",
           "args": [],
           "pc_start": "400af0",
-          "pc_end": "40e870"
+          "pc_end": "40e870",
+          "output_type": "stdout"
         },
         "cg": {
           "binpath": "/home/tongshiyu/programs/NPB3.3.1/NPB3.3-SER/bin/cg.S.x",
-          "args": []
+          "args": [],
+          "output_type": "stdout"
         },
         "ep": {
           "binpath": "/home/tongshiyu/programs/NPB3.3.1/NPB3.3-SER/bin/ep.S.x",
-          "args": []
+          "args": [],
+          "output_type": "stdout"
         },
         "ft": {
           "binpath": "/home/tongshiyu/programs/NPB3.3.1/NPB3.3-SER/bin/ft.S.x",
-          "args": []
+          "args": [],
+          "output_type": "stdout"
         },
         "is": {
           "binpath": "/home/tongshiyu/programs/NPB3.3.1/NPB3.3-SER/bin/is.S.x",
-          "args": []
+          "args": [],
+          "output_type": "stdout"
         },
         "lu": {
           "binpath": "/home/tongshiyu/programs/rodinia-master/openmp/lud/lud",
@@ -285,19 +320,24 @@
             "-s512"
           ],
           "pc_start": "400df0",
-          "pc_end": "401d30"
+          "pc_end": "401d30",
+          "output_type": "file",
+          "output_name": "lu_matrix_512.txt"
         },
         "mg": {
           "binpath": "/home/tongshiyu/programs/NPB3.3.1/NPB3.3-SER/bin/mg.S.x",
-          "args": []
+          "args": [],
+          "output_type": "stdout"
         },
         "sp": {
           "binpath": "/home/tongshiyu/programs/NPB3.3.1/NPB3.3-SER/bin/sp.S.x",
-          "args": []
+          "args": [],
+          "output_type": "stdout"
         },
         "ua": {
           "binpath": "/home/tongshiyu/programs/NPB3.3.1/NPB3.3-SER/bin/ua.S.x",
-          "args": []
+          "args": [],
+          "output_type": "stdout"
         }
       }
     },
@@ -308,55 +348,64 @@
           "binpath": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/2mm_ref",
           "args": [],
           "pc_start": "4011a0",
-          "pc_end": "49359b"
+          "pc_end": "49359b",
+          "output_type": "stderr"
         },
         "bicg": {
           "binpath": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/bicg_ref",
           "args": [],
           "pc_start": "4011a0",
-          "pc_end": "49346b"
+          "pc_end": "49346b",
+          "output_type": "stderr"
         },
         "correlation": {
           "binpath": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/correlation_ref",
           "args": [],
           "pc_start": "11a0",
-          "pc_end": "1dc4"
+          "pc_end": "1dc4",
+          "output_type": "stderr"
         },
         "fdtd-2d": {
           "binpath": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/fdtd-2d_ref",
           "args": [],
           "pc_start": "1180",
-          "pc_end": "1e34"
+          "pc_end": "1e34",
+          "output_type": "stderr"
         },
         "gesummv": {
           "binpath": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/gesummv_ref",
           "args": [],
           "pc_start": "1180",
-          "pc_end": "1a94"
+          "pc_end": "1a94",
+          "output_type": "stderr"
         },
         "syr2k": {
           "binpath": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/syr2k_ref",
           "args": [],
           "pc_start": "1180",
-          "pc_end": "1a94"
+          "pc_end": "1a94",
+          "output_type": "stderr"
         },
         "gaussian": {
           "binpath": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/gaussian_ref",
           "args": [],
           "pc_start": "1180",
-          "pc_end": "1a94"
+          "pc_end": "1a94",
+          "output_type": "stderr"
         },
         "convolution": {
           "binpath": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/convolution_ref",
           "args": [],
           "pc_start": "400af0",
-          "pc_end": "40e870"
+          "pc_end": "40e870",
+          "output_type": "stderr"
         },
         "mvt": {
           "binpath": "/home/tongshiyu/programs/PolyBenchC-4.2.1/bin/mvt_ref",
           "args": [],
           "pc_start": "1180",
-          "pc_end": "1a94"
+          "pc_end": "1a94",
+          "output_type": "stderr"
         }
       }
     }

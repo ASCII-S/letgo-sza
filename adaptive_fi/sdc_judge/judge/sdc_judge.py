@@ -23,6 +23,7 @@ class SDCJudgeResult:
     is_sdc: bool                      # True=SDC，False=Masked
     message: str                      # 比较详细消息
     tolerance: float                  # 使用的容差
+    tolerance_type: str               # 容差类型: 'absolute' 或 'relative'
     method: str                       # 比较方法
     max_error: Optional[float] = None # 最大误差（如果有）
     test_output_path: str = ""        # 测试输出文件路径
@@ -89,6 +90,7 @@ class SDCJudge:
         # 获取比较方法和容差
         method = app_config.compare_method
         tolerance = app_config.tolerance
+        tolerance_type = app_config.tolerance_type
 
         # 执行比较
         compare_result = self.comparator.compare(
@@ -105,8 +107,10 @@ class SDCJudge:
             log_index=log_index,
             is_sdc=not compare_result.is_match,  # 注意：取反
             message=compare_result.message,
-            tolerance=compare_result.tolerance,
+            tolerance=tolerance,  # 使用应用配置的容差
+            tolerance_type=tolerance_type,  # 容差类型
             method=compare_result.method,
+            max_error=compare_result.max_error if compare_result.max_error else None,
             test_output_path=test_output,
             golden_output_path=golden_output,
             timestamp=datetime.now().isoformat(),
