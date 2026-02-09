@@ -79,7 +79,7 @@ tags
 **/sdcout
 /InstPool
 /letgo_pinfi
-/letgo_Target
+# /letgo_Target
 /massif*
 /mnt
 /VirtualEnv
