@@ -1,0 +1,419 @@
+{
+  "timestamp": "2026-02-03T03:20:06.047011",
+  "configuration": {
+    "apps_count": 41,
+    "parallel_jobs": 1,
+    "timeout": 3600,
+    "max_retries": 2,
+    "min_calls": 1
+  },
+  "results": {
+    "total": 41,
+    "success": 36,
+    "failed": 5,
+    "timeout": 0
+  },
+  "total_time": 15306.339708328247,
+  "details": {
+    "success": [
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/amg_function_profile.json",
+        "file_size_mb": 0.34136009216308594,
+        "num_functions": 284,
+        "elapsed_time": 3.2213356494903564,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/amg_function_profile_20260202_230459.log",
+        "app_name": "amg",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/b+tree_function_profile.json",
+        "file_size_mb": 0.0258026123046875,
+        "num_functions": 21,
+        "elapsed_time": 133.36317491531372,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/b+tree_function_profile_20260202_230502.log",
+        "app_name": "b+tree",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/backprop_function_profile.json",
+        "file_size_mb": 0.02550983428955078,
+        "num_functions": 21,
+        "elapsed_time": 4.370785474777222,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/backprop_function_profile_20260202_230716.log",
+        "app_name": "backprop",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/bfs_function_profile.json",
+        "file_size_mb": 0.005110740661621094,
+        "num_functions": 4,
+        "elapsed_time": 1.566908359527588,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/bfs_function_profile_20260202_230720.log",
+        "app_name": "bfs",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/hotspot_function_profile.json",
+        "file_size_mb": 0.008746147155761719,
+        "num_functions": 7,
+        "elapsed_time": 0.46567344665527344,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/hotspot_function_profile_20260203_020726.log",
+        "app_name": "hotspot",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/hotspot3D_function_profile.json",
+        "file_size_mb": 0.011258125305175781,
+        "num_functions": 9,
+        "elapsed_time": 1352.4117486476898,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/hotspot3D_function_profile_20260203_020726.log",
+        "app_name": "hotspot3D",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/hpl_function_profile.json",
+        "file_size_mb": 0.07227325439453125,
+        "num_functions": 60,
+        "elapsed_time": 42.620107650756836,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/hpl_function_profile_20260203_022959.log",
+        "app_name": "hpl",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/kmeans_function_profile.json",
+        "file_size_mb": 0.008819580078125,
+        "num_functions": 7,
+        "elapsed_time": 7.475168943405151,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/kmeans_function_profile_20260203_023041.log",
+        "app_name": "kmeans",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/lu_function_profile.json",
+        "file_size_mb": 0.009885787963867188,
+        "num_functions": 8,
+        "elapsed_time": 8.927382230758667,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/lu_function_profile_20260203_023054.log",
+        "app_name": "lu",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/lavaMD_function_profile.json",
+        "file_size_mb": 0.008748054504394531,
+        "num_functions": 7,
+        "elapsed_time": 801.583066701889,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/lavaMD_function_profile_20260203_023103.log",
+        "app_name": "lavaMD",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/leukocyte_function_profile.json",
+        "file_size_mb": 0.0797109603881836,
+        "num_functions": 66,
+        "elapsed_time": 1258.5146338939667,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/leukocyte_function_profile_20260203_024424.log",
+        "app_name": "leukocyte",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/myocyte_function_profile.json",
+        "file_size_mb": 0.010004997253417969,
+        "num_functions": 8,
+        "elapsed_time": 2.017695903778076,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/myocyte_function_profile_20260203_030523.log",
+        "app_name": "myocyte",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/needle_function_profile.json",
+        "file_size_mb": 0.0051136016845703125,
+        "num_functions": 4,
+        "elapsed_time": 2.3188562393188477,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/needle_function_profile_20260203_030525.log",
+        "app_name": "needle",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/srad_function_profile.json",
+        "file_size_mb": 0.0075664520263671875,
+        "num_functions": 6,
+        "elapsed_time": 3.369643211364746,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/srad_function_profile_20260203_030527.log",
+        "app_name": "srad",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/nn_function_profile.json",
+        "file_size_mb": 0.003930091857910156,
+        "num_functions": 3,
+        "elapsed_time": 0.5204360485076904,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/nn_function_profile_20260203_030531.log",
+        "app_name": "nn",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/particlefilter_function_profile.json",
+        "file_size_mb": 0.02082538604736328,
+        "num_functions": 17,
+        "elapsed_time": 2.718341827392578,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/particlefilter_function_profile_20260203_030531.log",
+        "app_name": "particlefilter",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/streamcluster_function_profile.json",
+        "file_size_mb": 0.02841663360595703,
+        "num_functions": 23,
+        "elapsed_time": 371.89305305480957,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/streamcluster_function_profile_20260203_030534.log",
+        "app_name": "streamcluster",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/mantevo/HPCCG_function_profile.json",
+        "file_size_mb": 0.11964225769042969,
+        "num_functions": 97,
+        "elapsed_time": 88.18454480171204,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/HPCCG_function_profile_20260203_031146.log",
+        "app_name": "HPCCG",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/mantevo/miniFE_function_profile.json",
+        "file_size_mb": 0.7444734573364258,
+        "num_functions": 603,
+        "elapsed_time": 53.59120011329651,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/miniFE_function_profile_20260203_031314.log",
+        "app_name": "miniFE",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/mantevo/miniMD_function_profile.json",
+        "file_size_mb": 0.07182121276855469,
+        "num_functions": 59,
+        "elapsed_time": 110.16696095466614,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/miniMD_function_profile_20260203_031408.log",
+        "app_name": "miniMD",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/npb/bt_function_profile.json",
+        "file_size_mb": 0.03529930114746094,
+        "num_functions": 29,
+        "elapsed_time": 17.040123224258423,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/bt_function_profile_20260203_031606.log",
+        "app_name": "bt",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/npb/cg_function_profile.json",
+        "file_size_mb": 0.0206451416015625,
+        "num_functions": 17,
+        "elapsed_time": 10.32952618598938,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/cg_function_profile_20260203_031623.log",
+        "app_name": "cg",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/npb/ep_function_profile.json",
+        "file_size_mb": 0.015796661376953125,
+        "num_functions": 13,
+        "elapsed_time": 30.15956950187683,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/ep_function_profile_20260203_031633.log",
+        "app_name": "ep",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/npb/ft_function_profile.json",
+        "file_size_mb": 0.02785205841064453,
+        "num_functions": 23,
+        "elapsed_time": 22.750020742416382,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/ft_function_profile_20260203_031703.log",
+        "app_name": "ft",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/npb/is_function_profile.json",
+        "file_size_mb": 0.016997337341308594,
+        "num_functions": 14,
+        "elapsed_time": 1.2163841724395752,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/is_function_profile_20260203_031726.log",
+        "app_name": "is",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/rodinia/lu_function_profile.json",
+        "file_size_mb": 0.009885787963867188,
+        "num_functions": 8,
+        "elapsed_time": 8.926939010620117,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/lu_function_profile_20260203_031727.log",
+        "app_name": "lu",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/npb/mg_function_profile.json",
+        "file_size_mb": 0.030237197875976562,
+        "num_functions": 25,
+        "elapsed_time": 1.917590856552124,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/mg_function_profile_20260203_031736.log",
+        "app_name": "mg",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/npb/sp_function_profile.json",
+        "file_size_mb": 0.03647804260253906,
+        "num_functions": 30,
+        "elapsed_time": 8.676953315734863,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/sp_function_profile_20260203_031738.log",
+        "app_name": "sp",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/npb/ua_function_profile.json",
+        "file_size_mb": 0.092041015625,
+        "num_functions": 76,
+        "elapsed_time": 120.93353295326233,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/ua_function_profile_20260203_031747.log",
+        "app_name": "ua",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/polybench/2mm_function_profile.json",
+        "file_size_mb": 0.14699077606201172,
+        "num_functions": 123,
+        "elapsed_time": 1.3734393119812012,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/2mm_function_profile_20260203_031948.log",
+        "app_name": "2mm",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/polybench/bicg_function_profile.json",
+        "file_size_mb": 0.1468486785888672,
+        "num_functions": 123,
+        "elapsed_time": 1.3167471885681152,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/bicg_function_profile_20260203_031949.log",
+        "app_name": "bicg",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/polybench/correlation_function_profile.json",
+        "file_size_mb": 0.14697837829589844,
+        "num_functions": 123,
+        "elapsed_time": 1.366865873336792,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/correlation_function_profile_20260203_031950.log",
+        "app_name": "correlation",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/polybench/fdtd-2d_function_profile.json",
+        "file_size_mb": 0.14831924438476562,
+        "num_functions": 124,
+        "elapsed_time": 1.466825008392334,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/fdtd-2d_function_profile_20260203_031952.log",
+        "app_name": "fdtd-2d",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/polybench/gesummv_function_profile.json",
+        "file_size_mb": 0.14679908752441406,
+        "num_functions": 123,
+        "elapsed_time": 1.3164377212524414,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/gesummv_function_profile_20260203_031953.log",
+        "app_name": "gesummv",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/polybench/syr2k_function_profile.json",
+        "file_size_mb": 0.14823150634765625,
+        "num_functions": 124,
+        "elapsed_time": 1.4166929721832275,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/syr2k_function_profile_20260203_031955.log",
+        "app_name": "syr2k",
+        "attempts": 1
+      },
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/raw_json/polybench/mvt_function_profile.json",
+        "file_size_mb": 0.14804458618164062,
+        "num_functions": 124,
+        "elapsed_time": 1.3164007663726807,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/function/results/logs/mvt_function_profile_20260203_032004.log",
+        "app_name": "mvt",
+        "attempts": 1
+      }
+    ],
+    "failed": [
+      {
+        "success": false,
+        "error": "剖析超时（3600.0秒）",
+        "elapsed_time": 3600.002187728882,
+        "app_name": "heartwall",
+        "attempts": 3
+      },
+      {
+        "success": false,
+        "error": "剖析失败，退出码: 1",
+        "elapsed_time": 0.41532230377197266,
+        "app_name": "knn",
+        "attempts": 3
+      },
+      {
+        "success": false,
+        "error": "剖析失败，退出码: 255",
+        "elapsed_time": 1.3168301582336426,
+        "app_name": "miniAMR",
+        "attempts": 3
+      },
+      {
+        "success": false,
+        "error": "剖析失败，退出码: 2",
+        "elapsed_time": 0.03324437141418457,
+        "app_name": "gaussian",
+        "attempts": 3
+      },
+      {
+        "success": false,
+        "error": "剖析失败，退出码: 2",
+        "elapsed_time": 0.0328066349029541,
+        "app_name": "convolution",
+        "attempts": 3
+      }
+    ],
+    "timeout": []
+  }
+}

@@ -84,11 +84,11 @@ tags
 /mnt
 /VirtualEnv
 /analysis*
-/TargetedAnalysis*
-/TargetedBenchmark*
+TargetedAnalysis*
+BenchmarkResult
+TargetedBenchmark*
 DataGet/
 **/analysis_results*
-**/results*
 **/CSV
 **/asm
 

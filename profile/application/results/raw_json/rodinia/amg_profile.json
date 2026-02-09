@@ -1,0 +1,146 @@
+{
+  "tool_info": {
+    "name": "Application Profiler",
+    "version": "2.0",
+    "main_image": "amg"
+  },
+  "instruction_distribution": {
+    "total": {
+      "static_count": 78782,
+      "exec_count": 17193866
+    },
+    "by_category": {
+      "int_arithmetic": {
+        "static_count": 7844,
+        "exec_count": 2360260
+      },
+      "float": {
+        "static_count": 755,
+        "exec_count": 294973
+      },
+      "memory": {
+        "static_count": 11944,
+        "exec_count": 658002
+      },
+      "control_flow": {
+        "static_count": 14815,
+        "exec_count": 4386931
+      },
+      "logic": {
+        "static_count": 5661,
+        "exec_count": 164376
+      },
+      "mov": {
+        "static_count": 27621,
+        "exec_count": 3271449
+      },
+      "simd": {
+        "static_count": 2493,
+        "exec_count": 221887
+      },
+      "other": {
+        "static_count": 7649,
+        "exec_count": 5835988
+      }
+    },
+    "int_arithmetic_details": {
+      "add": { "static_count": 4018, "exec_count": 2289869 },
+      "sub": { "static_count": 3142, "exec_count": 55852 },
+      "mul": { "static_count": 609, "exec_count": 11054 },
+      "div": { "static_count": 75, "exec_count": 3485 }
+    },
+    "memory_details": {
+      "load": { "static_count": 6123, "exec_count": 390185 },
+      "store": { "static_count": 117, "exec_count": 98151 },
+      "stack": { "static_count": 5704, "exec_count": 169666 }
+    },
+    "control_flow_details": {
+      "jmp": { "static_count": 1931, "exec_count": 59916 },
+      "jcc": { "static_count": 8802, "exec_count": 4256470 },
+      "call": { "static_count": 2964, "exec_count": 35285 },
+      "ret": { "static_count": 1118, "exec_count": 35260 }
+    },
+    "logic_details": {
+      "bitwise": { "static_count": 3849, "exec_count": 97099 },
+      "shift": { "static_count": 1812, "exec_count": 67277 }
+    },
+    "simd_details": {
+      "sse": { "static_count": 2117, "exec_count": 208299 },
+      "avx": { "static_count": 376, "exec_count": 13588 },
+      "avx512": { "static_count": 0, "exec_count": 0 }
+    }
+  },
+  "numeric_sensitivity": {
+    "float_inst_static": 755,
+    "float_inst_exec": 294973,
+    "operation_distribution": {
+      "add_sub": 128597,
+      "mul": 122326,
+      "div": 4373,
+      "sqrt": 1,
+      "fma": 0,
+      "cmp": 17089,
+      "cvt": 408
+    },
+    "precision_distribution": {
+      "single": 12329,
+      "double": 282623,
+      "x87": 20,
+      "simd": 20086
+    }
+  },
+  "error_absorption": {
+    "cmp_inst_exec": 4034107,
+    "test_inst_exec": 196116,
+    "saturate_inst_exec": 0,
+    "minmax_inst_exec": 2554,
+    "abs_inst_exec": 2467,
+    "round_inst_exec": 1
+  },
+  "library_calls": {
+    "total_lib_calls": 15132,
+    "user_func_calls": 15083,
+    "by_category": {
+      "memory_lib": {
+        "call_count": 1443,
+        "unique_funcs": 7,
+        "functions": ["brk", "calloc", "free", "malloc", "mmap", "realloc", "sbrk"]
+      },
+      "io_lib": {
+        "call_count": 384,
+        "unique_funcs": 15,
+        "functions": ["_IO_default_xsputn", "_IO_do_write", "_IO_enable_locks", "_IO_fflush", "_IO_file_overflow", "_IO_file_setbuf", "_IO_file_sync", "_IO_file_write", "_IO_file_xsputn", "_IO_flush_all", "_IO_setb", "__printf_chk", "__printf_fp", "close", "snprintf"]
+      },
+      "string_lib": {
+        "call_count": 179,
+        "unique_funcs": 3,
+        "functions": ["strdup", "strtoll", "strtoul"]
+      },
+      "mpi_lib": {
+        "call_count": 275,
+        "unique_funcs": 16,
+        "functions": ["MPI_Allgather", "MPI_Allreduce", "MPI_Barrier", "MPI_Comm_create", "MPI_Comm_size", "MPI_Finalize", "PMPI_Allgatherv", "PMPI_Bcast", "PMPI_Comm_free", "PMPI_Comm_group", "PMPI_Comm_rank", "PMPI_Group_free", "PMPI_Group_incl", "PMPI_Init", "PMPI_Scan", "PMPI_Wtime"]
+      },
+      "omp_lib": {
+        "call_count": 6387,
+        "unique_funcs": 10,
+        "functions": ["GOMP_atomic_end", "GOMP_atomic_start", "GOMP_barrier", "GOMP_parallel", "omp_destroy_lock", "omp_get_max_threads", "omp_get_num_threads", "omp_get_thread_num", "omp_in_parallel", "omp_init_lock"]
+      },
+      "pthread_lib": {
+        "call_count": 65,
+        "unique_funcs": 26,
+        "functions": ["pthread_attr_init", "pthread_attr_init@plt", "pthread_create", "pthread_create@plt", "pthread_getaffinity_np", "pthread_getaffinity_np@plt", "pthread_key_create@plt", "pthread_key_delete", "pthread_key_delete@plt", "pthread_mutex_destroy@plt", "pthread_mutex_init", "pthread_mutex_init@plt", "pthread_mutex_lock", "pthread_mutex_unlock", "pthread_mutexattr_destroy", "pthread_mutexattr_destroy@plt", "pthread_mutexattr_init", "pthread_mutexattr_init@plt", "pthread_mutexattr_setkind_np", "pthread_mutexattr_setpshared", "pthread_mutexattr_setpshared@plt", "pthread_mutexattr_settype@plt", "pthread_self", "pthread_self@plt", "pthread_setspecific", "pthread_setspecific@plt"]
+      },
+      "other_lib": {
+        "call_count": 6399,
+        "unique_funcs": 480,
+        "functions": [".fini", ".plt", ".plt.got", ".plt.sec", ".text", "LOOKUP_CVAR_BY_NAME", "MPIDI_CH3I_BCInit", "MPIDI_CH3I_BCInit@plt", "MPIDI_CH3I_Comm_create_hook", "MPIDI_CH3I_Comm_create_hook@plt", "MPIDI_CH3I_Comm_destroy_hook", "MPIDI_CH3I_Comm_destroy_hook@plt", "MPIDI_CH3I_Comm_init", "MPIDI_CH3I_Comm_init@plt", "MPIDI_CH3I_Progress_finalize", "MPIDI_CH3I_Progress_finalize@plt", "MPIDI_CH3I_Progress_init", "MPIDI_CH3I_Progress_init@plt", "MPIDI_CH3I_Seg_alloc", "MPIDI_CH3I_Seg_alloc@plt", "MPIDI_CH3I_Seg_commit", "MPIDI_CH3I_Seg_commit@plt", "MPIDI_CH3I_Seg_destroy", "MPIDI_CH3I_Seg_destroy@plt", "MPIDI_CH3I_Shm_supported", "MPIDI_CH3I_Shm_supported@plt", "MPIDI_CH3I_comm_create", "MPIDI_CH3I_comm_destroy", "MPIDI_CH3U_Comm_register_create_hook", "MPIDI_CH3U_Comm_register_create_hook@plt", "MPIDI_CH3U_Comm_register_destroy_hook", "MPIDI_CH3U_Comm_register_destroy_hook@plt", "MPIDI_CH3U_Recvq_init", "MPIDI_CH3U_Recvq_init@plt", "MPIDI_CH3U_VC_WaitForClose", "MPIDI_CH3U_VC_WaitForClose@plt", "MPIDI_CH3_Finalize", "MPIDI_CH3_Finalize@plt", "MPIDI_CH3_FreeParentPort", "MPIDI_CH3_FreeParentPort@plt", "MPIDI_CH3_Init", "MPIDI_CH3_Init@plt", "MPIDI_CH3_InitCompleted", "MPIDI_CH3_InitCompleted@plt", "MPIDI_CH3_PG_Destroy", "MPIDI_CH3_PG_Destroy@plt", "MPIDI_CH3_PG_Init", "MPIDI_CH3_PG_Init@plt", "MPIDI_CH3_PktHandler_Init", "MPIDI_CH3_PktHandler_Init@plt", "MPIDI_CH3_VC_Destroy", "MPIDI_CH3_VC_Destroy@plt", "MPIDI_CH3_VC_Init", "MPIDI_CH3_VC_Init@plt", "MPIDI_CH3_Win_fns_init", "MPIDI_CH3_Win_fns_init@plt", "MPIDI_CH3_Win_hooks_init", "MPIDI_CH3_Win_hooks_init@plt", "MPIDI_CH3_Win_pkt_orderings_init", "MPIDI_CH3_Win_pkt_orderings_init@plt", "MPIDI_GetIPInterface", "MPIDI_GetIPInterface@plt", "MPIDI_PG_Close_VCs", "MPIDI_PG_Close_VCs@plt", "MPIDI_PG_Create", "MPIDI_PG_Create@plt", "MPIDI_PG_Destroy", "MPIDI_PG_Destroy@plt", "MPIDI_PG_Finalize", "MPIDI_PG_Finalize@plt", "MPIDI_PG_Init", "MPIDI_PG_Init@plt", "MPIDI_PG_InitConnKVS", "MPIDI_PG_InitConnKVS@plt", "MPIDI_PG_SetConnInfo", "MPIDI_PG_SetConnInfo@plt", "MPIDI_Populate_vc_node_ids", "MPIDI_Populate_vc_node_ids@plt", "MPIDI_RMA_finalize", "MPIDI_RMA_finalize@plt", "MPIDI_RMA_init", "MPIDI_RMA_init@plt", "MPIDI_VCRT_Add_ref", "MPIDI_VCRT_Add_ref@plt", "MPIDI_VCRT_Create", "MPIDI_VCRT_Create@plt", "MPIDI_VCRT_Release", "MPIDI_VCRT_Release@plt", "MPIDI_VCR_Dup", "MPIDI_VCR_Dup@plt", "MPIDI_VC_Init", "MPIDI_VC_Init@plt", "MPIDI_Win_fns_init", "MPIDI_Win_fns_init@plt", "MPID_Comm_get_lpid", "MPID_Comm_get_lpid@plt", "MPID_Dataloop_alloc", "MPID_Dataloop_alloc@plt", "MPID_Dataloop_alloc_and_copy", "MPID_Dataloop_alloc_and_copy@plt", "MPID_Dataloop_copy", "MPID_Dataloop_copy@plt", "MPID_Dataloop_create_contiguous", "MPID_Dataloop_create_contiguous@plt", "MPID_Dataloop_create_indexed", "MPID_Dataloop_create_indexed@plt", "MPID_Dataloop_create_pairtype", "MPID_Dataloop_create_pairtype@plt", "MPID_Dataloop_create_struct", "MPID_Dataloop_create_struct@plt", "MPID_Dataloop_free", "MPID_Dataloop_free@plt", "MPID_Dataloop_struct_alloc", "MPID_Dataloop_struct_alloc@plt", "MPID_Dataloop_update", "MPID_Dataloop_update@plt", "MPID_Datatype_free", "MPID_Datatype_free@plt", "MPID_Finalize", "MPID_Finalize@plt", "MPID_Get_max_node_id", "MPID_Get_max_node_id@plt", "MPID_Get_node_id", "MPID_Get_node_id@plt", "MPID_Get_processor_name", "MPID_Get_processor_name@plt", "MPID_Init", "MPID_Init@plt", "MPID_InitCompleted", "MPID_InitCompleted@plt", "MPID_Type_create_pairtype", "MPID_Type_create_pairtype@plt", "MPID_Type_indexed_count_contig", "MPID_Type_indexed_count_contig@plt", "MPID_nem_barrier", "MPID_nem_barrier@plt", "MPID_nem_barrier_init", "MPID_nem_barrier_init@plt", "MPID_nem_barrier_vars_init", "MPID_nem_barrier_vars_init@plt", "MPID_nem_choose_netmod", "MPID_nem_choose_netmod@plt", "MPID_nem_coll_init", "MPID_nem_coll_init@plt", "MPID_nem_finalize", "MPID_nem_finalize@plt", "MPID_nem_init", "MPID_nem_init@plt", "MPID_nem_lmt_pkthandler_init", "MPID_nem_lmt_pkthandler_init@plt", "MPID_nem_mpich_init", "MPID_nem_mpich_init@plt", "MPID_nem_tcp_bind", "MPID_nem_tcp_bind@plt", "MPID_nem_tcp_finalize", "MPID_nem_tcp_get_business_card", "MPID_nem_tcp_get_business_card@plt", "MPID_nem_tcp_get_ordering", "MPID_nem_tcp_init", "MPID_nem_tcp_send_finalize", "MPID_nem_tcp_send_finalize@plt", "MPID_nem_tcp_send_init", "MPID_nem_tcp_send_init@plt", "MPID_nem_tcp_set_sockopts", "MPID_nem_tcp_set_sockopts@plt", "MPID_nem_tcp_sm_finalize", "MPID_nem_tcp_sm_finalize@plt", "MPID_nem_tcp_sm_init", "MPID_nem_tcp_sm_init@plt", "MPIR_Add_finalize", "MPIR_Add_finalize@plt", "MPIR_Allgather", "MPIR_Allgather@plt", "MPIR_Allgather_impl", "MPIR_Allgather_impl@plt", "MPIR_Allgather_intra", "MPIR_Allgather_intra@plt", "MPIR_Allgatherv", "MPIR_Allgatherv@plt", "MPIR_Allgatherv_impl", "MPIR_Allgatherv_impl@plt", "MPIR_Allgatherv_intra", "MPIR_Allgatherv_intra@plt", "MPIR_Allreduce_impl", "MPIR_Allreduce_impl@plt", "MPIR_Allreduce_intra", "MPIR_Allreduce_intra@plt", "MPIR_Barrier", "MPIR_Barrier@plt", "MPIR_Barrier_impl", "MPIR_Barrier_impl@plt", "MPIR_Barrier_intra", "MPIR_Barrier_intra@plt", "MPIR_Bcast_binomial", "MPIR_Bcast_impl", "MPIR_Bcast_impl@plt", "MPIR_Bcast_intra", "MPIR_Bcast_intra@plt", "MPIR_Call_finalize_callbacks", "MPIR_Comm_commit", "MPIR_Comm_commit@plt", "MPIR_Comm_create", "MPIR_Comm_create@plt", "MPIR_Comm_create_calculate_mapping", "MPIR_Comm_create_calculate_mapping@plt", "MPIR_Comm_create_intra", "MPIR_Comm_create_intra@plt", "MPIR_Comm_create_map", "MPIR_Comm_create_map@plt", "MPIR_Comm_delete_internal", "MPIR_Comm_delete_internal@plt", "MPIR_Comm_free_impl", "MPIR_Comm_free_impl@plt", "MPIR_Comm_group_impl", "MPIR_Comm_group_impl@plt", "MPIR_Comm_init", "MPIR_Comm_init@plt", "MPIR_Comm_is_node_aware", "MPIR_Comm_is_node_aware@plt", "MPIR_Comm_is_node_consecutive", "MPIR_Comm_is_node_consecutive@plt", "MPIR_Comm_map_free", "MPIR_Comm_map_free@plt", "MPIR_Comm_map_irregular", "MPIR_Comm_map_irregular@plt", "MPIR_Comm_register_hint", "MPIR_Comm_register_hint@plt", "MPIR_Comm_release_always", "MPIR_Comm_release_always@plt", "MPIR_Datatype_finalize", "MPIR_Datatype_init", "MPIR_Datatype_init@plt", "MPIR_Err_init", "MPIR_Err_init@plt", "MPIR_Free_contextid", "MPIR_Free_contextid@plt", "MPIR_Get_contextid_sparse", "MPIR_Get_contextid_sparse@plt", "MPIR_Get_contextid_sparse_group", "MPIR_Get_contextid_sparse_group@plt", "MPIR_Group_check_subset", "MPIR_Group_check_subset@plt", "MPIR_Group_check_valid_ranks", "MPIR_Group_check_valid_ranks@plt", "MPIR_Group_create", "MPIR_Group_create@plt", "MPIR_Group_free_impl", "MPIR_Group_free_impl@plt", "MPIR_Group_incl_impl", "MPIR_Group_incl_impl@plt", "MPIR_Group_init", "MPIR_Group_init@plt", "MPIR_Group_release", "MPIR_Group_release@plt", "MPIR_Group_setup_lpid_list", "MPIR_Group_setup_lpid_list@plt", "MPIR_Init_thread", "MPIR_Init_thread@plt", "MPIR_Localcopy", "MPIR_Localcopy@plt", "MPIR_MAXF_check_dtype", "MPIR_SUM_check_dtype", "MPIR_Scan", "MPIR_Scan@plt", "MPIR_Scan_impl", "MPIR_Scan_impl@plt", "MPIR_T_CVAR_REGISTER_impl", "MPIR_T_CVAR_REGISTER_impl@plt", "MPIR_T_cat_add_cvar", "MPIR_T_cat_add_cvar@plt", "MPIR_T_cat_add_desc", "MPIR_T_cat_add_desc@plt", "MPIR_T_cat_create", "MPIR_T_cvar_finalize", "MPIR_T_cvar_finalize@plt", "MPIR_T_cvar_init", "MPIR_T_cvar_init@plt", "MPIR_T_env_finalize", "MPIR_T_env_finalize@plt", "MPIR_T_env_init", "MPIR_T_env_init@plt", "MPIR_Thread_CS_Finalize", "MPIR_Thread_CS_Finalize@plt", "MPIR_Type_get_true_extent_impl", "MPIR_Type_get_true_extent_impl@plt", "MPIR_Type_get_true_extent_x_impl", "MPIR_Type_get_true_extent_x_impl@plt", "MPIU_Find_local_and_external", "MPIU_Find_local_and_external@plt", "MPIU_Handle_direct_init", "MPIU_Handle_direct_init@plt", "MPIU_Handle_finalize", "MPIU_Handle_obj_alloc", "MPIU_Handle_obj_alloc@plt", "MPIU_Handle_obj_alloc_complete", "MPIU_Handle_obj_alloc_complete@plt", "MPIU_Handle_obj_alloc_unsafe", "MPIU_Handle_obj_alloc_unsafe@plt", "MPIU_Handle_obj_free", "MPIU_Handle_obj_free@plt", "MPIU_Str_add_int_arg", "MPIU_Str_add_int_arg@plt", "MPIU_Str_add_string_arg", "MPIU_Str_add_string_arg@plt", "MPIU_Strncpy", "MPIU_Strncpy@plt", "MPIU_Wtime", "MPIU_Wtime@plt", "MPIU_Wtime_diff", "MPIU_Wtime_diff@plt", "MPIU_Wtime_init", "MPIU_Wtime_init@plt", "MPIU_Wtime_todouble", "MPIU_Wtime_todouble@plt", "MPIU_dbg_init", "MPIU_dbg_init@plt", "MPL_env2bool", "MPL_env2bool@plt", "MPL_env2int", "MPL_env2int@plt", "MPL_env2range", "MPL_env2range@plt", "MPL_env2str", "MPL_env2str@plt", "PMI_Barrier", "PMI_Barrier@plt", "PMI_Finalize", "PMI_Finalize@plt", "PMI_Get_appnum", "PMI_Get_appnum@plt", "PMI_Get_rank", "PMI_Get_rank@plt", "PMI_Get_size", "PMI_Get_size@plt", "PMI_Init", "PMI_Init@plt", "PMI_KVS_Commit", "PMI_KVS_Commit@plt", "PMI_KVS_Get_my_name", "PMI_KVS_Get_my_name@plt", "PMI_KVS_Get_name_length_max", "PMI_KVS_Get_name_length_max@plt", "PMI_KVS_Get_value_length_max", "PMI_KVS_Get_value_length_max@plt", "PMI_KVS_Put", "PMI_KVS_Put@plt", "__call_tls_dtors", "__close_nocancel", "__cpu_indicator_init", "__ctype_init", "__cxa_atexit", "__cxa_finalize", "__default_morecore", "__do_global_dtors_aux", "__fcntl", "__fxstat64", "__getpagesize", "__libc_alloca_cutoff", "__libc_malloc", "__libc_pthread_init", "__libc_sigaction", "__libc_start_main", "__mprotect", "__munmap", "__open64_nocancel", "__pthread_disable_asynccancel", "__pthread_enable_asynccancel", "__pthread_initialize_minimal", "__pthread_key_create", "__pthread_mutex_destroy", "__pthread_tunables_init", "__register_atfork", "__sched_cpucount@plt", "__secure_getenv", "__sigaction", "__sigsetjmp", "__snprintf_chk", "__snprintf_chk@plt", "__strdup@plt", "__sysconf", "__tls_get_addr", "__tls_get_addr@plt", "__tunable_get_val", "__vfprintf_chk", "__vsprintf_chk", "__write", "_dl_addr", "_dl_allocate_tls", "_dl_allocate_tls_init", "_dl_catch_exception", "_dl_debug_state", "_dl_find_dso_for_object", "_dl_get_tls_static_info", "_exit", "_fini", "_init", "_pthread_cleanup_pop_restore", "_pthread_cleanup_push_defer", "_setjmp", "bind", "bind@plt", "bsd_signal", "calloc@plt", "cleanup_default_collops", "clock", "clock_gettime", "clock_gettime@plt", "clone", "close@plt", "closedir", "comm_created", "comm_destroyed", "connFreeKVS", "create_thread", "dbg_init", "deregister_tm_clones", "dup_vcrt", "elision_init", "exit", "fcntl@plt", "finalize_failed_procs_group", "find_and_allocate_context_id", "find_free_entry", "frame_dummy", "free@plt", "free_hint_handles", "get_nprocs_conf", "getdents64", "getenv", "getenv@plt", "gethostname", "gethostname@plt", "getpid", "getpid@plt", "getrlimit64", "getsockname", "getsockname@plt", "getsockopt", "getsockopt@plt", "ioctl", "ioctl@plt", "listen", "listen@plt", "locate_context_bit", "malloc@plt", "memcmp@plt", "memcpy@plt", "memset@plt", "mergesort_lpidarray", "mpirinitc2_", "mpirinitc2_@plt", "mpirinitc_", "mpirinitc_@plt", "mpirinitf_", "mpirinitf_@plt", "nem_coll_finalize", "opendir", "pg_destroy", "readdir64", "realloc@plt", "register_hook_finalize", "register_tm_clones", "secure_getenv@plt", "set_collops.part.0", "setbuf", "setbuf@plt", "setbuffer", "setsockopt", "setsockopt@plt", "signal@plt", "snprintf@plt", "socket", "socket@plt", "start_thread", "strchr@plt", "strcpy@plt", "strlen@plt", "strncpy@plt", "sysconf@plt", "uname"]
+      }
+    }
+  },
+  "global_stats": {
+    "total_inst_static": 78782,
+    "total_inst_exec": 17193866,
+    "total_func_calls": 30215
+  }
+}

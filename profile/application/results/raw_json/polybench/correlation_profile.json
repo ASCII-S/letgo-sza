@@ -1,0 +1,198 @@
+{
+  "tool_info": {
+    "name": "应用程序剖析器",
+    "version": "1.0",
+    "description": "程序维度的性能特征剖析，为弹性分析和故障注入提供依据"
+  },
+  "execution_summary": {
+    "total_instructions": 2214506,
+    "pc_range": {
+      "start": "0x0",
+      "end": "0xffffffffffffffff"
+    }
+  },
+  "program_workload_type": {
+    "description": "程序工作负载类型分析，判断是计算密集还是访存密集",
+    "classification": {
+      "type": "混合型",
+      "interpretation": "程序计算和内存访问较为平衡"
+    },
+    "metrics": {
+      "compute_memory_ratio": {
+        "value": 0.66,
+        "pure_compute_inst": 543669,
+        "memory_access_inst": 828106,
+        "interpretation": "计算/访存比值越高说明越偏向计算密集；比值<1说明访存密集",
+        "thresholds": {
+          "compute_intensive": ">10 (每次访存对应10+次计算)",
+          "compute_biased": "2-10",
+          "balanced": "0.5-2",
+          "memory_biased": "0.1-0.5",
+          "memory_intensive": "<0.1"
+        }
+      },
+      "memory_traffic": {
+        "read_bytes": 3509688,
+        "write_bytes": 1641410,
+        "total_mb": 4.91,
+        "bytes_per_inst": 2.33,
+        "interpretation": "每条指令平均访存字节数越高，说明程序对内存带宽依赖越大"
+      },
+      "simd_scalar_ratio": {
+        "simd_instructions": 140790,
+        "scalar_instructions": 2073716,
+        "simd_ratio": 0.06,
+        "interpretation": "SIMD比例高说明程序利用向量化，通常是计算密集型的特征"
+      },
+      "data_movement": {
+        "count": 365823,
+        "ratio": 0.17,
+        "interpretation": "数据移动指令(MOV)比例高说明程序花费大量时间在数据搬运，不利于计算效率"
+      }
+    },
+    "resilience_implications": {
+      "compute_intensive": "计算密集型程序：寄存器错误影响大，值传播链长，但内存错误影响相对小",
+      "memory_intensive": "访存密集型程序：内存/缓存错误影响大，地址计算错误危害严重",
+      "current_program": "混合型 - 建议关注内存子系统错误"
+    }
+  },
+  "data_flow_characteristics": {
+    "description": "数据流和依赖特征影响错误传播范围和速度",
+    "metrics": {
+      "value_lifetime": {
+        "average": 10.73,
+        "median": 2.00,
+        "samples": 1782948,
+        "interpretation": "值生命周期短说明寄存器被快速使用和覆盖，错误存活时间短，容错好",
+        "resilience_impact": "中等弹性"
+      },
+      "value_fanout": {
+        "average": 9404.95,
+        "samples": 2835108,
+        "interpretation": "值扇出低说明一个值影响的后续指令少，错误影响范围小，容错好",
+        "resilience_impact": "低弹性"
+      },
+      "register_rewrite_frequency": {
+        "total_rewrites": 1903108,
+        "interpretation": "寄存器重写频繁说明错误值容易被新值覆盖，容错好",
+        "resilience_impact": "高弹性"
+      }
+    }
+  },
+  "redundancy_checking_characteristics": {
+    "description": "冗余和校验机制可以检测和过滤错误",
+    "metrics": {
+      "compare_instructions": {
+        "count": 121613,
+        "density": 0.05,
+        "interpretation": "比较指令密度高说明程序有更多隐式错误检测点，容错好",
+        "resilience_impact": "高弹性"
+      },
+      "test_instructions": {
+        "count": 78189,
+        "density": 0.04,
+        "interpretation": "TEST指令用于条件检查，可以过滤异常值，容错好",
+        "resilience_impact": "高弹性"
+      },
+      "boundary_checks": {
+        "count": 0,
+        "interpretation": "边界检查可以防止错误值导致越界访问，容错好",
+        "resilience_impact": "低弹性"
+      }
+    }
+  },
+  "instruction_operation_characteristics": {
+    "description": "不同指令类型对错误的敏感度不同",
+    "metrics": {
+      "instruction_type_distribution": {
+        "arithmetic": 743,
+        "control_flow": 1711,
+        "data_movement": 1441,
+        "logic": 645,
+        "memory": 4015,
+        "other": 2272
+      },
+      "mask_operations": {
+        "count": 72829,
+        "density": 0.03,
+        "interpretation": "掩码操作(AND/OR)可以掩盖部分位错误，容错好",
+        "resilience_impact": "中等弹性"
+      },
+      "float_vs_integer": {
+        "float_instructions": 443,
+        "integer_instructions": 10384,
+        "float_ratio": 0.00,
+        "interpretation": "浮点运算对某些位错误更宽容（如低位误差），整数运算对错误更敏感",
+        "resilience_impact": "依赖具体场景"
+      }
+    }
+  },
+  "control_flow_characteristics": {
+    "description": "控制流特征影响错误激活和传播路径",
+    "metrics": {
+      "branch_statistics": {
+        "total_branches": 248330,
+        "branch_taken": 132344,
+        "branch_not_taken": 115986,
+        "branch_bias": 0.53,
+        "interpretation": "高度偏向的分支（bias接近1）更容易容错，因为错误不太可能改变分支方向",
+        "resilience_impact": "低弹性"
+      },
+      "loop_characteristics": {
+        "back_edge_count": 475,
+        "total_iterations": 475,
+        "interpretation": "循环迭代次数多可能稀释单次错误的影响，容错好",
+        "resilience_impact": "中等弹性"
+      },
+      "function_call_depth": {
+        "total_calls": 21799,
+        "total_returns": 21795,
+        "max_depth": 11,
+        "interpretation": "频繁函数调用导致寄存器保存/恢复，可能清除或隔离错误，容错好",
+        "resilience_impact": "中等弹性"
+      }
+    }
+  },
+  "memory_access_pattern": {
+    "description": "内存访问模式影响错误在寄存器和内存间的传播",
+    "metrics": {
+      "read_write_ratio": {
+        "memory_reads": 583952,
+        "memory_writes": 244154,
+        "ratio": 2.39,
+        "interpretation": "高写入率说明错误寄存器值容易被覆盖；高读取率说明错误可能传播到内存",
+        "resilience_impact": "中等弹性"
+      },
+      "stack_vs_heap": {
+        "stack_accesses": 669330,
+        "estimated_heap_accesses": 158776,
+        "stack_ratio": 0.81,
+        "interpretation": "栈访问通常局部性强，错误影响受限；堆访问可能跨函数传播错误",
+        "resilience_impact": "高弹性（栈为主）"
+      },
+      "memory_reuse": {
+        "unique_addresses": 4488,
+        "total_accesses": 828106,
+        "avg_reuse": 184.52,
+        "interpretation": "重复访问率高说明内存局部性好，错误影响范围可能受限",
+        "resilience_impact": "中等影响"
+      }
+    }
+  },
+  "program_structure_characteristics": {
+    "description": "程序结构影响错误的激活概率和传播路径",
+    "metrics": {
+      "hot_instructions": {
+        "count": 1044,
+        "interpretation": "热点代码的弹性更关键，集中在少数热点说明优化这些代码的容错性很重要",
+        "resilience_impact": "关键区域，需重点关注"
+      }
+    }
+  },
+  "overall_resilience_assessment": {
+    "description": "基于上述指标的综合弹性评估",
+    "key_insights": [
+      "比较指令密度高，隐式错误检测点多，有利于容错"
+    ]
+  }
+}

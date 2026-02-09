@@ -29,6 +29,7 @@ APP_PROFILER_TOOL = os.path.join(toolbase, "obj-intel64/app_profiler/app_profile
 PROFILER_TOOL = os.path.join(toolbase, "obj-intel64/application_profiler/application_profiler.so")
 FUNCTION_PROFILER_TOOL = os.path.join(toolbase, "obj-intel64/function_profiler/function_profiler.so")
 BBL_PROFILER_TOOL = os.path.join(toolbase, "obj-intel64/bbl_profiler/bbl_profiler.so")
+INSTRUCTION_PROFILER_TOOL = os.path.join(toolbase, "obj-intel64/instruction_profiler/instruction_profiler.so")
 
 # ============================================================
 # 应用程序列表配置
@@ -129,6 +130,26 @@ for suite in APP_SUITES.keys():
     suite_dir = os.path.join(BBL_RAW_JSON_DIR, suite)
     os.makedirs(suite_dir, exist_ok=True)
 
+# Instruction维度输出目录配置
+INSTRUCTION_PROFILE_DIR = os.path.join(PROFILE_HOME, "instruction")
+INSTRUCTION_RESULTS_DIR = os.path.join(INSTRUCTION_PROFILE_DIR, "results")
+
+# Instruction子目录
+INSTRUCTION_RAW_JSON_DIR = os.path.join(INSTRUCTION_RESULTS_DIR, "raw_json")
+INSTRUCTION_SUMMARY_DIR = os.path.join(INSTRUCTION_RESULTS_DIR, "summary")
+INSTRUCTION_VISUALIZATION_DIR = os.path.join(INSTRUCTION_RESULTS_DIR, "visualization")
+INSTRUCTION_LOGS_DIR = os.path.join(INSTRUCTION_RESULTS_DIR, "logs")
+
+# 确保指令剖析相关目录存在
+for directory in [INSTRUCTION_RAW_JSON_DIR, INSTRUCTION_SUMMARY_DIR,
+                   INSTRUCTION_VISUALIZATION_DIR, INSTRUCTION_LOGS_DIR]:
+    os.makedirs(directory, exist_ok=True)
+
+# 按套件创建指令剖析子目录
+for suite in APP_SUITES.keys():
+    suite_dir = os.path.join(INSTRUCTION_RAW_JSON_DIR, suite)
+    os.makedirs(suite_dir, exist_ok=True)
+
 # ============================================================
 # 分析和可视化配置
 # ============================================================
@@ -198,3 +219,9 @@ def get_bbl_output_json_path(app_name):
     suite = get_app_suite(app_name)
     suite_dir = os.path.join(BBL_RAW_JSON_DIR, suite)
     return os.path.join(suite_dir, f"{app_name}_bbl_profile.json")
+
+def get_instruction_output_json_path(app_name):
+    """获取应用的指令剖析JSON输出路径"""
+    suite = get_app_suite(app_name)
+    suite_dir = os.path.join(INSTRUCTION_RAW_JSON_DIR, suite)
+    return os.path.join(suite_dir, f"{app_name}_instruction_profile.json")

@@ -1,555 +1,356 @@
-# Application Profiling - 程序维度剖析
+# Application Profiler - 应用维度剖析
 
-使用 **app_profiler** 工具进行批量程序剖析的脚本集合。
+使用 `app_profiler` 工具批量剖析应用程序的 Python 脚本集合。
 
-> **重要更新**: 本项目已更新为使用新版 `app_profiler` 工具（位于 `/home/tongshiyu/pin/source/tools/pinfi/app_profiler/`），提供更全面的应用级特征剖析。
->
-> **快速开始**: 参见 `QUICK_START.md`
+## 工具说明
 
-## 应用配置
+**app_profiler** 是基于 Intel Pin 的应用级特征剖析工具，提供四类剖析指标：
 
-**配置文件位置**: `../applications.json` (共享配置，41个应用)
+- **D类 - 指令分布**: 整数/浮点/内存/控制流/逻辑/MOV/SIMD/其他（含细分）
+- **A类 - 数值敏感性**: 浮点运算详细分类、精度分布、敏感运算（div/sqrt）
+- **B类 - 误差吸收**: 比较/测试/饱和/MIN·MAX/绝对值/舍入指令
+- **C类 - 库调用**: math/BLAS/LAPACK/memory/IO/string/MPI/OpenMP/pthread
 
-**查看可用应用**：
-```bash
-# 按套件统计
-python3 list_applications.py --by-suite
-
-# 查看所有应用
-python3 list_applications.py
-
-# 查看单个应用详情
-python3 list_applications.py --app backprop
-```
-
-**应用统计**：
-- **Rodinia**: 19个应用（OpenMP）
-- **Mantevo**: 4个应用（MPI）
-- **NPB**: 9个应用（Serial）
-- **PolyBench**: 9个应用（Optimization）
-- **总计**: 41个应用
+工具位置: `/home/tongshiyu/pin/source/tools/pinfi/app_profiler/`
+配置文件: `../applications.json` (41个应用)
 
 ---
 
-## 核心脚本
+## 快速开始
 
-### 1. profile_single.py - 单应用剖析
+### 1. 验证配置
 
-剖析单个应用程序。
-
-**使用方法**：
 ```bash
-python3 profile_single.py <app_name> [options]
+python3 test_profiler.py
 ```
 
-**参数**：
-- `app_name` - 应用名称（来自configure.py）
-- `--output, -o` - 输出JSON路径（可选）
-- `--timeout, -t` - 超时时间（秒，默认3600）
+### 2. 单应用剖析
 
-**示例**：
 ```bash
-# 剖析backprop
+# 基础用法
 python3 profile_single.py backprop
 
-# 自定义输出路径和超时
-python3 profile_single.py bfs --output ./my_bfs.json --timeout 7200
+# 详细模式
+python3 profile_single.py backprop --verbose
+
+# 指定输出和超时
+python3 profile_single.py hpl --output /path/to/output.json --timeout 7200
 ```
 
-**输出**：
-- JSON文件：`results/raw_json/<suite>/<app>_profile.json`
-- 日志文件：`results/logs/<app>_profile_<timestamp>.log`
+### 3. 批量剖析
 
----
-
-### 2. profile_batch.py - 批量剖析
-
-批量剖析多个应用，支持并行处理。
-
-**使用方法**：
 ```bash
-python profile_batch.py [--all|--suite <name>|--apps <list>] [options]
+# 按套件剖析（串行）
+python3 profile_batch.py --suite rodinia
+
+# 并行剖析（4任务）
+python3 profile_batch.py --suite rodinia --parallel 4
+
+# 剖析所有应用
+python3 profile_batch.py --all --parallel 4
+
+# 指定应用列表
+python3 profile_batch.py --apps backprop bfs hotspot --parallel 3
+
+# 排除部分应用
+python3 profile_batch.py --all --exclude hpl miniAMR
+
+# Dry-run预览
+python3 profile_batch.py --suite mantevo --dry-run
 ```
 
-**应用选择参数（互斥）**：
-- `--all` - 剖析所有应用
-- `--suite <name>` - 剖析指定套件（rodinia, mantevo, npb, polybench）
-- `--apps <list>` - 指定应用列表
+### 4. 查看应用配置
 
-**其他参数**：
-- `--exclude <list>` - 排除指定应用
-- `--parallel, -p` - 并行任务数（1-4，默认1）
-- `--timeout, -t` - 每个应用超时时间（秒，默认3600）
-- `--retries, -r` - 失败重试次数（默认2）
-- `--dry-run` - 只显示将要剖析的应用列表
-
-**示例**：
-```bash
-# 剖析所有应用（串行）
-python profile_batch.py --all
-
-# 剖析Rodinia套件（4并行）
-python profile_batch.py --suite rodinia --parallel 4
-
-# 剖析指定应用
-python profile_batch.py --apps backprop bfs hotspot
-
-# 剖析所有但排除超时应用
-python profile_batch.py --all --exclude hpl miniAMR
-
-# Dry-run查看应用列表
-python profile_batch.py --suite mantevo --dry-run
-
-# 增加超时和重试
-python profile_batch.py --all --timeout 7200 --retries 3
-```
-
-**输出**：
-- 每个应用的JSON文件
-- 批量日志：`results/logs/batch_profile_<timestamp>.log`
-- 批量汇总：`results/summary/batch_summary_<timestamp>.json`
-
----
-
-### 4. list_applications.py - 应用配置查看
-
-查看和浏览应用配置信息。
-
-**使用方法**：
-```bash
-python3 list_applications.py [options]
-```
-
-**参数**：
-- `--by-suite` - 按套件统计应用
-- `--suite <name>` - 只显示指定套件
-- `--detailed, -d` - 显示详细信息
-- `--app <name>` - 显示单个应用的详细配置
-
-**示例**：
 ```bash
 # 按套件统计
 python3 list_applications.py --by-suite
-
-# 表格形式列出所有应用
-python3 list_applications.py
-
-# 详细信息
-python3 list_applications.py --detailed
-
-# 查看Rodinia套件
-python3 list_applications.py --suite rodinia
 
 # 查看单个应用
 python3 list_applications.py --app backprop
-```
 
-**输出**：
-- 应用列表（表格或详细格式）
-- 二进制路径、参数、PC范围
-- MPI标记、套件归属
-
----
-
-### 5. analyze_results.py - 结果分析
-
-从JSON文件提取指标，生成汇总报告。
-
-**使用方法**：
-```bash
-python analyze_results.py [options]
-```
-
-**参数**：
-- `--json-dir, -j` - JSON文件目录（默认results/raw_json）
-- `--output, -o` - 输出目录（默认results/summary）
-
-**示例**：
-```bash
-# 分析默认目录
-python analyze_results.py
-
-# 指定自定义目录
-python analyze_results.py --json-dir ./custom_json --output ./custom_summary
-```
-
-**输出文件**：
-1. `metrics_summary.csv` - 指标汇总CSV
-   - app_name, suite, workload_type
-   - 所有关键指标
-   - resilience_score
-
-2. `suite_comparison.csv` - 套件对比
-   - 每个套件的mean, std, min, max
-
-3. `resilience_scores.csv` - 弹性评分排行
-   - app_name, suite, resilience_score, grade
-
-4. `summary_report.txt` - 文本报告
-   - 按套件统计
-   - 工作负载类型分布
-   - Top 10 高/低弹性程序
-
----
-
-### 6. visualize.py - 可视化
-
-生成可视化图表。
-
-**使用方法**：
-```bash
-python visualize.py [options]
-```
-
-**参数**：
-- `--summary-dir, -s` - 汇总数据目录（默认results/summary）
-- `--output, -o` - 输出目录（默认results/visualization）
-
-**示例**：
-```bash
-# 生成所有图表
-python visualize.py
-
-# 自定义目录
-python visualize.py --summary-dir ./custom_summary --output ./custom_plots
-```
-
-**输出图表**：
-1. `workload_classification.png` - 工作负载分类饼图
-2. `compute_memory_ratio.png` - 计算/访存比柱状图（按套件着色）
-3. `suite_heatmap.png` - 套件特征对比热图（归一化）
-4. `resilience_ranking.png` - 弹性评分排行（横向柱状图）
-5. `dataflow_features.png` - 数据流特征散点图
-
----
-
-## 完整工作流
-
-### 基础流程
-
-```bash
-# 1. 查看要剖析的应用
-python3 list_applications.py --by-suite
-
-# 2. 批量剖析
-python3 profile_batch.py --all --parallel 4
-
-# 3. 分析结果
-python3 analyze_results.py
-
-# 4. 生成图表
-python3 visualize.py
-
-# 5. 查看报告
-cat results/summary/summary_report.txt
-ls results/visualization/
-```
-
-### 分阶段执行
-
-```bash
-# 阶段1：先剖析Rodinia和PolyBench
-python profile_batch.py --suite rodinia --parallel 4
-python profile_batch.py --suite polybench --parallel 4
-
-# 阶段2：再剖析Mantevo和NPB（可能需要更长时间）
-python profile_batch.py --suite mantevo --timeout 7200
-python profile_batch.py --suite npb
-
-# 阶段3：汇总分析
-python analyze_results.py
-python visualize.py
-```
-
-### 增量执行
-
-```bash
-# 只剖析失败的应用
-python profile_batch.py --apps app1 app2 app3
-
-# 重新分析（会处理所有已有的JSON）
-python analyze_results.py
-python visualize.py
+# 列出所有应用
+python3 list_applications.py
 ```
 
 ---
 
-## 关键指标说明
+## 命令行参数
 
-### 程序工作负载类型
-- **compute_memory_ratio** - 计算/访存比
-  - `>10`: 计算密集型
-  - `2-10`: 计算偏向型
-  - `0.5-2`: 混合型
-  - `0.1-0.5`: 访存偏向型
-  - `<0.1`: 访存密集型
+### profile_single.py
 
-- **bytes_per_instruction** - 每指令访存字节数
-- **simd_ratio** - SIMD/向量化比例
-- **workload_type** - 工作负载分类
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `app_name` | 应用名称（必需） | - |
+| `--output, -o` | 输出JSON路径 | `results/raw_json/<suite>/<app>_profile.json` |
+| `--timeout, -t` | 超时时间（秒） | 3600 |
+| `--verbose, -v` | 详细输出模式 | False |
 
-### 数据流特征
-- **value_lifetime_avg** - 值生命周期（平均）
-  - 从定义到首次使用的指令跨度
-  - 越短→错误传播能力有限→高弹性
+### profile_batch.py
 
-- **value_fanout_avg** - 值扇出度（平均）
-  - 一个值被后续指令使用的次数
-  - 越低→错误影响范围小→高弹性
+**应用选择（互斥）:**
+- `--all` - 剖析所有应用
+- `--suite <name>` - 剖析指定套件（rodinia/mantevo/npb/polybench）
+- `--apps <list>` - 指定应用列表
 
-- **register_rewrite_rate** - 寄存器重写率
-  - 寄存器被覆写的频率
-  - 越高→错误被快速覆盖→高弹性
-
-### 冗余和校验
-- **compare_instruction_density** - 比较指令密度
-  - CMP/CMOV指令占比
-  - 越高→隐式错误检查多→高弹性
-
-### 控制流特征
-- **branch_bias** - 分支偏向性
-  - 分支方向倾向程度（0-1）
-  - 越高→错误难以改变控制流→高弹性
-
-- **loop_avg_iterations** - 循环平均迭代次数
-
-### 内存访问
-- **memory_read_write_ratio** - 内存读写比
-  - 读/写次数比
-  - 写多→错误被覆盖→高弹性
-
-### 弹性评分
-- **resilience_score** - 综合弹性评分（0-100）
-  - 基于上述指标加权计算
-  - A级（≥70）：高弹性
-  - B级（50-70）：中等弹性
-  - C级（<50）：低弹性
+**执行参数:**
+- `--exclude <list>` - 排除指定应用
+- `--parallel, -p` - 并行任务数（1-4，默认1）
+- `--timeout, -t` - 每应用超时（秒，默认3600）
+- `--retries, -r` - 失败重试次数（默认2）
+- `--dry-run` - 仅预览不执行
 
 ---
 
-## 输出JSON格式
+## 输出文件
 
-application_profiler 输出的JSON包含以下主要部分：
+### 目录结构
+
+```
+results/
+├── raw_json/              # 剖析结果JSON
+│   ├── rodinia/          # 按套件分类
+│   │   ├── backprop_profile.json
+│   │   └── ...
+│   ├── mantevo/
+│   ├── npb/
+│   └── polybench/
+├── summary/               # 批量汇总
+│   └── batch_summary_<timestamp>.json
+├── visualization/         # 可视化图表
+└── logs/                  # 执行日志
+    ├── <app>_profile_<timestamp>.log
+    └── batch_profile_<timestamp>.log
+```
+
+### JSON 格式
 
 ```json
 {
-  "tool_info": {...},
-  "execution_summary": {
-    "total_instructions": 12345678,
-    "total_basic_blocks": 5000
+  "tool_info": {
+    "name": "Application Profiler",
+    "version": "2.0",
+    "main_image": "backprop"
   },
-  "program_workload_type": {
-    "classification": {"type": "访存偏向型"},
-    "metrics": {
-      "compute_memory_ratio": {"value": 0.45},
-      "bytes_per_instruction": 2.3
+  "instruction_distribution": {
+    "total": {"static_count": 1234, "exec_count": 567890},
+    "by_category": {
+      "int_arithmetic": {...},
+      "float": {...},
+      "memory": {...},
+      "control_flow": {...},
+      "logic": {...},
+      "mov": {...},
+      "simd": {...},
+      "other": {...}
+    },
+    "int_arithmetic_details": {"add": {...}, "sub": {...}, ...},
+    "memory_details": {"load": {...}, "store": {...}, "stack": {...}},
+    "control_flow_details": {"jmp": {...}, "jcc": {...}, "call": {...}, "ret": {...}},
+    "logic_details": {"bitwise": {...}, "shift": {...}},
+    "simd_details": {"sse": {...}, "avx": {...}, "avx512": {...}}
+  },
+  "numeric_sensitivity": {
+    "float_inst_static": 100,
+    "float_inst_exec": 30000,
+    "operation_distribution": {
+      "add_sub": 10000,
+      "mul": 8000,
+      "div": 100,
+      "sqrt": 50,
+      "fma": 5000,
+      "cmp": 1000,
+      "cvt": 500
+    },
+    "precision_distribution": {
+      "single": 5000,
+      "double": 25000,
+      "x87": 0
+    },
+    "simd_float_exec": 10000
+  },
+  "error_absorption": {
+    "cmp_inst_exec": 5000,
+    "test_inst_exec": 2000,
+    "saturate_inst_exec": 100,
+    "minmax_inst_exec": 50,
+    "abs_inst_exec": 30,
+    "round_inst_exec": 20
+  },
+  "library_calls": {
+    "total_lib_calls": 500,
+    "user_func_calls": 100,
+    "by_category": {
+      "math_lib": {"call_count": 50, "unique_funcs": 5, "functions": [...]},
+      "blas_lib": {...},
+      "lapack_lib": {...},
+      "memory_lib": {...},
+      "io_lib": {...},
+      "string_lib": {...},
+      "mpi_lib": {...},
+      "omp_lib": {...},
+      "pthread_lib": {...}
     }
   },
-  "data_flow_characteristics": {
-    "metrics": {
-      "value_lifetime": {"average": 15.5, "median": 10},
-      "value_fanout": {"average": 3.2}
-    }
-  },
-  "control_flow_characteristics": {...},
-  "memory_access_patterns": {...},
-  "instruction_characteristics": {...}
+  "global_stats": {
+    "total_inst_static": 1234,
+    "total_inst_exec": 567890,
+    "total_func_calls": 600
+  }
 }
 ```
 
 ---
 
-## 故障排除
+## Python API
 
-### 1. 剖析失败
-**症状**：某个应用剖析失败
+### 基础用法
 
-**解决方案**：
+```python
+from profile_single import ApplicationProfiler
+
+# 创建剖析器
+profiler = ApplicationProfiler("backprop", verbose=False)
+
+# 执行剖析
+result = profiler.run(timeout=300)
+
+# 检查结果
+if result['success']:
+    print(f"成功: {result['output_file']}")
+    print(f"耗时: {result['elapsed_time']:.1f}秒")
+else:
+    print(f"失败: {result['error']}")
+```
+
+### 批量剖析
+
+```python
+from profile_single import ApplicationProfiler
+
+apps = ["backprop", "bfs", "hotspot"]
+results = []
+
+for app_name in apps:
+    profiler = ApplicationProfiler(app_name)
+    result = profiler.run(timeout=300)
+    results.append((app_name, result))
+
+    status = "✓" if result['success'] else "✗"
+    print(f"{status} {app_name}")
+```
+
+完整示例请参考 `example_batch_profile.py`。
+
+---
+
+## 应用套件
+
+**配置来源**: `../applications.json`
+
+| 套件 | 数量 | 说明 |
+|------|------|------|
+| **rodinia** | 19 | Rodinia Benchmark Suite (OpenMP) |
+| **mantevo** | 4 | Mantevo Benchmark Suite (MPI) |
+| **npb** | 9 | NAS Parallel Benchmarks Serial |
+| **polybench** | 9 | PolyBench/C Benchmark Suite |
+| **总计** | 41 | - |
+
+**MPI应用**: HPCCG, miniAMR, miniFE, miniMD
+
+---
+
+## 常见问题
+
+### 1. 工具未编译
+
 ```bash
-# 查看日志
+# 编译 app_profiler
+cd /home/tongshiyu/pin/source/tools/pinfi
+make obj-intel64/app_profiler/app_profiler.so
+```
+
+### 2. 应用超时
+
+```bash
+# 增加超时时间
+python3 profile_single.py hpl --timeout 10800
+python3 profile_batch.py --suite mantevo --timeout 7200
+```
+
+### 3. MPI应用失败
+
+```bash
+# 检查MPI环境
+which mpirun
+module load openmpi
+```
+
+### 4. 内存不足
+
+```bash
+# 减少并行数或分批处理
+python3 profile_batch.py --all --parallel 1
+python3 profile_batch.py --suite rodinia
+python3 profile_batch.py --suite polybench
+```
+
+### 5. 查看日志
+
+```bash
+# 单应用日志
 cat results/logs/<app>_profile_*.log
 
-# 增加超时重试
-python profile_single.py <app> --timeout 7200
-```
-
-### 2. MPI应用失败
-**症状**：Mantevo应用报错
-
-**解决方案**：
-检查MPI环境：
-```bash
-which mpirun
-mpirun --version
-```
-
-### 3. JSON解析错误
-**症状**：analyze_results.py报JSON格式错误
-
-**解决方案**：
-```bash
-# 检查JSON文件
-cat results/raw_json/<suite>/<app>_profile.json
-
-# 删除损坏的JSON并重新剖析
-rm results/raw_json/<suite>/<app>_profile.json
-python profile_single.py <app>
-```
-
-### 4. 可视化失败
-**症状**：visualize.py报缺少数据
-
-**解决方案**：
-```bash
-# 先运行分析
-python analyze_results.py
-
-# 检查汇总文件
-ls results/summary/
-```
-
-### 5. 内存不足
-**症状**：系统卡住或OOM
-
-**解决方案**：
-```bash
-# 减少并行数
-python profile_batch.py --all --parallel 2
-
-# 或分批处理
-python profile_batch.py --suite rodinia
-python profile_batch.py --suite mantevo
-...
+# 批量日志
+cat results/logs/batch_profile_*.log
+tail -f results/logs/batch_profile_*.log  # 实时监控
 ```
 
 ---
 
-## 性能优化建议
+## 性能建议
 
-### 1. 并行处理
-- 推荐4个并行任务：`--parallel 4`
-- CPU核心数少时降低并行数
-
-### 2. 超时设置
-- 小程序（如backprop）：默认3600秒足够
-- 大程序（如hpl）：建议7200秒或更多
-
-### 3. 分批处理
-```bash
-# 先处理快速的套件
-python profile_batch.py --suite rodinia --parallel 4
-python profile_batch.py --suite polybench --parallel 4
-
-# 再处理慢速套件
-python profile_batch.py --suite mantevo --timeout 7200
-```
+1. **并行任务**: 根据CPU核心数选择，推荐2-4个
+2. **超时设置**: 小程序用默认值，大程序（hpl/miniAMR）建议7200秒+
+3. **分批处理**: 先快速套件（rodinia/polybench），再慢速套件（mantevo）
+4. **Dry-run**: 使用 `--dry-run` 预览任务
 
 ---
 
-## 依赖说明
+## 脚本说明
 
-### 必需依赖
+| 脚本 | 功能 |
+|------|------|
+| `profile_single.py` | 单应用剖析 |
+| `profile_batch.py` | 批量剖析（支持并行） |
+| `list_applications.py` | 查看应用配置 |
+| `test_profiler.py` | 验证配置 |
+| `example_batch_profile.py` | Python API示例 |
+| `generate_app_configs.py` | 生成applications.json |
+
+---
+
+## 依赖
+
+**Python依赖**:
 ```bash
-pip install pandas numpy
+pip install tqdm  # 可选，用于进度条
 ```
 
-### 可视化依赖（可选）
-```bash
-pip install matplotlib seaborn
-```
-
-### 进度条（可选）
-```bash
-pip install tqdm
-```
-
-### 系统要求
+**系统依赖**:
 - Python 3.6+
-- application_profiler.so 已编译
-- Pin 工具
+- Intel Pin
 - MPI环境（用于Mantevo套件）
+- 编译好的 `app_profiler.so`
 
 ---
 
-## 配置文件
+## 参考
 
-配置文件：`../config.py`
-
-可修改的配置：
-```python
-# 超时时间
-PROFILE_TIMEOUT = 3600  # 1小时
-
-# 并行任务数
-MAX_PARALLEL_JOBS = 4
-
-# 重试次数
-MAX_RETRIES = 2
-
-# 弹性评分权重
-RESILIENCE_WEIGHTS = {
-    'value_lifetime': 0.20,
-    'value_fanout': 0.20,
-    'register_rewrite_rate': 0.15,
-    'compare_density': 0.15,
-    'branch_bias': 0.10,
-    'mask_operations': 0.10,
-    'function_call_frequency': 0.10
-}
-```
+- **工具文档**: `/home/tongshiyu/pin/source/tools/pinfi/app_profiler/README.md`
+- **配置文件**: `../applications.json` 和 `../config.py`
+- **完整配置**: `/home/tongshiyu/pin/source/tools/letgo/configure.py`
 
 ---
 
-## 常见用例
-
-### 用例1：全量剖析所有应用
-```bash
-python profile_batch.py --all --parallel 4
-python analyze_results.py
-python visualize.py
-```
-
-### 用例2：对比不同套件的弹性特征
-```bash
-python profile_batch.py --suite rodinia --parallel 4
-python profile_batch.py --suite mantevo
-python analyze_results.py
-# 查看 suite_comparison.csv 和 suite_heatmap.png
-```
-
-### 用例3：识别高弹性/低弹性应用
-```bash
-python profile_batch.py --all --parallel 4
-python analyze_results.py
-# 查看 resilience_scores.csv 和 resilience_ranking.png
-```
-
-### 用例4：分析特定应用的弹性瓶颈
-```bash
-python profile_single.py <app>
-# 查看 raw_json/<suite>/<app>_profile.json
-# 分析哪些指标导致低弹性评分
-```
-
----
-
-## 扩展和定制
-
-### 添加新指标
-在 `analyze_results.py` 的 `extract_metrics_from_json()` 中添加：
-```python
-if 'new_feature' in data:
-    metrics['new_metric'] = data['new_feature'].get('value')
-```
-
-### 修改弹性评分算法
-在 `../config.py` 中修改 `RESILIENCE_WEIGHTS`
-
-### 添加新图表
-在 `visualize.py` 中添加新的绘图函数
-
----
-
-## 许可
-
-与 LetGo 项目保持一致
+**版本**: v2.0
+**最后更新**: 2026-02-09
