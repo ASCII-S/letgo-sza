@@ -1,6 +1,10 @@
 # Application Profiling - 程序维度剖析
 
-使用 application_profiler 工具进行批量程序剖析的脚本集合。
+使用 **app_profiler** 工具进行批量程序剖析的脚本集合。
+
+> **重要更新**: 本项目已更新为使用新版 `app_profiler` 工具（位于 `/home/tongshiyu/pin/source/tools/pinfi/app_profiler/`），提供更全面的应用级特征剖析。
+>
+> **快速开始**: 参见 `QUICK_START.md`
 
 ## 应用配置
 

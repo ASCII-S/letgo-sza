@@ -24,27 +24,27 @@ from pathlib import Path
 profile_home = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, profile_home)
 from config import (
-    PIN_BINARY, PROFILER_TOOL,
+    PIN_BINARY, APP_PROFILER_TOOL,
     get_app_config, get_output_json_path,
     PROFILE_TIMEOUT, MPI_APP, LOGS_DIR
 )
 
 
 class ApplicationProfiler:
-    """应用程序剖析器类"""
+    """应用程序剖析器类（使用 app_profiler 工具）"""
 
-    def __init__(self, app_name, output_json=None, pc_start=None, pc_end=None):
+    def __init__(self, app_name, output_json=None, verbose=False):
         """
         初始化剖析器
 
         Args:
             app_name: 应用程序名称
             output_json: 输出JSON路径（可选）
-            pc_start: 起始PC地址（可选，明确指定时才使用）
-            pc_end: 结束PC地址（可选，明确指定时才使用）
+            verbose: 是否启用详细输出模式
         """
         self.app_name = app_name
         self.output_json = output_json or get_output_json_path(app_name)
+        self.verbose = verbose
 
         # 从 configure.py 获取应用配置
         try:
@@ -54,10 +54,6 @@ class ApplicationProfiler:
 
         self.binpath = self.config['binpath']
         self.args = self.config.get('args', [])
-
-        # PC范围：只在明确指定时才使用，不从配置文件自动获取
-        self.pc_start = pc_start
-        self.pc_end = pc_end
 
         self.is_mpi = app_name in MPI_APP
 
@@ -74,16 +70,14 @@ class ApplicationProfiler:
             cmd.extend(['mpirun', '-np', '1'])
 
         # Pin 和工具
-        cmd.extend([PIN_BINARY, '-t', PROFILER_TOOL])
+        cmd.extend([PIN_BINARY, '-t', APP_PROFILER_TOOL])
 
         # 输出文件
         cmd.extend(['-o', self.output_json])
 
-        # PC范围（如果指定）
-        if self.pc_start:
-            cmd.extend(['-pc_start', self.pc_start])
-        if self.pc_end:
-            cmd.extend(['-pc_end', self.pc_end])
+        # 详细模式
+        if self.verbose:
+            cmd.append('-v')
 
         # 程序和参数
         cmd.append('--')
@@ -110,8 +104,7 @@ class ApplicationProfiler:
         print(f"二进制文件: {self.binpath}")
         print(f"参数: {' '.join(str(a) for a in self.args)}")
         print(f"输出JSON: {self.output_json}")
-        if self.pc_start:
-            print(f"PC范围: {self.pc_start} - {self.pc_end}")
+        print(f"详细模式: {'是' if self.verbose else '否'}")
         print(f"MPI应用: {'是' if self.is_mpi else '否'}")
         print(f"命令: {' '.join(cmd)}")
         print(f"日志: {self.log_file}")
@@ -216,7 +209,7 @@ class ApplicationProfiler:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='剖析单个应用程序',
+        description='使用 app_profiler 剖析单个应用程序',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:
@@ -228,6 +221,15 @@ def main():
 
   # 设置超时时间
   python profile_single.py hpl --timeout 7200
+
+  # 详细输出模式
+  python profile_single.py backprop --verbose
+
+剖析指标包括:
+  - 指令类型分布 (D类)
+  - 数值敏感性 (A类)
+  - 误差吸收能力 (B类)
+  - 库调用统计 (C类)
         """
     )
 
@@ -237,13 +239,16 @@ def main():
                        help='输出JSON文件路径（默认：results/raw_json/<suite>/<app>_profile.json）')
     parser.add_argument('--timeout', '-t', type=int, default=PROFILE_TIMEOUT,
                        help=f'超时时间（秒），默认：{PROFILE_TIMEOUT}')
+    parser.add_argument('--verbose', '-v', action='store_true',
+                       help='启用详细输出模式')
 
     args = parser.parse_args()
 
     # 创建剖析器并运行
     profiler = ApplicationProfiler(
         args.app_name,
-        output_json=args.output
+        output_json=args.output,
+        verbose=args.verbose
     )
 
     result = profiler.run(timeout=args.timeout)

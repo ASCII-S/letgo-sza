@@ -23,6 +23,9 @@ from configure import (
 # Pin 和工具路径配置
 # ============================================================
 PIN_BINARY = os.path.join(pin_home, "pin")
+# 应用级剖析工具（新版本）
+APP_PROFILER_TOOL = os.path.join(toolbase, "obj-intel64/app_profiler/app_profiler.so")
+# 旧版本工具（如果存在）
 PROFILER_TOOL = os.path.join(toolbase, "obj-intel64/application_profiler/application_profiler.so")
 FUNCTION_PROFILER_TOOL = os.path.join(toolbase, "obj-intel64/function_profiler/function_profiler.so")
 BBL_PROFILER_TOOL = os.path.join(toolbase, "obj-intel64/bbl_profiler/bbl_profiler.so")
