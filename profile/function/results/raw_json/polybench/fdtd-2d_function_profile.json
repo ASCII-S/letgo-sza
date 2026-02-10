@@ -72,6 +72,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 8,
         "reg_write_exec": 5,
@@ -163,6 +167,10 @@
         "call_static": 6,
         "call_other_exec": 3,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 104,
@@ -256,6 +264,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 3,
         "reg_write_exec": 2,
@@ -347,6 +359,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 4,
@@ -440,6 +456,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 10,
         "reg_write_exec": 15,
@@ -531,6 +551,10 @@
         "call_static": 4,
         "call_other_exec": 4,
         "indirect_exec": 4
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 192,
@@ -624,6 +648,10 @@
         "call_other_exec": 4,
         "indirect_exec": 4
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 124,
         "reg_write_exec": 76,
@@ -715,6 +743,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 49193,
@@ -808,6 +840,10 @@
         "call_other_exec": 1928,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 3
+      },
       "register_usage": {
         "reg_read_exec": 100347,
         "reg_write_exec": 105556,
@@ -899,6 +935,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 3009826,
@@ -992,6 +1032,10 @@
         "call_other_exec": 11,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 5
+      },
       "register_usage": {
         "reg_read_exec": 88,
         "reg_write_exec": 82,
@@ -1083,6 +1127,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 831,
@@ -1176,6 +1224,10 @@
         "call_other_exec": 0,
         "indirect_exec": 0
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 5,
         "reg_write_exec": 3,
@@ -1267,6 +1319,10 @@
         "call_static": 2,
         "call_other_exec": 14,
         "indirect_exec": 7
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 2
       },
       "register_usage": {
         "reg_read_exec": 3697,
@@ -1360,6 +1416,10 @@
         "call_other_exec": 3,
         "indirect_exec": 2
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 3
+      },
       "register_usage": {
         "reg_read_exec": 152,
         "reg_write_exec": 108,
@@ -1451,6 +1511,10 @@
         "call_static": 1,
         "call_other_exec": 1,
         "indirect_exec": 0
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 9,
@@ -1544,6 +1608,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 45,
         "reg_write_exec": 33,
@@ -1635,6 +1703,10 @@
         "call_static": 3,
         "call_other_exec": 1,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 50,
@@ -1728,6 +1800,10 @@
         "call_other_exec": 1806,
         "indirect_exec": 1806
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 101040,
         "reg_write_exec": 39732,
@@ -1819,6 +1895,10 @@
         "call_static": 75,
         "call_other_exec": 10842,
         "indirect_exec": 14436
+      },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 5
       },
       "register_usage": {
         "reg_read_exec": 896970,
@@ -1912,6 +1992,10 @@
         "call_other_exec": 3612,
         "indirect_exec": 3612
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 2
+      },
       "register_usage": {
         "reg_read_exec": 263676,
         "reg_write_exec": 196854,
@@ -2003,6 +2087,10 @@
         "call_static": 3,
         "call_other_exec": 2,
         "indirect_exec": 4
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 204,
@@ -2096,6 +2184,10 @@
         "call_other_exec": 0,
         "indirect_exec": 0
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 3000,
         "reg_write_exec": 2400,
@@ -2187,6 +2279,10 @@
         "call_static": 2,
         "call_other_exec": 1928,
         "indirect_exec": 1928
+      },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 106040,
@@ -2280,6 +2376,10 @@
         "call_other_exec": 3616,
         "indirect_exec": 5424
       },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 2
+      },
       "register_usage": {
         "reg_read_exec": 256736,
         "reg_write_exec": 188032,
@@ -2371,6 +2471,10 @@
         "call_static": 5,
         "call_other_exec": 120,
         "indirect_exec": 2048
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 27552,
@@ -2464,6 +2568,10 @@
         "call_other_exec": 121,
         "indirect_exec": 120
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 2
+      },
       "register_usage": {
         "reg_read_exec": 66192,
         "reg_write_exec": 51833,
@@ -2555,6 +2663,10 @@
         "call_static": 1,
         "call_other_exec": 0,
         "indirect_exec": 120
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 2880,
@@ -2648,6 +2760,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 37,
         "reg_write_exec": 28,
@@ -2739,6 +2855,10 @@
         "call_static": 3,
         "call_other_exec": 0,
         "indirect_exec": 3618
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 182142,
@@ -2832,6 +2952,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 172,
         "reg_write_exec": 109,
@@ -2923,6 +3047,10 @@
         "call_static": 9,
         "call_other_exec": 1,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 133,
@@ -3016,6 +3144,10 @@
         "call_other_exec": 0,
         "indirect_exec": 4
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 183,
         "reg_write_exec": 116,
@@ -3107,6 +3239,10 @@
         "call_static": 34,
         "call_other_exec": 4,
         "indirect_exec": 17
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 2206,
@@ -3200,6 +3336,10 @@
         "call_other_exec": 2,
         "indirect_exec": 3
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 224,
         "reg_write_exec": 160,
@@ -3291,6 +3431,10 @@
         "call_static": 25,
         "call_other_exec": 1,
         "indirect_exec": 21
+      },
+      "call_graph": {
+        "fan_in": 4,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 4594,
@@ -3384,6 +3528,10 @@
         "call_other_exec": 1,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 364,
         "reg_write_exec": 196,
@@ -3475,6 +3623,10 @@
         "call_static": 4,
         "call_other_exec": 12,
         "indirect_exec": 4
+      },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 2
       },
       "register_usage": {
         "reg_read_exec": 584,
@@ -3568,6 +3720,10 @@
         "call_other_exec": 12,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 1348,
         "reg_write_exec": 845,
@@ -3659,6 +3815,10 @@
         "call_static": 12,
         "call_other_exec": 3,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 3
       },
       "register_usage": {
         "reg_read_exec": 91,
@@ -3752,6 +3912,10 @@
         "call_other_exec": 14,
         "indirect_exec": 17
       },
+      "call_graph": {
+        "fan_in": 6,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 1119,
         "reg_write_exec": 845,
@@ -3843,6 +4007,10 @@
         "call_static": 11,
         "call_other_exec": 1,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 66,
@@ -3936,6 +4104,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 266,
         "reg_write_exec": 200,
@@ -4027,6 +4199,10 @@
         "call_static": 12,
         "call_other_exec": 4,
         "indirect_exec": 5
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 2
       },
       "register_usage": {
         "reg_read_exec": 307,
@@ -4120,6 +4296,10 @@
         "call_other_exec": 2,
         "indirect_exec": 2
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 20,
         "reg_write_exec": 22,
@@ -4211,6 +4391,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 10,
@@ -4304,6 +4488,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 10,
         "reg_write_exec": 9,
@@ -4395,6 +4583,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 10,
@@ -4488,6 +4680,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 8,
         "reg_write_exec": 6,
@@ -4579,6 +4775,10 @@
         "call_static": 2,
         "call_other_exec": 10,
         "indirect_exec": 0
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 2
       },
       "register_usage": {
         "reg_read_exec": 125,
@@ -4672,6 +4872,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 11,
         "reg_write_exec": 10,
@@ -4763,6 +4967,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 11,
@@ -4856,6 +5064,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 10,
         "reg_write_exec": 9,
@@ -4947,6 +5159,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 16,
@@ -5040,6 +5256,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 24,
         "reg_write_exec": 20,
@@ -5131,6 +5351,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 21,
@@ -5224,6 +5448,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 10,
         "reg_write_exec": 9,
@@ -5315,6 +5543,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 7,
@@ -5408,6 +5640,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 21,
         "reg_write_exec": 17,
@@ -5499,6 +5735,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 11,
@@ -5592,6 +5832,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 11,
         "reg_write_exec": 10,
@@ -5683,6 +5927,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 4
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 132,
@@ -5776,6 +6024,10 @@
         "call_other_exec": 0,
         "indirect_exec": 7
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 297,
         "reg_write_exec": 215,
@@ -5867,6 +6119,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 20,
@@ -5960,6 +6216,10 @@
         "call_other_exec": 0,
         "indirect_exec": 5
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 231,
         "reg_write_exec": 178,
@@ -6051,6 +6311,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 3612
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 97575,
@@ -6144,6 +6408,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1829
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 42323,
         "reg_write_exec": 34999,
@@ -6235,6 +6503,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 6
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 439,
@@ -6328,6 +6600,10 @@
         "call_other_exec": 0,
         "indirect_exec": 0
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 10914,
         "reg_write_exec": 7276,
@@ -6419,6 +6695,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 3094
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 61155,
@@ -6512,6 +6792,10 @@
         "call_other_exec": 0,
         "indirect_exec": 5
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 219,
         "reg_write_exec": 90,
@@ -6603,6 +6887,10 @@
         "call_static": 2,
         "call_other_exec": 0,
         "indirect_exec": 6
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 2021,
@@ -6696,6 +6984,10 @@
         "call_other_exec": 6,
         "indirect_exec": 3
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 234,
         "reg_write_exec": 207,
@@ -6787,6 +7079,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 10,
@@ -6880,6 +7176,10 @@
         "call_other_exec": 0,
         "indirect_exec": 0
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 6,
         "reg_write_exec": 11,
@@ -6971,6 +7271,10 @@
         "call_static": 2,
         "call_other_exec": 0,
         "indirect_exec": 1928
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 21208,
@@ -7064,6 +7368,10 @@
         "call_other_exec": 4,
         "indirect_exec": 3
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 139,
         "reg_write_exec": 106,
@@ -7155,6 +7463,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 6,
@@ -7248,6 +7560,10 @@
         "call_other_exec": 1,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 34,
         "reg_write_exec": 26,
@@ -7339,6 +7655,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 31,
@@ -7432,6 +7752,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 35618,
         "reg_write_exec": 27090,
@@ -7523,6 +7847,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 19
+      },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 555,
@@ -7616,6 +7944,10 @@
         "call_other_exec": 0,
         "indirect_exec": 20
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 485,
         "reg_write_exec": 367,
@@ -7707,6 +8039,10 @@
         "call_static": 31,
         "call_other_exec": 22,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 11
       },
       "register_usage": {
         "reg_read_exec": 1042,
@@ -7800,6 +8136,10 @@
         "call_other_exec": 1,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 107,
         "reg_write_exec": 99,
@@ -7891,6 +8231,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 21,
@@ -7984,6 +8328,10 @@
         "call_other_exec": 0,
         "indirect_exec": 0
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 37,
         "reg_write_exec": 18,
@@ -8075,6 +8423,10 @@
         "call_static": 1,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 15,
@@ -8168,6 +8520,10 @@
         "call_other_exec": 10255,
         "indirect_exec": 7580
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 2
+      },
       "register_usage": {
         "reg_read_exec": 369770,
         "reg_write_exec": 317460,
@@ -8259,6 +8615,10 @@
         "call_static": 76,
         "call_other_exec": 20069,
         "indirect_exec": 1800
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 11
       },
       "register_usage": {
         "reg_read_exec": 1776653,
@@ -8352,6 +8712,10 @@
         "call_other_exec": 0,
         "indirect_exec": 0
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 14400,
         "reg_write_exec": 10800,
@@ -8443,6 +8807,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 11,
@@ -8536,6 +8904,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 11,
         "reg_write_exec": 10,
@@ -8627,6 +8999,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 95,
@@ -8720,6 +9096,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 11,
         "reg_write_exec": 10,
@@ -8811,6 +9191,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 11,
@@ -8904,6 +9288,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 19,
         "reg_write_exec": 18,
@@ -8995,6 +9383,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 6,
@@ -9088,6 +9480,10 @@
         "call_other_exec": 0,
         "indirect_exec": 4
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 56,
         "reg_write_exec": 52,
@@ -9179,6 +9575,10 @@
         "call_static": 10,
         "call_other_exec": 5,
         "indirect_exec": 0
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 155,
@@ -9272,6 +9672,10 @@
         "call_other_exec": 36,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 7
+      },
       "register_usage": {
         "reg_read_exec": 1466,
         "reg_write_exec": 945,
@@ -9363,6 +9767,10 @@
         "call_static": 11,
         "call_other_exec": 11,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 6
       },
       "register_usage": {
         "reg_read_exec": 2066,
@@ -9456,6 +9864,10 @@
         "call_other_exec": 4,
         "indirect_exec": 4
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 280,
         "reg_write_exec": 244,
@@ -9547,6 +9959,10 @@
         "call_static": 17,
         "call_other_exec": 4,
         "indirect_exec": 5
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 1043,
@@ -9640,6 +10056,10 @@
         "call_other_exec": 5,
         "indirect_exec": 5
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 1703,
         "reg_write_exec": 1531,
@@ -9731,6 +10151,10 @@
         "call_static": 1,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 39,
@@ -9824,6 +10248,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 51,
         "reg_write_exec": 38,
@@ -9915,6 +10343,10 @@
         "call_static": 9,
         "call_other_exec": 3,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 3
       },
       "register_usage": {
         "reg_read_exec": 132,
@@ -10008,6 +10440,10 @@
         "call_other_exec": 1,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 32,
         "reg_write_exec": 29,
@@ -10099,6 +10535,10 @@
         "call_static": 14,
         "call_other_exec": 16,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 4
       },
       "register_usage": {
         "reg_read_exec": 1844,
@@ -10192,6 +10632,10 @@
         "call_other_exec": 2,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 2
+      },
       "register_usage": {
         "reg_read_exec": 165,
         "reg_write_exec": 154,
@@ -10283,6 +10727,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 699
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 15447,
@@ -10376,6 +10824,10 @@
         "call_other_exec": 0,
         "indirect_exec": 2835
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 195555,
         "reg_write_exec": 149023,
@@ -10467,6 +10919,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1800
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 48600,
@@ -10560,6 +11016,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1325
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 41075,
         "reg_write_exec": 29150,
@@ -10651,6 +11111,10 @@
         "call_static": 12,
         "call_other_exec": 27,
         "indirect_exec": 27
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 1701,
@@ -10744,6 +11208,10 @@
         "call_other_exec": 0,
         "indirect_exec": 7619
       },
+      "call_graph": {
+        "fan_in": 3,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 248584,
         "reg_write_exec": 217113,
@@ -10835,6 +11303,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1800
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 45004,
@@ -10928,6 +11400,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 8,
         "reg_write_exec": 6,
@@ -11019,6 +11495,10 @@
         "call_static": 1,
         "call_other_exec": 6,
         "indirect_exec": 7
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 194,
@@ -11112,6 +11592,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 38,
         "reg_write_exec": 23,
@@ -11203,6 +11687,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 0
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 16,
@@ -11296,6 +11784,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 47,
         "reg_write_exec": 33,
@@ -11387,6 +11879,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 0
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 3,

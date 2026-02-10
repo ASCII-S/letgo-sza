@@ -72,6 +72,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 9,
         "reg_write_exec": 11,
@@ -163,6 +167,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 14,
@@ -256,6 +264,10 @@
         "call_other_exec": 51,
         "indirect_exec": 51
       },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 1377,
         "reg_write_exec": 1326,
@@ -347,6 +359,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 46
+      },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 828,
@@ -440,6 +456,10 @@
         "call_other_exec": 0,
         "indirect_exec": 552014
       },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 15730101,
         "reg_write_exec": 10763507,
@@ -531,6 +551,10 @@
         "call_static": 0,
         "call_other_exec": 0,
         "indirect_exec": 2
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
       },
       "register_usage": {
         "reg_read_exec": 1906610,
@@ -624,6 +648,10 @@
         "call_other_exec": 0,
         "indirect_exec": 56964
       },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 3360876,
         "reg_write_exec": 2677308,
@@ -715,6 +743,10 @@
         "call_static": 5,
         "call_other_exec": 142400,
         "indirect_exec": 28480
+      },
+      "call_graph": {
+        "fan_in": 2,
+        "fan_out": 4
       },
       "register_usage": {
         "reg_read_exec": 1680320,
@@ -808,6 +840,10 @@
         "call_other_exec": 20480,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
+      },
       "register_usage": {
         "reg_read_exec": 1311711,
         "reg_write_exec": 1188501,
@@ -899,6 +935,10 @@
         "call_static": 3,
         "call_other_exec": 243,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 2
       },
       "register_usage": {
         "reg_read_exec": 4666,
@@ -992,6 +1032,10 @@
         "call_other_exec": 1500,
         "indirect_exec": 5
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 2
+      },
       "register_usage": {
         "reg_read_exec": 27660,
         "reg_write_exec": 20865,
@@ -1083,6 +1127,10 @@
         "call_static": 1,
         "call_other_exec": 5,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 1
       },
       "register_usage": {
         "reg_read_exec": 577772,
@@ -1176,6 +1224,10 @@
         "call_other_exec": 0,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 4150,
         "reg_write_exec": 3492,
@@ -1267,6 +1319,10 @@
         "call_static": 8,
         "call_other_exec": 8,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 6
       },
       "register_usage": {
         "reg_read_exec": 976067,
@@ -1360,6 +1416,10 @@
         "call_other_exec": 0,
         "indirect_exec": 4000
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 0
+      },
       "register_usage": {
         "reg_read_exec": 34653126,
         "reg_write_exec": 26479214,
@@ -1452,6 +1512,10 @@
         "call_other_exec": 1120202,
         "indirect_exec": 1
       },
+      "call_graph": {
+        "fan_in": 1,
+        "fan_out": 15
+      },
       "register_usage": {
         "reg_read_exec": 54980423,
         "reg_write_exec": 47697875,
@@ -1543,6 +1607,10 @@
         "call_static": 34,
         "call_other_exec": 23,
         "indirect_exec": 1
+      },
+      "call_graph": {
+        "fan_in": 0,
+        "fan_out": 9
       },
       "register_usage": {
         "reg_read_exec": 15224,
