@@ -1,0 +1,2775 @@
+{
+  "tool_info": {
+    "name": "Function Profiler",
+    "version": "1.0",
+    "description": "函数维度的执行特性剖析工具",
+    "main_image": "/home/tongshiyu/programs/NPB3.3.1/NPB3.3-SER/bin/sp.S.x",
+    "base_address": "0x400000"
+  },
+  "functions": [
+    {
+      "function_name": "deregister_tm_clones",
+      "start_addr": "0x400b20",
+      "end_addr": "0x400b60",
+      "offset_start": "0xb20",
+      "offset_end": "0xb60",
+      "function_size_bytes": 64,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 8,
+        "inst_static": 17
+      },
+      "data_flow": {
+        "mem_read_static": 3,
+        "mem_write_static": 1,
+        "mem_inst_static": 4,
+        "mem_read_exec": 2,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 3
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute_characteristics": {
+        "arith_static": 1,
+        "logic_static": 0,
+        "float_static": 0,
+        "simd_static": 0,
+        "pure_compute_static": 1,
+        "data_movement_static": 7,
+        "compare_static": 2,
+        "stack_static": 3,
+        "string_static": 0,
+        "nop_static": 3,
+        "other_static": 0,
+        "arith_exec": 1,
+        "logic_exec": 0,
+        "float_exec": 0,
+        "simd_exec": 0,
+        "pure_compute_exec": 1,
+        "data_movement_exec": 4,
+        "compare_exec": 1,
+        "stack_exec": 2,
+        "string_exec": 0,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.5261,
+        "inst_type_entropy_exec": 2.0588
+      },
+      "control_flow": {
+        "branch_static": 3,
+        "branch_exec": 1,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 0,
+        "call_other_exec": 0,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 9,
+        "reg_write_exec": 11,
+        "reg_read_static": 23,
+        "reg_write_static": 18,
+        "unique_reg_read": 3,
+        "unique_reg_write": 4
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 1,
+        "branch_not_taken_exec": 0,
+        "cond_branch_static": 2,
+        "uncond_branch_static": 1,
+        "loop_iter_total": 0,
+        "call_depth_max": 0,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 6,
+        "edge_static": 5,
+        "static_cyclomatic": 1,
+        "bbl_exec": 2,
+        "unique_bbl_exec": 2,
+        "unique_edge_exec": 1,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "register_tm_clones",
+      "start_addr": "0x400b60",
+      "end_addr": "0x400ba0",
+      "offset_start": "0xb60",
+      "offset_end": "0xba0",
+      "function_size_bytes": 64,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 12,
+        "inst_static": 20
+      },
+      "data_flow": {
+        "mem_read_static": 3,
+        "mem_write_static": 1,
+        "mem_inst_static": 4,
+        "mem_read_exec": 2,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 3
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute_characteristics": {
+        "arith_static": 2,
+        "logic_static": 3,
+        "float_static": 0,
+        "simd_static": 0,
+        "pure_compute_static": 5,
+        "data_movement_static": 8,
+        "compare_static": 1,
+        "stack_static": 3,
+        "string_static": 0,
+        "nop_static": 2,
+        "other_static": 0,
+        "arith_exec": 2,
+        "logic_exec": 3,
+        "float_exec": 0,
+        "simd_exec": 0,
+        "pure_compute_exec": 5,
+        "data_movement_exec": 5,
+        "compare_exec": 0,
+        "stack_exec": 2,
+        "string_exec": 0,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.6860,
+        "inst_type_entropy_exec": 2.1339
+      },
+      "control_flow": {
+        "branch_static": 3,
+        "branch_exec": 1,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 0,
+        "call_other_exec": 0,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 14,
+        "reg_write_exec": 19,
+        "reg_read_static": 25,
+        "reg_write_static": 26,
+        "unique_reg_read": 4,
+        "unique_reg_write": 5
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 1,
+        "branch_not_taken_exec": 0,
+        "cond_branch_static": 2,
+        "uncond_branch_static": 1,
+        "loop_iter_total": 0,
+        "call_depth_max": 0,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 6,
+        "edge_static": 5,
+        "static_cyclomatic": 1,
+        "bbl_exec": 2,
+        "unique_bbl_exec": 2,
+        "unique_edge_exec": 1,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "MAIN__",
+      "start_addr": "0x400be6",
+      "end_addr": "0x401aca",
+      "offset_start": "0xbe6",
+      "offset_end": "0x1aca",
+      "function_size_bytes": 3812,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 2451,
+        "inst_static": 616
+      },
+      "data_flow": {
+        "mem_read_static": 64,
+        "mem_write_static": 290,
+        "mem_inst_static": 354,
+        "mem_read_exec": 154,
+        "mem_write_exec": 432,
+        "mem_inst_exec": 586
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 142,
+        "stride_read_exec": 0,
+        "random_read_exec": 11,
+        "seq_write_exec": 138,
+        "stride_write_exec": 0,
+        "random_write_exec": 293
+      },
+      "compute_characteristics": {
+        "arith_static": 40,
+        "logic_static": 7,
+        "float_static": 67,
+        "simd_static": 73,
+        "pure_compute_static": 33,
+        "data_movement_static": 430,
+        "compare_static": 21,
+        "stack_static": 31,
+        "string_static": 36,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 221,
+        "logic_exec": 303,
+        "float_exec": 24,
+        "simd_exec": 28,
+        "pure_compute_exec": 524,
+        "data_movement_exec": 1077,
+        "compare_exec": 333,
+        "stack_exec": 31,
+        "string_exec": 6,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.3955,
+        "inst_type_entropy_exec": 2.4692
+      },
+      "control_flow": {
+        "branch_static": 29,
+        "branch_exec": 335,
+        "loop_static": 6,
+        "return_static": 1,
+        "call_static": 82,
+        "call_other_exec": 175,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 3461,
+        "reg_write_exec": 3011,
+        "reg_read_static": 740,
+        "reg_write_static": 539,
+        "unique_reg_read": 8,
+        "unique_reg_write": 11
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 230,
+        "branch_not_taken_exec": 104,
+        "cond_branch_static": 23,
+        "uncond_branch_static": 6,
+        "loop_iter_total": 127,
+        "call_depth_max": 175,
+        "loop_depth_max": 1
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 122,
+        "edge_static": 62,
+        "static_cyclomatic": 1,
+        "bbl_exec": 516,
+        "unique_bbl_exec": 54,
+        "unique_edge_exec": 58,
+        "dynamic_cyclomatic": 6
+      }
+    },
+    {
+      "function_name": "main",
+      "start_addr": "0x401aca",
+      "end_addr": "0x401af1",
+      "offset_start": "0x1aca",
+      "offset_end": "0x1af1",
+      "function_size_bytes": 39,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 9,
+        "inst_static": 9
+      },
+      "data_flow": {
+        "mem_read_static": 1,
+        "mem_write_static": 3,
+        "mem_inst_static": 4,
+        "mem_read_exec": 1,
+        "mem_write_exec": 3,
+        "mem_inst_exec": 4
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 2,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute_characteristics": {
+        "arith_static": 2,
+        "logic_static": 0,
+        "float_static": 0,
+        "simd_static": 0,
+        "pure_compute_static": 2,
+        "data_movement_static": 3,
+        "compare_static": 0,
+        "stack_static": 0,
+        "string_static": 0,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 2,
+        "logic_exec": 0,
+        "float_exec": 0,
+        "simd_exec": 0,
+        "pure_compute_exec": 2,
+        "data_movement_exec": 3,
+        "compare_exec": 0,
+        "stack_exec": 0,
+        "string_exec": 0,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 1.8911,
+        "inst_type_entropy_exec": 1.5613
+      },
+      "control_flow": {
+        "branch_static": 0,
+        "branch_exec": 0,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 3,
+        "call_other_exec": 3,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 9,
+        "reg_write_exec": 15,
+        "reg_read_static": 9,
+        "reg_write_static": 15,
+        "unique_reg_read": 1,
+        "unique_reg_write": 4
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 0,
+        "branch_not_taken_exec": 0,
+        "cond_branch_static": 0,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 0,
+        "call_depth_max": 3,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 4,
+        "edge_static": 0,
+        "static_cyclomatic": 1,
+        "bbl_exec": 4,
+        "unique_bbl_exec": 4,
+        "unique_edge_exec": 3,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "initialize_",
+      "start_addr": "0x401af1",
+      "end_addr": "0x402409",
+      "offset_start": "0x1af1",
+      "offset_end": "0x2409",
+      "function_size_bytes": 2328,
+      "execution_stats": {
+        "call_exec": 2,
+        "inst_exec": 956516,
+        "inst_static": 481
+      },
+      "data_flow": {
+        "mem_read_static": 76,
+        "mem_write_static": 67,
+        "mem_inst_static": 141,
+        "mem_read_exec": 151102,
+        "mem_write_exec": 102820,
+        "mem_inst_exec": 253610
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 28604,
+        "stride_read_exec": 0,
+        "random_read_exec": 122497,
+        "seq_write_exec": 45952,
+        "stride_write_exec": 0,
+        "random_write_exec": 56867
+      },
+      "compute_characteristics": {
+        "arith_static": 108,
+        "logic_static": 23,
+        "float_static": 117,
+        "simd_static": 133,
+        "pure_compute_static": 132,
+        "data_movement_static": 253,
+        "compare_static": 27,
+        "stack_static": 12,
+        "string_static": 72,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 408290,
+        "logic_exec": 6844,
+        "float_exec": 632102,
+        "simd_exec": 637744,
+        "pure_compute_exec": 483654,
+        "data_movement_exec": 441526,
+        "compare_exec": 35640,
+        "stack_exec": 24,
+        "string_exec": 118432,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.7931,
+        "inst_type_entropy_exec": 2.4068
+      },
+      "control_flow": {
+        "branch_static": 42,
+        "branch_exec": 36110,
+        "loop_static": 25,
+        "return_static": 1,
+        "call_static": 12,
+        "call_other_exec": 22464,
+        "indirect_exec": 2
+      },
+      "register_usage": {
+        "reg_read_exec": 1479766,
+        "reg_write_exec": 963814,
+        "reg_read_static": 661,
+        "reg_write_static": 529,
+        "unique_reg_read": 16,
+        "unique_reg_write": 16
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 29360,
+        "branch_not_taken_exec": 6750,
+        "cond_branch_static": 42,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 29360,
+        "call_depth_max": 22463,
+        "loop_depth_max": 4
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 80,
+        "edge_static": 109,
+        "static_cyclomatic": 31,
+        "bbl_exec": 64544,
+        "unique_bbl_exec": 80,
+        "unique_edge_exec": 104,
+        "dynamic_cyclomatic": 26
+      }
+    },
+    {
+      "function_name": "lhsinit_",
+      "start_addr": "0x402409",
+      "end_addr": "0x4024d5",
+      "offset_start": "0x2409",
+      "offset_end": "0x24d5",
+      "function_size_bytes": 204,
+      "execution_stats": {
+        "call_exec": 1010,
+        "inst_exec": 686800,
+        "inst_static": 37
+      },
+      "data_flow": {
+        "mem_read_static": 4,
+        "mem_write_static": 12,
+        "mem_inst_static": 16,
+        "mem_read_exec": 4040,
+        "mem_write_exec": 363600,
+        "mem_inst_exec": 367640
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 4039,
+        "seq_write_exec": 0,
+        "stride_write_exec": 121200,
+        "random_write_exec": 242399
+      },
+      "compute_characteristics": {
+        "arith_static": 5,
+        "logic_static": 2,
+        "float_static": 13,
+        "simd_static": 14,
+        "pure_compute_static": 7,
+        "data_movement_static": 23,
+        "compare_static": 3,
+        "stack_static": 0,
+        "string_static": 15,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 122210,
+        "logic_exec": 11110,
+        "float_exec": 364610,
+        "simd_exec": 365620,
+        "pure_compute_exec": 133320,
+        "data_movement_exec": 429250,
+        "compare_exec": 61610,
+        "stack_exec": 0,
+        "string_exec": 375720,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.6687,
+        "inst_type_entropy_exec": 2.5458
+      },
+      "control_flow": {
+        "branch_static": 3,
+        "branch_exec": 61610,
+        "loop_static": 2,
+        "return_static": 1,
+        "call_static": 0,
+        "call_other_exec": 0,
+        "indirect_exec": 1010
+      },
+      "register_usage": {
+        "reg_read_exec": 1194830,
+        "reg_write_exec": 456520,
+        "reg_read_static": 58,
+        "reg_write_static": 32,
+        "unique_reg_read": 9,
+        "unique_reg_write": 9
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 49490,
+        "branch_not_taken_exec": 12120,
+        "cond_branch_static": 3,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 49490,
+        "call_depth_max": 0,
+        "loop_depth_max": 2
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 6,
+        "edge_static": 8,
+        "static_cyclomatic": 4,
+        "bbl_exec": 73730,
+        "unique_bbl_exec": 6,
+        "unique_edge_exec": 7,
+        "dynamic_cyclomatic": 3
+      }
+    },
+    {
+      "function_name": "lhsinitj_",
+      "start_addr": "0x4024d5",
+      "end_addr": "0x4025a7",
+      "offset_start": "0x24d5",
+      "offset_end": "0x25a7",
+      "function_size_bytes": 210,
+      "execution_stats": {
+        "call_exec": 2020,
+        "inst_exec": 1357440,
+        "inst_static": 38
+      },
+      "data_flow": {
+        "mem_read_static": 4,
+        "mem_write_static": 12,
+        "mem_inst_static": 16,
+        "mem_read_exec": 8080,
+        "mem_write_exec": 727200,
+        "mem_inst_exec": 735280
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 8079,
+        "seq_write_exec": 0,
+        "stride_write_exec": 242400,
+        "random_write_exec": 484799
+      },
+      "compute_characteristics": {
+        "arith_static": 6,
+        "logic_static": 2,
+        "float_static": 13,
+        "simd_static": 14,
+        "pure_compute_static": 8,
+        "data_movement_static": 23,
+        "compare_static": 3,
+        "stack_static": 0,
+        "string_static": 15,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 246440,
+        "logic_exec": 4040,
+        "float_exec": 729220,
+        "simd_exec": 731240,
+        "pure_compute_exec": 250480,
+        "data_movement_exec": 858500,
+        "compare_exec": 123220,
+        "stack_exec": 0,
+        "string_exec": 751440,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.6835,
+        "inst_type_entropy_exec": 2.5176
+      },
+      "control_flow": {
+        "branch_static": 3,
+        "branch_exec": 123220,
+        "loop_static": 2,
+        "return_static": 1,
+        "call_static": 0,
+        "call_other_exec": 0,
+        "indirect_exec": 2020
+      },
+      "register_usage": {
+        "reg_read_exec": 2373500,
+        "reg_write_exec": 880720,
+        "reg_read_static": 59,
+        "reg_write_static": 34,
+        "unique_reg_read": 9,
+        "unique_reg_write": 9
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 98980,
+        "branch_not_taken_exec": 24240,
+        "cond_branch_static": 3,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 98980,
+        "call_depth_max": 0,
+        "loop_depth_max": 2
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 6,
+        "edge_static": 8,
+        "static_cyclomatic": 4,
+        "bbl_exec": 147460,
+        "unique_bbl_exec": 6,
+        "unique_edge_exec": 7,
+        "dynamic_cyclomatic": 3
+      }
+    },
+    {
+      "function_name": "exact_solution_",
+      "start_addr": "0x4025a7",
+      "end_addr": "0x402684",
+      "offset_start": "0x25a7",
+      "offset_end": "0x2684",
+      "function_size_bytes": 221,
+      "execution_stats": {
+        "call_exec": 27792,
+        "inst_exec": 5169312,
+        "inst_static": 42
+      },
+      "data_flow": {
+        "mem_read_static": 17,
+        "mem_write_static": 1,
+        "mem_inst_static": 18,
+        "mem_read_exec": 1917648,
+        "mem_write_exec": 138960,
+        "mem_inst_exec": 2056608
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 166895,
+        "stride_read_exec": 833760,
+        "random_read_exec": 916992,
+        "seq_write_exec": 118221,
+        "stride_write_exec": 0,
+        "random_write_exec": 20738
+      },
+      "compute_characteristics": {
+        "arith_static": 26,
+        "logic_static": 0,
+        "float_static": 35,
+        "simd_static": 35,
+        "pure_compute_static": 20,
+        "data_movement_static": 13,
+        "compare_static": 1,
+        "stack_static": 0,
+        "string_static": 4,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 3612960,
+        "logic_exec": 0,
+        "float_exec": 4530096,
+        "simd_exec": 4530096,
+        "pure_compute_exec": 2779200,
+        "data_movement_exec": 1250640,
+        "compare_exec": 138960,
+        "stack_exec": 0,
+        "string_exec": 222336,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.2255,
+        "inst_type_entropy_exec": 2.0775
+      },
+      "control_flow": {
+        "branch_static": 1,
+        "branch_exec": 138960,
+        "loop_static": 1,
+        "return_static": 1,
+        "call_static": 0,
+        "call_other_exec": 0,
+        "indirect_exec": 27792
+      },
+      "register_usage": {
+        "reg_read_exec": 8865648,
+        "reg_write_exec": 5336064,
+        "reg_read_static": 67,
+        "reg_write_static": 44,
+        "unique_reg_read": 6,
+        "unique_reg_write": 4
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 111168,
+        "branch_not_taken_exec": 27792,
+        "cond_branch_static": 1,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 111168,
+        "call_depth_max": 0,
+        "loop_depth_max": 1
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 3,
+        "edge_static": 3,
+        "static_cyclomatic": 2,
+        "bbl_exec": 194544,
+        "unique_bbl_exec": 3,
+        "unique_edge_exec": 3,
+        "dynamic_cyclomatic": 2
+      }
+    },
+    {
+      "function_name": "exact_rhs_",
+      "start_addr": "0x402684",
+      "end_addr": "0x4042a3",
+      "offset_start": "0x2684",
+      "offset_end": "0x42a3",
+      "function_size_bytes": 7199,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 1232347,
+        "inst_static": 1350
+      },
+      "data_flow": {
+        "mem_read_static": 365,
+        "mem_write_static": 107,
+        "mem_inst_static": 469,
+        "mem_read_exec": 308896,
+        "mem_write_exec": 96882,
+        "mem_inst_exec": 405748
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 124627,
+        "stride_read_exec": 1200,
+        "random_read_exec": 183068,
+        "seq_write_exec": 33468,
+        "stride_write_exec": 22000,
+        "random_write_exec": 41413
+      },
+      "compute_characteristics": {
+        "arith_static": 538,
+        "logic_static": 17,
+        "float_static": 838,
+        "simd_static": 849,
+        "pure_compute_static": 558,
+        "data_movement_static": 662,
+        "compare_static": 57,
+        "stack_static": 12,
+        "string_static": 348,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 581366,
+        "logic_exec": 9485,
+        "float_exec": 849731,
+        "simd_exec": 858662,
+        "pure_compute_exec": 585121,
+        "data_movement_exec": 490535,
+        "compare_exec": 71564,
+        "stack_exec": 12,
+        "string_exec": 296785,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.5036,
+        "inst_type_entropy_exec": 2.4681
+      },
+      "control_flow": {
+        "branch_static": 63,
+        "branch_exec": 71866,
+        "loop_static": 40,
+        "return_static": 1,
+        "call_static": 3,
+        "call_other_exec": 3600,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 1947114,
+        "reg_write_exec": 1269768,
+        "reg_read_static": 2036,
+        "reg_write_static": 1374,
+        "unique_reg_read": 16,
+        "unique_reg_write": 16
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 56235,
+        "branch_not_taken_exec": 15630,
+        "cond_branch_static": 61,
+        "uncond_branch_static": 2,
+        "loop_iter_total": 56235,
+        "call_depth_max": 3600,
+        "loop_depth_max": 4
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 105,
+        "edge_static": 162,
+        "static_cyclomatic": 59,
+        "bbl_exec": 88696,
+        "unique_bbl_exec": 102,
+        "unique_edge_exec": 139,
+        "dynamic_cyclomatic": 39
+      }
+    },
+    {
+      "function_name": "set_constants_",
+      "start_addr": "0x4042a3",
+      "end_addr": "0x404aac",
+      "offset_start": "0x42a3",
+      "offset_end": "0x4aac",
+      "function_size_bytes": 2057,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 298,
+        "inst_static": 298
+      },
+      "data_flow": {
+        "mem_read_static": 39,
+        "mem_write_static": 159,
+        "mem_inst_static": 198,
+        "mem_read_exec": 39,
+        "mem_write_exec": 159,
+        "mem_inst_exec": 198
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 30,
+        "stride_read_exec": 0,
+        "random_read_exec": 8,
+        "seq_write_exec": 143,
+        "stride_write_exec": 0,
+        "random_write_exec": 15
+      },
+      "compute_characteristics": {
+        "arith_static": 66,
+        "logic_static": 4,
+        "float_static": 287,
+        "simd_static": 291,
+        "pure_compute_static": 100,
+        "data_movement_static": 224,
+        "compare_static": 0,
+        "stack_static": 0,
+        "string_static": 190,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 66,
+        "logic_exec": 4,
+        "float_exec": 287,
+        "simd_exec": 291,
+        "pure_compute_exec": 100,
+        "data_movement_exec": 224,
+        "compare_exec": 0,
+        "stack_exec": 0,
+        "string_exec": 190,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.2278,
+        "inst_type_entropy_exec": 2.2191
+      },
+      "control_flow": {
+        "branch_static": 0,
+        "branch_exec": 0,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 0,
+        "call_other_exec": 0,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 524,
+        "reg_write_exec": 143,
+        "reg_read_static": 524,
+        "reg_write_static": 143,
+        "unique_reg_read": 2,
+        "unique_reg_write": 2
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 0,
+        "branch_not_taken_exec": 0,
+        "cond_branch_static": 0,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 0,
+        "call_depth_max": 0,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 1,
+        "edge_static": 0,
+        "static_cyclomatic": 1,
+        "bbl_exec": 1,
+        "unique_bbl_exec": 1,
+        "unique_edge_exec": 0,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "adi_",
+      "start_addr": "0x404aac",
+      "end_addr": "0x404af1",
+      "offset_start": "0x4aac",
+      "offset_end": "0x4af1",
+      "function_size_bytes": 69,
+      "execution_stats": {
+        "call_exec": 101,
+        "inst_exec": 1515,
+        "inst_static": 15
+      },
+      "data_flow": {
+        "mem_read_static": 1,
+        "mem_write_static": 6,
+        "mem_inst_static": 7,
+        "mem_read_exec": 101,
+        "mem_write_exec": 606,
+        "mem_inst_exec": 707
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 100,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 605,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute_characteristics": {
+        "arith_static": 2,
+        "logic_static": 0,
+        "float_static": 0,
+        "simd_static": 0,
+        "pure_compute_static": 2,
+        "data_movement_static": 6,
+        "compare_static": 0,
+        "stack_static": 0,
+        "string_static": 0,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 202,
+        "logic_exec": 0,
+        "float_exec": 0,
+        "simd_exec": 0,
+        "pure_compute_exec": 202,
+        "data_movement_exec": 606,
+        "compare_exec": 0,
+        "stack_exec": 0,
+        "string_exec": 0,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 1.7056,
+        "inst_type_entropy_exec": 1.4488
+      },
+      "control_flow": {
+        "branch_static": 0,
+        "branch_exec": 0,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 6,
+        "call_other_exec": 606,
+        "indirect_exec": 101
+      },
+      "register_usage": {
+        "reg_read_exec": 1515,
+        "reg_write_exec": 2424,
+        "reg_read_static": 15,
+        "reg_write_static": 24,
+        "unique_reg_read": 1,
+        "unique_reg_write": 2
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 0,
+        "branch_not_taken_exec": 0,
+        "cond_branch_static": 0,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 0,
+        "call_depth_max": 506,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 7,
+        "edge_static": 0,
+        "static_cyclomatic": 1,
+        "bbl_exec": 707,
+        "unique_bbl_exec": 7,
+        "unique_edge_exec": 6,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "compute_rhs_",
+      "start_addr": "0x404af1",
+      "end_addr": "0x406cd0",
+      "offset_start": "0x4af1",
+      "offset_end": "0x6cd0",
+      "function_size_bytes": 8671,
+      "execution_stats": {
+        "call_exec": 102,
+        "inst_exec": 94851534,
+        "inst_static": 1698
+      },
+      "data_flow": {
+        "mem_read_static": 448,
+        "mem_write_static": 161,
+        "mem_inst_static": 598,
+        "mem_read_exec": 25933806,
+        "mem_write_exec": 5796966,
+        "mem_inst_exec": 31678548
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 5880402,
+        "stride_read_exec": 918000,
+        "random_read_exec": 19135403,
+        "seq_write_exec": 4400688,
+        "stride_write_exec": 176256,
+        "random_write_exec": 1220021
+      },
+      "compute_characteristics": {
+        "arith_static": 604,
+        "logic_static": 21,
+        "float_static": 768,
+        "simd_static": 768,
+        "pure_compute_static": 581,
+        "data_movement_static": 851,
+        "compare_static": 99,
+        "stack_static": 12,
+        "string_static": 310,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 50728680,
+        "logic_exec": 139842,
+        "float_exec": 72703662,
+        "simd_exec": 72703662,
+        "pure_compute_exec": 48028740,
+        "data_movement_exec": 35446632,
+        "compare_exec": 4179348,
+        "stack_exec": 1224,
+        "string_exec": 19113168,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.5869,
+        "inst_type_entropy_exec": 2.3573
+      },
+      "control_flow": {
+        "branch_static": 113,
+        "branch_exec": 4180674,
+        "loop_static": 69,
+        "return_static": 1,
+        "call_static": 8,
+        "call_other_exec": 0,
+        "indirect_exec": 102
+      },
+      "register_usage": {
+        "reg_read_exec": 162271902,
+        "reg_write_exec": 95735976,
+        "reg_read_static": 2605,
+        "reg_write_static": 1782,
+        "unique_reg_read": 16,
+        "unique_reg_write": 16
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 3375792,
+        "branch_not_taken_exec": 803658,
+        "cond_branch_static": 101,
+        "uncond_branch_static": 12,
+        "loop_iter_total": 3375282,
+        "call_depth_max": 0,
+        "loop_depth_max": 9
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 178,
+        "edge_static": 270,
+        "static_cyclomatic": 94,
+        "bbl_exec": 4868970,
+        "unique_bbl_exec": 152,
+        "unique_edge_exec": 207,
+        "dynamic_cyclomatic": 57
+      }
+    },
+    {
+      "function_name": "x_solve_",
+      "start_addr": "0x406cd0",
+      "end_addr": "0x40806a",
+      "offset_start": "0x6cd0",
+      "offset_end": "0x806a",
+      "function_size_bytes": 5018,
+      "execution_stats": {
+        "call_exec": 101,
+        "inst_exec": 47501007,
+        "inst_static": 874
+      },
+      "data_flow": {
+        "mem_read_static": 234,
+        "mem_write_static": 116,
+        "mem_inst_static": 348,
+        "mem_read_exec": 12491680,
+        "mem_write_exec": 6487129,
+        "mem_inst_exec": 18967699
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 6962738,
+        "stride_read_exec": 0,
+        "random_read_exec": 5528941,
+        "seq_write_exec": 3834768,
+        "stride_write_exec": 0,
+        "random_write_exec": 2652360
+      },
+      "compute_characteristics": {
+        "arith_static": 236,
+        "logic_static": 13,
+        "float_static": 390,
+        "simd_static": 398,
+        "pure_compute_static": 222,
+        "data_movement_static": 528,
+        "compare_static": 45,
+        "stack_static": 12,
+        "string_static": 218,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 15499662,
+        "logic_exec": 213110,
+        "float_exec": 27720460,
+        "simd_exec": 28428470,
+        "pure_compute_exec": 14380582,
+        "data_movement_exec": 26166676,
+        "compare_exec": 2810123,
+        "stack_exec": 1212,
+        "string_exec": 13139090,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.5713,
+        "inst_type_entropy_exec": 2.4892
+      },
+      "control_flow": {
+        "branch_static": 47,
+        "branch_exec": 2810224,
+        "loop_static": 29,
+        "return_static": 1,
+        "call_static": 4,
+        "call_other_exec": 1111,
+        "indirect_exec": 101
+      },
+      "register_usage": {
+        "reg_read_exec": 75472048,
+        "reg_write_exec": 45639375,
+        "reg_read_static": 1280,
+        "reg_write_static": 887,
+        "unique_reg_read": 16,
+        "unique_reg_write": 16
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 1969702,
+        "branch_not_taken_exec": 840421,
+        "cond_branch_static": 45,
+        "uncond_branch_static": 2,
+        "loop_iter_total": 1605900,
+        "call_depth_max": 1011,
+        "loop_depth_max": 5
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 82,
+        "edge_static": 122,
+        "static_cyclomatic": 42,
+        "bbl_exec": 3458947,
+        "unique_bbl_exec": 75,
+        "unique_edge_exec": 101,
+        "dynamic_cyclomatic": 28
+      }
+    },
+    {
+      "function_name": "ninvr_",
+      "start_addr": "0x40806a",
+      "end_addr": "0x408224",
+      "offset_start": "0x806a",
+      "offset_end": "0x8224",
+      "function_size_bytes": 442,
+      "execution_stats": {
+        "call_exec": 101,
+        "inst_exec": 3253311,
+        "inst_static": 91
+      },
+      "data_flow": {
+        "mem_read_static": 21,
+        "mem_write_static": 13,
+        "mem_inst_static": 34,
+        "mem_read_exec": 506515,
+        "mem_write_exec": 505606,
+        "mem_inst_exec": 1012121
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 495910,
+        "stride_read_exec": 0,
+        "random_read_exec": 10604,
+        "seq_write_exec": 495405,
+        "stride_write_exec": 0,
+        "random_write_exec": 10200
+      },
+      "compute_characteristics": {
+        "arith_static": 18,
+        "logic_static": 2,
+        "float_static": 22,
+        "simd_static": 23,
+        "pure_compute_static": 22,
+        "data_movement_static": 49,
+        "compare_static": 9,
+        "stack_static": 12,
+        "string_static": 15,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 1042623,
+        "logic_exec": 111100,
+        "float_exec": 1919303,
+        "simd_exec": 2020303,
+        "pure_compute_exec": 1355723,
+        "data_movement_exec": 1852441,
+        "compare_exec": 123523,
+        "stack_exec": 1212,
+        "string_exec": 1021413,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.9334,
+        "inst_type_entropy_exec": 2.4921
+      },
+      "control_flow": {
+        "branch_static": 10,
+        "branch_exec": 123523,
+        "loop_static": 4,
+        "return_static": 1,
+        "call_static": 2,
+        "call_other_exec": 0,
+        "indirect_exec": 101
+      },
+      "register_usage": {
+        "reg_read_exec": 5024750,
+        "reg_write_exec": 3094741,
+        "reg_read_static": 125,
+        "reg_write_static": 107,
+        "unique_reg_read": 16,
+        "unique_reg_write": 16
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 101202,
+        "branch_not_taken_exec": 22321,
+        "cond_branch_static": 9,
+        "uncond_branch_static": 1,
+        "loop_iter_total": 101000,
+        "call_depth_max": 0,
+        "loop_depth_max": 4
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 16,
+        "edge_static": 22,
+        "static_cyclomatic": 8,
+        "bbl_exec": 134835,
+        "unique_bbl_exec": 12,
+        "unique_edge_exec": 14,
+        "dynamic_cyclomatic": 4
+      }
+    },
+    {
+      "function_name": "y_solve_",
+      "start_addr": "0x408224",
+      "end_addr": "0x40973d",
+      "offset_start": "0x8224",
+      "offset_end": "0x973d",
+      "function_size_bytes": 5401,
+      "execution_stats": {
+        "call_exec": 101,
+        "inst_exec": 46850668,
+        "inst_static": 947
+      },
+      "data_flow": {
+        "mem_read_static": 257,
+        "mem_write_static": 126,
+        "mem_inst_static": 381,
+        "mem_read_exec": 12940120,
+        "mem_write_exec": 6541669,
+        "mem_inst_exec": 19470679
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 3228768,
+        "stride_read_exec": 202000,
+        "random_read_exec": 9509351,
+        "seq_write_exec": 3782248,
+        "stride_write_exec": 0,
+        "random_write_exec": 2759420
+      },
+      "compute_characteristics": {
+        "arith_static": 247,
+        "logic_static": 16,
+        "float_static": 393,
+        "simd_static": 401,
+        "pure_compute_static": 238,
+        "data_movement_static": 563,
+        "compare_static": 54,
+        "stack_static": 12,
+        "string_static": 227,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 16265343,
+        "logic_exec": 193920,
+        "float_exec": 27723490,
+        "simd_exec": 28431500,
+        "pure_compute_exec": 15056373,
+        "data_movement_exec": 24767826,
+        "compare_exec": 2809113,
+        "stack_exec": 1212,
+        "string_exec": 13144140,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.6010,
+        "inst_type_entropy_exec": 2.4942
+      },
+      "control_flow": {
+        "branch_static": 62,
+        "branch_exec": 2813254,
+        "loop_static": 35,
+        "return_static": 1,
+        "call_static": 4,
+        "call_other_exec": 1111,
+        "indirect_exec": 101
+      },
+      "register_usage": {
+        "reg_read_exec": 73956139,
+        "reg_write_exec": 45680987,
+        "reg_read_static": 1370,
+        "reg_write_static": 964,
+        "unique_reg_read": 16,
+        "unique_reg_write": 16
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 1970712,
+        "branch_not_taken_exec": 839411,
+        "cond_branch_static": 55,
+        "uncond_branch_static": 7,
+        "loop_iter_total": 1607920,
+        "call_depth_max": 1011,
+        "loop_depth_max": 7
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 97,
+        "edge_static": 147,
+        "static_cyclomatic": 52,
+        "bbl_exec": 3457937,
+        "unique_bbl_exec": 86,
+        "unique_edge_exec": 112,
+        "dynamic_cyclomatic": 28
+      }
+    },
+    {
+      "function_name": "pinvr_",
+      "start_addr": "0x40973d",
+      "end_addr": "0x4098f7",
+      "offset_start": "0x973d",
+      "offset_end": "0x98f7",
+      "function_size_bytes": 442,
+      "execution_stats": {
+        "call_exec": 101,
+        "inst_exec": 3253311,
+        "inst_static": 91
+      },
+      "data_flow": {
+        "mem_read_static": 21,
+        "mem_write_static": 13,
+        "mem_inst_static": 34,
+        "mem_read_exec": 506515,
+        "mem_write_exec": 505606,
+        "mem_inst_exec": 1012121
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 495910,
+        "stride_read_exec": 0,
+        "random_read_exec": 10604,
+        "seq_write_exec": 495405,
+        "stride_write_exec": 0,
+        "random_write_exec": 10200
+      },
+      "compute_characteristics": {
+        "arith_static": 18,
+        "logic_static": 2,
+        "float_static": 22,
+        "simd_static": 23,
+        "pure_compute_static": 22,
+        "data_movement_static": 49,
+        "compare_static": 9,
+        "stack_static": 12,
+        "string_static": 15,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 1042623,
+        "logic_exec": 111100,
+        "float_exec": 1919303,
+        "simd_exec": 2020303,
+        "pure_compute_exec": 1355723,
+        "data_movement_exec": 1852441,
+        "compare_exec": 123523,
+        "stack_exec": 1212,
+        "string_exec": 1021413,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.9334,
+        "inst_type_entropy_exec": 2.4921
+      },
+      "control_flow": {
+        "branch_static": 10,
+        "branch_exec": 123523,
+        "loop_static": 4,
+        "return_static": 1,
+        "call_static": 2,
+        "call_other_exec": 0,
+        "indirect_exec": 101
+      },
+      "register_usage": {
+        "reg_read_exec": 5024750,
+        "reg_write_exec": 3094741,
+        "reg_read_static": 125,
+        "reg_write_static": 107,
+        "unique_reg_read": 16,
+        "unique_reg_write": 16
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 101202,
+        "branch_not_taken_exec": 22321,
+        "cond_branch_static": 9,
+        "uncond_branch_static": 1,
+        "loop_iter_total": 101000,
+        "call_depth_max": 0,
+        "loop_depth_max": 4
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 16,
+        "edge_static": 22,
+        "static_cyclomatic": 8,
+        "bbl_exec": 134835,
+        "unique_bbl_exec": 12,
+        "unique_edge_exec": 14,
+        "dynamic_cyclomatic": 4
+      }
+    },
+    {
+      "function_name": "z_solve_",
+      "start_addr": "0x4098f7",
+      "end_addr": "0x40ae3e",
+      "offset_start": "0x98f7",
+      "offset_end": "0xae3e",
+      "function_size_bytes": 5447,
+      "execution_stats": {
+        "call_exec": 101,
+        "inst_exec": 46918237,
+        "inst_static": 956
+      },
+      "data_flow": {
+        "mem_read_static": 258,
+        "mem_write_static": 126,
+        "mem_inst_static": 382,
+        "mem_read_exec": 13040110,
+        "mem_write_exec": 6640649,
+        "mem_inst_exec": 19669649
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 3226748,
+        "stride_read_exec": 202000,
+        "random_read_exec": 9611361,
+        "seq_write_exec": 3782147,
+        "stride_write_exec": 0,
+        "random_write_exec": 2858501
+      },
+      "compute_characteristics": {
+        "arith_static": 250,
+        "logic_static": 19,
+        "float_static": 393,
+        "simd_static": 401,
+        "pure_compute_static": 244,
+        "data_movement_static": 566,
+        "compare_static": 54,
+        "stack_static": 12,
+        "string_static": 227,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 15854172,
+        "logic_exec": 178770,
+        "float_exec": 27723490,
+        "simd_exec": 28431500,
+        "pure_compute_exec": 14630052,
+        "data_movement_exec": 25261716,
+        "compare_exec": 2809113,
+        "stack_exec": 1212,
+        "string_exec": 13144140,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.6068,
+        "inst_type_entropy_exec": 2.4909
+      },
+      "control_flow": {
+        "branch_static": 62,
+        "branch_exec": 2813254,
+        "loop_static": 35,
+        "return_static": 1,
+        "call_static": 4,
+        "call_other_exec": 1111,
+        "indirect_exec": 101
+      },
+      "register_usage": {
+        "reg_read_exec": 75287218,
+        "reg_write_exec": 45223255,
+        "reg_read_static": 1390,
+        "reg_write_static": 979,
+        "unique_reg_read": 16,
+        "unique_reg_write": 16
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 1970712,
+        "branch_not_taken_exec": 839411,
+        "cond_branch_static": 55,
+        "uncond_branch_static": 7,
+        "loop_iter_total": 1607920,
+        "call_depth_max": 1011,
+        "loop_depth_max": 7
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 97,
+        "edge_static": 147,
+        "static_cyclomatic": 52,
+        "bbl_exec": 3457937,
+        "unique_bbl_exec": 86,
+        "unique_edge_exec": 112,
+        "dynamic_cyclomatic": 28
+      }
+    },
+    {
+      "function_name": "tzetar_",
+      "start_addr": "0x40ae3e",
+      "end_addr": "0x40b0c8",
+      "offset_start": "0xae3e",
+      "offset_end": "0xb0c8",
+      "function_size_bytes": 650,
+      "execution_stats": {
+        "call_exec": 101,
+        "inst_exec": 6418752,
+        "inst_static": 130
+      },
+      "data_flow": {
+        "mem_read_static": 31,
+        "mem_write_static": 17,
+        "mem_inst_static": 47,
+        "mem_read_exec": 1117464,
+        "mem_write_exec": 506919,
+        "mem_inst_exec": 1623373
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 307848,
+        "stride_read_exec": 101000,
+        "random_read_exec": 708615,
+        "seq_write_exec": 495808,
+        "stride_write_exec": 0,
+        "random_write_exec": 11110
+      },
+      "compute_characteristics": {
+        "arith_static": 39,
+        "logic_static": 1,
+        "float_static": 52,
+        "simd_static": 52,
+        "pure_compute_static": 46,
+        "data_movement_static": 68,
+        "compare_static": 9,
+        "stack_static": 12,
+        "string_static": 19,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 3072723,
+        "logic_exec": 10100,
+        "float_exec": 5050202,
+        "simd_exec": 5050202,
+        "pure_compute_exec": 3788813,
+        "data_movement_exec": 3088782,
+        "compare_exec": 123523,
+        "stack_exec": 1212,
+        "string_exec": 1526312,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.7653,
+        "inst_type_entropy_exec": 2.3059
+      },
+      "control_flow": {
+        "branch_static": 10,
+        "branch_exec": 123523,
+        "loop_static": 4,
+        "return_static": 1,
+        "call_static": 2,
+        "call_other_exec": 0,
+        "indirect_exec": 101
+      },
+      "register_usage": {
+        "reg_read_exec": 10242814,
+        "reg_write_exec": 6268969,
+        "reg_read_static": 192,
+        "reg_write_static": 143,
+        "unique_reg_read": 16,
+        "unique_reg_write": 16
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 101202,
+        "branch_not_taken_exec": 22321,
+        "cond_branch_static": 9,
+        "uncond_branch_static": 1,
+        "loop_iter_total": 101000,
+        "call_depth_max": 0,
+        "loop_depth_max": 4
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 16,
+        "edge_static": 22,
+        "static_cyclomatic": 8,
+        "bbl_exec": 134835,
+        "unique_bbl_exec": 12,
+        "unique_edge_exec": 14,
+        "dynamic_cyclomatic": 4
+      }
+    },
+    {
+      "function_name": "add_",
+      "start_addr": "0x40b0c8",
+      "end_addr": "0x40b1bb",
+      "offset_start": "0xb0c8",
+      "offset_end": "0xb1bb",
+      "function_size_bytes": 243,
+      "execution_stats": {
+        "call_exec": 101,
+        "inst_exec": 3959200,
+        "inst_static": 63
+      },
+      "data_flow": {
+        "mem_read_static": 12,
+        "mem_write_static": 6,
+        "mem_inst_static": 18,
+        "mem_read_exec": 1010909,
+        "mem_write_exec": 505303,
+        "mem_inst_exec": 1516212
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 606,
+        "stride_read_exec": 0,
+        "random_read_exec": 1010302,
+        "seq_write_exec": 495102,
+        "stride_write_exec": 0,
+        "random_write_exec": 10200
+      },
+      "compute_characteristics": {
+        "arith_static": 10,
+        "logic_static": 1,
+        "float_static": 3,
+        "simd_static": 3,
+        "pure_compute_static": 10,
+        "data_movement_static": 28,
+        "compare_static": 10,
+        "stack_static": 6,
+        "string_static": 5,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 1244421,
+        "logic_exec": 10100,
+        "float_exec": 1515000,
+        "simd_exec": 1515000,
+        "pure_compute_exec": 749521,
+        "data_movement_exec": 1447532,
+        "compare_exec": 628523,
+        "stack_exec": 606,
+        "string_exec": 1122110,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.8503,
+        "inst_type_entropy_exec": 2.7424
+      },
+      "control_flow": {
+        "branch_static": 11,
+        "branch_exec": 628523,
+        "loop_static": 5,
+        "return_static": 1,
+        "call_static": 2,
+        "call_other_exec": 0,
+        "indirect_exec": 101
+      },
+      "register_usage": {
+        "reg_read_exec": 6437336,
+        "reg_write_exec": 4204125,
+        "reg_read_static": 85,
+        "reg_write_static": 78,
+        "unique_reg_read": 13,
+        "unique_reg_write": 13
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 505202,
+        "branch_not_taken_exec": 123321,
+        "cond_branch_static": 10,
+        "uncond_branch_static": 1,
+        "loop_iter_total": 505000,
+        "call_depth_max": 0,
+        "loop_depth_max": 5
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 18,
+        "edge_static": 25,
+        "static_cyclomatic": 9,
+        "bbl_exec": 740835,
+        "unique_bbl_exec": 14,
+        "unique_edge_exec": 17,
+        "dynamic_cyclomatic": 5
+      }
+    },
+    {
+      "function_name": "txinvr_",
+      "start_addr": "0x40b1bb",
+      "end_addr": "0x40b452",
+      "offset_start": "0xb1bb",
+      "offset_end": "0xb452",
+      "function_size_bytes": 663,
+      "execution_stats": {
+        "call_exec": 101,
+        "inst_exec": 6519853,
+        "inst_static": 132
+      },
+      "data_flow": {
+        "mem_read_static": 32,
+        "mem_write_static": 17,
+        "mem_inst_static": 48,
+        "mem_read_exec": 1117565,
+        "mem_write_exec": 506919,
+        "mem_inst_exec": 1623474
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 307949,
+        "stride_read_exec": 101000,
+        "random_read_exec": 708615,
+        "seq_write_exec": 495808,
+        "stride_write_exec": 0,
+        "random_write_exec": 11110
+      },
+      "compute_characteristics": {
+        "arith_static": 38,
+        "logic_static": 2,
+        "float_static": 53,
+        "simd_static": 54,
+        "pure_compute_static": 47,
+        "data_movement_static": 70,
+        "compare_static": 9,
+        "stack_static": 12,
+        "string_static": 20,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 2971723,
+        "logic_exec": 111100,
+        "float_exec": 5050303,
+        "simd_exec": 5151303,
+        "pure_compute_exec": 3889813,
+        "data_movement_exec": 3189883,
+        "compare_exec": 123523,
+        "stack_exec": 1212,
+        "string_exec": 1526413,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.7758,
+        "inst_type_entropy_exec": 2.3369
+      },
+      "control_flow": {
+        "branch_static": 10,
+        "branch_exec": 123523,
+        "loop_static": 4,
+        "return_static": 1,
+        "call_static": 2,
+        "call_other_exec": 0,
+        "indirect_exec": 101
+      },
+      "register_usage": {
+        "reg_read_exec": 10343915,
+        "reg_write_exec": 6370070,
+        "reg_read_static": 194,
+        "reg_write_static": 145,
+        "unique_reg_read": 16,
+        "unique_reg_write": 16
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 101202,
+        "branch_not_taken_exec": 22321,
+        "cond_branch_static": 9,
+        "uncond_branch_static": 1,
+        "loop_iter_total": 101000,
+        "call_depth_max": 0,
+        "loop_depth_max": 4
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 16,
+        "edge_static": 22,
+        "static_cyclomatic": 8,
+        "bbl_exec": 134835,
+        "unique_bbl_exec": 12,
+        "unique_edge_exec": 14,
+        "dynamic_cyclomatic": 4
+      }
+    },
+    {
+      "function_name": "error_norm_",
+      "start_addr": "0x40b452",
+      "end_addr": "0x40b616",
+      "offset_start": "0xb452",
+      "offset_end": "0xb616",
+      "function_size_bytes": 452,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 101234,
+        "inst_static": 109
+      },
+      "data_flow": {
+        "mem_read_static": 25,
+        "mem_write_static": 21,
+        "mem_inst_static": 45,
+        "mem_read_exec": 28168,
+        "mem_write_exec": 12294,
+        "mem_inst_exec": 40450
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 47,
+        "stride_read_exec": 0,
+        "random_read_exec": 28120,
+        "seq_write_exec": 8822,
+        "stride_write_exec": 0,
+        "random_write_exec": 3471
+      },
+      "compute_characteristics": {
+        "arith_static": 27,
+        "logic_static": 8,
+        "float_static": 28,
+        "simd_static": 35,
+        "pure_compute_static": 35,
+        "data_movement_static": 52,
+        "compare_static": 5,
+        "stack_static": 12,
+        "string_static": 14,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 40539,
+        "logic_exec": 2032,
+        "float_exec": 48890,
+        "simd_exec": 50778,
+        "pure_compute_exec": 25143,
+        "data_movement_exec": 33827,
+        "compare_exec": 10529,
+        "stack_exec": 12,
+        "string_exec": 21051,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.8923,
+        "inst_type_entropy_exec": 2.6989
+      },
+      "control_flow": {
+        "branch_static": 8,
+        "branch_exec": 10686,
+        "loop_static": 5,
+        "return_static": 1,
+        "call_static": 1,
+        "call_other_exec": 1728,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 190489,
+        "reg_write_exec": 105273,
+        "reg_read_static": 160,
+        "reg_write_static": 122,
+        "unique_reg_read": 11,
+        "unique_reg_write": 12
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 8643,
+        "branch_not_taken_exec": 2043,
+        "cond_branch_static": 8,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 8643,
+        "call_depth_max": 1728,
+        "loop_depth_max": 4
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 15,
+        "edge_static": 21,
+        "static_cyclomatic": 8,
+        "bbl_exec": 14301,
+        "unique_bbl_exec": 15,
+        "unique_edge_exec": 19,
+        "dynamic_cyclomatic": 6
+      }
+    },
+    {
+      "function_name": "rhs_norm_",
+      "start_addr": "0x40b616",
+      "end_addr": "0x40b741",
+      "offset_start": "0xb616",
+      "offset_end": "0xb741",
+      "function_size_bytes": 299,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 43263,
+        "inst_static": 80
+      },
+      "data_flow": {
+        "mem_read_static": 14,
+        "mem_write_static": 11,
+        "mem_inst_static": 25,
+        "mem_read_exec": 10016,
+        "mem_write_exec": 5014,
+        "mem_inst_exec": 15030
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 12,
+        "stride_read_exec": 0,
+        "random_read_exec": 10003,
+        "seq_write_exec": 5012,
+        "stride_write_exec": 0,
+        "random_write_exec": 1
+      },
+      "compute_characteristics": {
+        "arith_static": 19,
+        "logic_static": 5,
+        "float_static": 18,
+        "simd_static": 22,
+        "pure_compute_static": 27,
+        "data_movement_static": 35,
+        "compare_static": 8,
+        "stack_static": 8,
+        "string_static": 12,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 17345,
+        "logic_exec": 104,
+        "float_exec": 20038,
+        "simd_exec": 20042,
+        "pure_compute_exec": 12457,
+        "data_movement_exec": 13353,
+        "compare_exec": 6226,
+        "stack_exec": 8,
+        "string_exec": 11125,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.9696,
+        "inst_type_entropy_exec": 2.6896
+      },
+      "control_flow": {
+        "branch_static": 8,
+        "branch_exec": 6226,
+        "loop_static": 5,
+        "return_static": 1,
+        "call_static": 0,
+        "call_other_exec": 0,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 81837,
+        "reg_write_exec": 45688,
+        "reg_read_static": 118,
+        "reg_write_static": 93,
+        "unique_reg_read": 14,
+        "unique_reg_write": 14
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 5003,
+        "branch_not_taken_exec": 1223,
+        "cond_branch_static": 8,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 5003,
+        "call_depth_max": 0,
+        "loop_depth_max": 4
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 14,
+        "edge_static": 21,
+        "static_cyclomatic": 9,
+        "bbl_exec": 7339,
+        "unique_bbl_exec": 14,
+        "unique_edge_exec": 18,
+        "dynamic_cyclomatic": 6
+      }
+    },
+    {
+      "function_name": "verify_",
+      "start_addr": "0x40b741",
+      "end_addr": "0x40c73b",
+      "offset_start": "0xb741",
+      "offset_end": "0xc73b",
+      "function_size_bytes": 4090,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 729,
+        "inst_static": 635
+      },
+      "data_flow": {
+        "mem_read_static": 133,
+        "mem_write_static": 277,
+        "mem_inst_static": 410,
+        "mem_read_exec": 107,
+        "mem_write_exec": 224,
+        "mem_inst_exec": 331
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 37,
+        "stride_read_exec": 0,
+        "random_read_exec": 69,
+        "seq_write_exec": 151,
+        "stride_write_exec": 0,
+        "random_write_exec": 72
+      },
+      "compute_characteristics": {
+        "arith_static": 16,
+        "logic_static": 7,
+        "float_static": 180,
+        "simd_static": 186,
+        "pure_compute_static": 23,
+        "data_movement_static": 446,
+        "compare_static": 43,
+        "stack_static": 6,
+        "string_static": 181,
+        "nop_static": 0,
+        "other_static": 1,
+        "arith_exec": 68,
+        "logic_exec": 21,
+        "float_exec": 116,
+        "simd_exec": 138,
+        "pure_compute_exec": 89,
+        "data_movement_exec": 439,
+        "compare_exec": 55,
+        "stack_exec": 6,
+        "string_exec": 115,
+        "nop_exec": 0,
+        "other_exec": 1
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.5694,
+        "inst_type_entropy_exec": 2.7222
+      },
+      "control_flow": {
+        "branch_static": 59,
+        "branch_exec": 69,
+        "loop_static": 5,
+        "return_static": 1,
+        "call_static": 62,
+        "call_other_exec": 75,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 1000,
+        "reg_write_exec": 714,
+        "reg_read_static": 838,
+        "reg_write_static": 503,
+        "unique_reg_read": 8,
+        "unique_reg_write": 8
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 32,
+        "branch_not_taken_exec": 23,
+        "cond_branch_static": 43,
+        "uncond_branch_static": 16,
+        "loop_iter_total": 20,
+        "call_depth_max": 75,
+        "loop_depth_max": 1
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 128,
+        "edge_static": 108,
+        "static_cyclomatic": 1,
+        "bbl_exec": 150,
+        "unique_bbl_exec": 58,
+        "unique_edge_exec": 62,
+        "dynamic_cyclomatic": 6
+      }
+    },
+    {
+      "function_name": "print_results_",
+      "start_addr": "0x40c73b",
+      "end_addr": "0x40cf67",
+      "offset_start": "0xc73b",
+      "offset_end": "0xcf67",
+      "function_size_bytes": 2092,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 283,
+        "inst_static": 362
+      },
+      "data_flow": {
+        "mem_read_static": 36,
+        "mem_write_static": 212,
+        "mem_inst_static": 248,
+        "mem_read_exec": 32,
+        "mem_write_exec": 169,
+        "mem_inst_exec": 201
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 9,
+        "stride_read_exec": 0,
+        "random_read_exec": 22,
+        "seq_write_exec": 149,
+        "stride_write_exec": 0,
+        "random_write_exec": 19
+      },
+      "compute_characteristics": {
+        "arith_static": 2,
+        "logic_static": 0,
+        "float_static": 2,
+        "simd_static": 2,
+        "pure_compute_static": 2,
+        "data_movement_static": 277,
+        "compare_static": 5,
+        "stack_static": 12,
+        "string_static": 2,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 2,
+        "logic_exec": 0,
+        "float_exec": 0,
+        "simd_exec": 0,
+        "pure_compute_exec": 2,
+        "data_movement_exec": 220,
+        "compare_exec": 2,
+        "stack_exec": 12,
+        "string_exec": 0,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 1.3182,
+        "inst_type_entropy_exec": 1.1192
+      },
+      "control_flow": {
+        "branch_static": 8,
+        "branch_exec": 3,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 69,
+        "call_other_exec": 55,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 336,
+        "reg_write_exec": 239,
+        "reg_read_static": 427,
+        "reg_write_static": 303,
+        "unique_reg_read": 14,
+        "unique_reg_write": 11
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 1,
+        "branch_not_taken_exec": 1,
+        "cond_branch_static": 5,
+        "uncond_branch_static": 3,
+        "loop_iter_total": 0,
+        "call_depth_max": 55,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 79,
+        "edge_static": 14,
+        "static_cyclomatic": 1,
+        "bbl_exec": 59,
+        "unique_bbl_exec": 59,
+        "unique_edge_exec": 58,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "elapsed_time_",
+      "start_addr": "0x40cf67",
+      "end_addr": "0x40cf85",
+      "offset_start": "0xcf67",
+      "offset_end": "0xcf85",
+      "function_size_bytes": 30,
+      "execution_stats": {
+        "call_exec": 2,
+        "inst_exec": 14,
+        "inst_static": 7
+      },
+      "data_flow": {
+        "mem_read_static": 2,
+        "mem_write_static": 1,
+        "mem_inst_static": 3,
+        "mem_read_exec": 4,
+        "mem_write_exec": 2,
+        "mem_inst_exec": 6
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 3,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 1,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute_characteristics": {
+        "arith_static": 2,
+        "logic_static": 0,
+        "float_static": 1,
+        "simd_static": 1,
+        "pure_compute_static": 2,
+        "data_movement_static": 3,
+        "compare_static": 0,
+        "stack_static": 0,
+        "string_static": 1,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 4,
+        "logic_exec": 0,
+        "float_exec": 2,
+        "simd_exec": 2,
+        "pure_compute_exec": 4,
+        "data_movement_exec": 6,
+        "compare_exec": 0,
+        "stack_exec": 0,
+        "string_exec": 2,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.6464,
+        "inst_type_entropy_exec": 2.4194
+      },
+      "control_flow": {
+        "branch_static": 0,
+        "branch_exec": 0,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 1,
+        "call_other_exec": 2,
+        "indirect_exec": 2
+      },
+      "register_usage": {
+        "reg_read_exec": 14,
+        "reg_write_exec": 22,
+        "reg_read_static": 7,
+        "reg_write_static": 11,
+        "unique_reg_read": 1,
+        "unique_reg_write": 3
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 0,
+        "branch_not_taken_exec": 0,
+        "cond_branch_static": 0,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 0,
+        "call_depth_max": 1,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 2,
+        "edge_static": 0,
+        "static_cyclomatic": 1,
+        "bbl_exec": 4,
+        "unique_bbl_exec": 2,
+        "unique_edge_exec": 1,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "timer_clear_",
+      "start_addr": "0x40cf85",
+      "end_addr": "0x40cf95",
+      "offset_start": "0xcf85",
+      "offset_end": "0xcf95",
+      "function_size_bytes": 16,
+      "execution_stats": {
+        "call_exec": 30,
+        "inst_exec": 90,
+        "inst_static": 3
+      },
+      "data_flow": {
+        "mem_read_static": 2,
+        "mem_write_static": 1,
+        "mem_inst_static": 3,
+        "mem_read_exec": 60,
+        "mem_write_exec": 30,
+        "mem_inst_exec": 90
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 59,
+        "seq_write_exec": 28,
+        "stride_write_exec": 0,
+        "random_write_exec": 1
+      },
+      "compute_characteristics": {
+        "arith_static": 0,
+        "logic_static": 0,
+        "float_static": 0,
+        "simd_static": 0,
+        "pure_compute_static": 0,
+        "data_movement_static": 2,
+        "compare_static": 0,
+        "stack_static": 0,
+        "string_static": 1,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 0,
+        "logic_exec": 0,
+        "float_exec": 0,
+        "simd_exec": 0,
+        "pure_compute_exec": 0,
+        "data_movement_exec": 60,
+        "compare_exec": 0,
+        "stack_exec": 0,
+        "string_exec": 30,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 1.5000,
+        "inst_type_entropy_exec": 0.9183
+      },
+      "control_flow": {
+        "branch_static": 0,
+        "branch_exec": 0,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 0,
+        "call_other_exec": 0,
+        "indirect_exec": 30
+      },
+      "register_usage": {
+        "reg_read_exec": 90,
+        "reg_write_exec": 90,
+        "reg_read_static": 3,
+        "reg_write_static": 3,
+        "unique_reg_read": 3,
+        "unique_reg_write": 2
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 0,
+        "branch_not_taken_exec": 0,
+        "cond_branch_static": 0,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 0,
+        "call_depth_max": 0,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 1,
+        "edge_static": 0,
+        "static_cyclomatic": 1,
+        "bbl_exec": 30,
+        "unique_bbl_exec": 1,
+        "unique_edge_exec": 0,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "timer_start_",
+      "start_addr": "0x40cf95",
+      "end_addr": "0x40cfad",
+      "offset_start": "0xcf95",
+      "offset_end": "0xcfad",
+      "function_size_bytes": 24,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 7,
+        "inst_static": 7
+      },
+      "data_flow": {
+        "mem_read_static": 3,
+        "mem_write_static": 3,
+        "mem_inst_static": 6,
+        "mem_read_exec": 3,
+        "mem_write_exec": 3,
+        "mem_inst_exec": 6
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 1,
+        "seq_write_exec": 1,
+        "stride_write_exec": 0,
+        "random_write_exec": 1
+      },
+      "compute_characteristics": {
+        "arith_static": 1,
+        "logic_static": 0,
+        "float_static": 1,
+        "simd_static": 1,
+        "pure_compute_static": 1,
+        "data_movement_static": 4,
+        "compare_static": 0,
+        "stack_static": 2,
+        "string_static": 2,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 1,
+        "logic_exec": 0,
+        "float_exec": 1,
+        "simd_exec": 1,
+        "pure_compute_exec": 1,
+        "data_movement_exec": 4,
+        "compare_exec": 0,
+        "stack_exec": 2,
+        "string_exec": 2,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.7774,
+        "inst_type_entropy_exec": 2.5850
+      },
+      "control_flow": {
+        "branch_static": 0,
+        "branch_exec": 0,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 1,
+        "call_other_exec": 1,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 10,
+        "reg_write_exec": 10,
+        "reg_read_static": 10,
+        "reg_write_static": 10,
+        "unique_reg_read": 3,
+        "unique_reg_write": 2
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 0,
+        "branch_not_taken_exec": 0,
+        "cond_branch_static": 0,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 0,
+        "call_depth_max": 1,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 2,
+        "edge_static": 0,
+        "static_cyclomatic": 1,
+        "bbl_exec": 2,
+        "unique_bbl_exec": 2,
+        "unique_edge_exec": 1,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "timer_stop_",
+      "start_addr": "0x40cfad",
+      "end_addr": "0x40cfda",
+      "offset_start": "0xcfad",
+      "offset_end": "0xcfda",
+      "function_size_bytes": 45,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 10,
+        "inst_static": 10
+      },
+      "data_flow": {
+        "mem_read_static": 5,
+        "mem_write_static": 3,
+        "mem_inst_static": 8,
+        "mem_read_exec": 5,
+        "mem_write_exec": 3,
+        "mem_inst_exec": 8
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 3,
+        "seq_write_exec": 1,
+        "stride_write_exec": 0,
+        "random_write_exec": 1
+      },
+      "compute_characteristics": {
+        "arith_static": 2,
+        "logic_static": 0,
+        "float_static": 3,
+        "simd_static": 3,
+        "pure_compute_static": 0,
+        "data_movement_static": 6,
+        "compare_static": 0,
+        "stack_static": 2,
+        "string_static": 2,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 2,
+        "logic_exec": 0,
+        "float_exec": 3,
+        "simd_exec": 3,
+        "pure_compute_exec": 0,
+        "data_movement_exec": 6,
+        "compare_exec": 0,
+        "stack_exec": 2,
+        "string_exec": 2,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.7710,
+        "inst_type_entropy_exec": 2.6153
+      },
+      "control_flow": {
+        "branch_static": 0,
+        "branch_exec": 0,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 1,
+        "call_other_exec": 1,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 15,
+        "reg_write_exec": 12,
+        "reg_read_static": 15,
+        "reg_write_static": 12,
+        "unique_reg_read": 5,
+        "unique_reg_write": 4
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 0,
+        "branch_not_taken_exec": 0,
+        "cond_branch_static": 0,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 0,
+        "call_depth_max": 1,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 2,
+        "edge_static": 0,
+        "static_cyclomatic": 1,
+        "bbl_exec": 2,
+        "unique_bbl_exec": 2,
+        "unique_edge_exec": 1,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "timer_read_",
+      "start_addr": "0x40cfda",
+      "end_addr": "0x40cfe7",
+      "offset_start": "0xcfda",
+      "offset_end": "0xcfe7",
+      "function_size_bytes": 13,
+      "execution_stats": {
+        "call_exec": 1,
+        "inst_exec": 3,
+        "inst_static": 3
+      },
+      "data_flow": {
+        "mem_read_static": 3,
+        "mem_write_static": 0,
+        "mem_inst_static": 3,
+        "mem_read_exec": 3,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 3
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 2,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute_characteristics": {
+        "arith_static": 0,
+        "logic_static": 0,
+        "float_static": 1,
+        "simd_static": 1,
+        "pure_compute_static": 0,
+        "data_movement_static": 2,
+        "compare_static": 0,
+        "stack_static": 0,
+        "string_static": 2,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 0,
+        "logic_exec": 0,
+        "float_exec": 1,
+        "simd_exec": 1,
+        "pure_compute_exec": 0,
+        "data_movement_exec": 2,
+        "compare_exec": 0,
+        "stack_exec": 0,
+        "string_exec": 2,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.2359,
+        "inst_type_entropy_exec": 1.9183
+      },
+      "control_flow": {
+        "branch_static": 0,
+        "branch_exec": 0,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 0,
+        "call_other_exec": 0,
+        "indirect_exec": 1
+      },
+      "register_usage": {
+        "reg_read_exec": 3,
+        "reg_write_exec": 4,
+        "reg_read_static": 3,
+        "reg_write_static": 4,
+        "unique_reg_read": 3,
+        "unique_reg_write": 2
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 0,
+        "branch_not_taken_exec": 0,
+        "cond_branch_static": 0,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 0,
+        "call_depth_max": 0,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 1,
+        "edge_static": 0,
+        "static_cyclomatic": 1,
+        "bbl_exec": 1,
+        "unique_bbl_exec": 1,
+        "unique_edge_exec": 0,
+        "dynamic_cyclomatic": 1
+      }
+    },
+    {
+      "function_name": "wtime_",
+      "start_addr": "0x40cfe7",
+      "end_addr": "0x40d070",
+      "offset_start": "0xcfe7",
+      "offset_end": "0xd070",
+      "function_size_bytes": 137,
+      "execution_stats": {
+        "call_exec": 2,
+        "inst_exec": 58,
+        "inst_static": 31
+      },
+      "data_flow": {
+        "mem_read_static": 11,
+        "mem_write_static": 6,
+        "mem_inst_static": 17,
+        "mem_read_exec": 21,
+        "mem_write_exec": 9,
+        "mem_inst_exec": 30
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 5,
+        "stride_read_exec": 0,
+        "random_read_exec": 15,
+        "seq_write_exec": 6,
+        "stride_write_exec": 0,
+        "random_write_exec": 2
+      },
+      "compute_characteristics": {
+        "arith_static": 5,
+        "logic_static": 4,
+        "float_static": 6,
+        "simd_static": 8,
+        "pure_compute_static": 9,
+        "data_movement_static": 14,
+        "compare_static": 1,
+        "stack_static": 2,
+        "string_static": 2,
+        "nop_static": 0,
+        "other_static": 0,
+        "arith_exec": 10,
+        "logic_exec": 8,
+        "float_exec": 12,
+        "simd_exec": 16,
+        "pure_compute_exec": 18,
+        "data_movement_exec": 26,
+        "compare_exec": 2,
+        "stack_exec": 4,
+        "string_exec": 4,
+        "nop_exec": 0,
+        "other_exec": 0
+      },
+      "instruction_entropy": {
+        "inst_type_entropy_static": 2.9924,
+        "inst_type_entropy_exec": 2.8861
+      },
+      "control_flow": {
+        "branch_static": 2,
+        "branch_exec": 4,
+        "loop_static": 0,
+        "return_static": 1,
+        "call_static": 2,
+        "call_other_exec": 2,
+        "indirect_exec": 2
+      },
+      "register_usage": {
+        "reg_read_exec": 83,
+        "reg_write_exec": 69,
+        "reg_read_static": 45,
+        "reg_write_static": 37,
+        "unique_reg_read": 5,
+        "unique_reg_write": 6
+      },
+      "control_flow_detail": {
+        "branch_taken_exec": 3,
+        "branch_not_taken_exec": 1,
+        "cond_branch_static": 2,
+        "uncond_branch_static": 0,
+        "loop_iter_total": 0,
+        "call_depth_max": 1,
+        "loop_depth_max": 0
+      },
+      "cyclomatic_complexity": {
+        "bbl_static": 6,
+        "edge_static": 5,
+        "static_cyclomatic": 1,
+        "bbl_exec": 9,
+        "unique_bbl_exec": 5,
+        "unique_edge_exec": 5,
+        "dynamic_cyclomatic": 2
+      }
+    }
+  ],
+  "statistics": {
+    "total_functions_analyzed": 30,
+    "total_instructions_executed": 269078272
+  }
+}
