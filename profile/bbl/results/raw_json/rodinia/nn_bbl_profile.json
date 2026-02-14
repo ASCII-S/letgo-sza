@@ -27,19 +27,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 1,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 1,
         "logic_exec": 0,
         "float_exec": 0,
@@ -80,19 +90,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -133,19 +153,29 @@
         "terminator_type": "ret",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 1,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 1,
         "logic_exec": 0,
         "float_exec": 0,
@@ -186,19 +216,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 28,
+        "mem_write_exec": 14,
+        "mem_inst_exec": 28
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 27,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 12,
+        "stride_write_exec": 0,
+        "random_write_exec": 1
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 28,
-        "mem_write_exec": 14,
-        "mem_inst_exec": 28,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -239,19 +279,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -292,19 +342,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -345,19 +405,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 34,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 34
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 33,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 34,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 34,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -398,19 +468,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -451,19 +531,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -504,19 +594,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -557,19 +657,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -610,19 +720,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -663,19 +783,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1025,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1025
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1024,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 1025,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1025,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -716,19 +846,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -769,19 +909,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 2,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 2,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -822,19 +972,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -875,19 +1035,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 2,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 2,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -928,19 +1098,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -981,19 +1161,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1034,19 +1224,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1087,19 +1287,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1140,19 +1350,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1193,19 +1413,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 2,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 2,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1246,19 +1476,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1299,19 +1539,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 10240,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 10240
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 10239,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 10240,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 10240,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1352,19 +1602,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1405,19 +1665,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 2,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 2,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1458,19 +1728,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1511,19 +1791,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1564,19 +1854,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1617,19 +1917,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 10240,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 10240
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 10239,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 10240,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 10240,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1670,19 +1980,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1723,19 +2043,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 3,
         "mem_inst_static": 4,
+        "mem_read_exec": 1,
+        "mem_write_exec": 3,
+        "mem_inst_exec": 4
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 2,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 2,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 8,
         "pure_compute_static": 2,
-        "mem_read_exec": 1,
-        "mem_write_exec": 3,
-        "mem_inst_exec": 4,
         "arith_exec": 0,
         "logic_exec": 2,
         "float_exec": 0,
@@ -1776,19 +2106,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 3,
         "pure_compute_static": 1,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 1,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1829,19 +2169,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 0,
         "mem_inst_static": 0,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1882,19 +2232,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1935,19 +2295,29 @@
         "terminator_type": "ret",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 0,
         "mem_inst_static": 2,
+        "mem_read_exec": 2,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 2,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -1988,19 +2358,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 2,
         "logic_static": 3,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 4,
         "pure_compute_static": 5,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 2,
         "logic_exec": 3,
         "float_exec": 0,
@@ -2041,19 +2421,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 0,
         "mem_inst_static": 0,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2094,19 +2484,29 @@
         "terminator_type": "indirect_branch",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2147,19 +2547,29 @@
         "terminator_type": "ret",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 0,
         "mem_inst_static": 2,
+        "mem_read_exec": 2,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 2,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2200,19 +2610,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2253,19 +2673,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 2,
         "mem_inst_static": 2,
+        "mem_read_exec": 0,
+        "mem_write_exec": 2,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 1,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 2,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2306,19 +2736,29 @@
         "terminator_type": "ret",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 1,
         "mem_inst_static": 3,
+        "mem_read_exec": 2,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 3
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 0,
-        "mem_read_exec": 2,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 3,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2359,19 +2799,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2412,19 +2862,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 0,
         "mem_inst_static": 0,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2465,19 +2925,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 13,
         "mem_inst_static": 15,
+        "mem_read_exec": 2,
+        "mem_write_exec": 13,
+        "mem_inst_exec": 15
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 1,
+        "seq_write_exec": 9,
+        "stride_write_exec": 0,
+        "random_write_exec": 3
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 3,
         "float_static": 2,
         "simd_static": 4,
         "data_movement_static": 15,
         "pure_compute_static": 4,
-        "mem_read_exec": 2,
-        "mem_write_exec": 13,
-        "mem_inst_exec": 15,
         "arith_exec": 1,
         "logic_exec": 3,
         "float_exec": 2,
@@ -2518,19 +2988,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 5,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2571,19 +3051,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 1,
         "mem_inst_static": 3,
+        "mem_read_exec": 2,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 3
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 1,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 4,
         "pure_compute_static": 1,
-        "mem_read_exec": 2,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 3,
         "arith_exec": 1,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2624,19 +3114,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 1,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2677,19 +3177,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2730,19 +3240,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 1,
         "mem_inst_static": 3,
+        "mem_read_exec": 2,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 3
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 1,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 3,
         "pure_compute_static": 1,
-        "mem_read_exec": 2,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 3,
         "arith_exec": 1,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2783,19 +3303,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 2,
         "mem_inst_static": 4,
+        "mem_read_exec": 2,
+        "mem_write_exec": 2,
+        "mem_inst_exec": 4
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 1,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 1
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 4,
         "pure_compute_static": 1,
-        "mem_read_exec": 2,
-        "mem_write_exec": 2,
-        "mem_inst_exec": 4,
         "arith_exec": 1,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2836,19 +3366,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 2,
         "mem_inst_static": 4,
+        "mem_read_exec": 2,
+        "mem_write_exec": 2,
+        "mem_inst_exec": 4
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 1,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 1
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 2,
         "simd_static": 2,
         "data_movement_static": 4,
         "pure_compute_static": 2,
-        "mem_read_exec": 2,
-        "mem_write_exec": 2,
-        "mem_inst_exec": 4,
         "arith_exec": 1,
         "logic_exec": 0,
         "float_exec": 2,
@@ -2889,19 +3429,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 2,
         "mem_inst_static": 3,
+        "mem_read_exec": 1,
+        "mem_write_exec": 2,
+        "mem_inst_exec": 3
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 1
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 1,
         "float_static": 2,
         "simd_static": 2,
         "data_movement_static": 4,
         "pure_compute_static": 2,
-        "mem_read_exec": 1,
-        "mem_write_exec": 2,
-        "mem_inst_exec": 3,
         "arith_exec": 0,
         "logic_exec": 1,
         "float_exec": 2,
@@ -2942,19 +3492,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 1,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -2995,19 +3555,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 5,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3048,19 +3618,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3101,19 +3681,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 6,
         "mem_write_static": 2,
         "mem_inst_static": 7,
+        "mem_read_exec": 30,
+        "mem_write_exec": 10,
+        "mem_inst_exec": 35
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 19,
+        "stride_read_exec": 0,
+        "random_read_exec": 10,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 9
+      },
+      "compute": {
         "arith_static": 2,
         "logic_static": 1,
         "float_static": 2,
         "simd_static": 2,
         "data_movement_static": 7,
         "pure_compute_static": 2,
-        "mem_read_exec": 30,
-        "mem_write_exec": 10,
-        "mem_inst_exec": 35,
         "arith_exec": 10,
         "logic_exec": 5,
         "float_exec": 10,
@@ -3154,19 +3744,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 0,
         "mem_inst_static": 2,
+        "mem_read_exec": 2,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 2,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3207,19 +3807,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 1,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 5,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3260,19 +3870,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 0,
         "mem_inst_static": 0,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3313,19 +3933,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 5,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3366,19 +3996,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 3,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3419,19 +4059,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 1,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3472,19 +4122,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3525,19 +4185,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3578,19 +4248,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3631,19 +4311,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 1025,
+        "mem_write_exec": 1025,
+        "mem_inst_exec": 2050
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1024,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 1024,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 6,
         "pure_compute_static": 0,
-        "mem_read_exec": 1025,
-        "mem_write_exec": 1025,
-        "mem_inst_exec": 2050,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3684,19 +4374,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 1025,
+        "mem_write_exec": 1025,
+        "mem_inst_exec": 2050
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1024,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 1024,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 1025,
-        "mem_write_exec": 1025,
-        "mem_inst_exec": 2050,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3737,19 +4437,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 1,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3790,19 +4500,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 0,
         "mem_inst_static": 0,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3843,19 +4563,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 1,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3896,19 +4626,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 1,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -3949,19 +4689,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 0,
         "mem_inst_static": 0,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4002,19 +4752,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4055,19 +4815,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1025,
+        "mem_inst_exec": 1025
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 1024,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1025,
-        "mem_inst_exec": 1025,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4108,19 +4878,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 2,
         "mem_inst_static": 4,
+        "mem_read_exec": 20480,
+        "mem_write_exec": 20480,
+        "mem_inst_exec": 40960
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 20479,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 20479
+      },
+      "compute": {
         "arith_static": 3,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 11,
         "pure_compute_static": 3,
-        "mem_read_exec": 20480,
-        "mem_write_exec": 20480,
-        "mem_inst_exec": 40960,
         "arith_exec": 30720,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4161,19 +4941,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 10,
         "mem_write_static": 1,
         "mem_inst_static": 11,
+        "mem_read_exec": 102400,
+        "mem_write_exec": 10240,
+        "mem_inst_exec": 112640
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 92159,
+        "stride_read_exec": 0,
+        "random_read_exec": 10240,
+        "seq_write_exec": 10239,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 7,
         "logic_static": 0,
         "float_static": 14,
         "simd_static": 14,
         "data_movement_static": 11,
         "pure_compute_static": 6,
-        "mem_read_exec": 102400,
-        "mem_write_exec": 10240,
-        "mem_inst_exec": 112640,
         "arith_exec": 71680,
         "logic_exec": 0,
         "float_exec": 143360,
@@ -4214,19 +5004,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 3,
         "mem_write_static": 2,
         "mem_inst_static": 4,
+        "mem_read_exec": 30720,
+        "mem_write_exec": 20480,
+        "mem_inst_exec": 40960
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 30719,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 20479
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 2,
         "simd_static": 2,
         "data_movement_static": 2,
         "pure_compute_static": 1,
-        "mem_read_exec": 30720,
-        "mem_write_exec": 20480,
-        "mem_inst_exec": 40960,
         "arith_exec": 10240,
         "logic_exec": 0,
         "float_exec": 20480,
@@ -4267,19 +5067,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 0,
         "mem_inst_static": 2,
+        "mem_read_exec": 2050,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 2050
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 2049,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 2050,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 2050,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4320,19 +5130,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1025,
+        "mem_inst_exec": 1025
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 1024,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1025,
-        "mem_inst_exec": 1025,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4373,19 +5193,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 3,
         "mem_inst_static": 4,
+        "mem_read_exec": 10240,
+        "mem_write_exec": 30720,
+        "mem_inst_exec": 40960
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 10239,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 30719,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 2,
         "simd_static": 2,
         "data_movement_static": 4,
         "pure_compute_static": 0,
-        "mem_read_exec": 10240,
-        "mem_write_exec": 30720,
-        "mem_inst_exec": 40960,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 20480,
@@ -4426,19 +5256,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 4,
         "mem_write_static": 0,
         "mem_inst_static": 4,
+        "mem_read_exec": 204800,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 204800
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 102399,
+        "stride_read_exec": 0,
+        "random_read_exec": 102400,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 1,
         "float_static": 2,
         "simd_static": 3,
         "data_movement_static": 5,
         "pure_compute_static": 3,
-        "mem_read_exec": 204800,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 204800,
         "arith_exec": 51200,
         "logic_exec": 51200,
         "float_exec": 102400,
@@ -4479,19 +5319,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 7,
         "mem_write_static": 3,
         "mem_inst_static": 9,
+        "mem_read_exec": 204253,
+        "mem_write_exec": 87537,
+        "mem_inst_exec": 262611
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 145894,
+        "stride_read_exec": 0,
+        "random_read_exec": 58358,
+        "seq_write_exec": 87536,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 2,
         "logic_static": 1,
         "float_static": 3,
         "simd_static": 3,
         "data_movement_static": 9,
         "pure_compute_static": 3,
-        "mem_read_exec": 204253,
-        "mem_write_exec": 87537,
-        "mem_inst_exec": 262611,
         "arith_exec": 58358,
         "logic_exec": 29179,
         "float_exec": 87537,
@@ -4532,19 +5382,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 3,
         "mem_write_static": 1,
         "mem_inst_static": 3,
+        "mem_read_exec": 66063,
+        "mem_write_exec": 22021,
+        "mem_inst_exec": 66063
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 66062,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 22020,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 66063,
-        "mem_write_exec": 22021,
-        "mem_inst_exec": 66063,
         "arith_exec": 22021,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4585,19 +5445,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 0,
         "mem_inst_static": 2,
+        "mem_read_exec": 20480,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 20480
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 20479,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 20480,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 20480,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4638,19 +5508,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 6,
         "mem_write_static": 0,
         "mem_inst_static": 6,
+        "mem_read_exec": 61440,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 61440
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 20480,
+        "stride_read_exec": 0,
+        "random_read_exec": 40959,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 2,
         "logic_static": 1,
         "float_static": 3,
         "simd_static": 4,
         "data_movement_static": 10,
         "pure_compute_static": 5,
-        "mem_read_exec": 61440,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 61440,
         "arith_exec": 20480,
         "logic_exec": 10240,
         "float_exec": 30720,
@@ -4691,19 +5571,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 4,
         "mem_write_static": 2,
         "mem_inst_static": 6,
+        "mem_read_exec": 136,
+        "mem_write_exec": 68,
+        "mem_inst_exec": 204
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 135,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 67
+      },
+      "compute": {
         "arith_static": 6,
         "logic_static": 1,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 12,
         "pure_compute_static": 7,
-        "mem_read_exec": 136,
-        "mem_write_exec": 68,
-        "mem_inst_exec": 204,
         "arith_exec": 204,
         "logic_exec": 34,
         "float_exec": 0,
@@ -4744,19 +5634,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 8,
         "mem_write_static": 2,
         "mem_inst_static": 9,
+        "mem_read_exec": 272,
+        "mem_write_exec": 68,
+        "mem_inst_exec": 306
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 203,
+        "stride_read_exec": 0,
+        "random_read_exec": 68,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 67
+      },
+      "compute": {
         "arith_static": 3,
         "logic_static": 1,
         "float_static": 3,
         "simd_static": 3,
         "data_movement_static": 11,
         "pure_compute_static": 4,
-        "mem_read_exec": 272,
-        "mem_write_exec": 68,
-        "mem_inst_exec": 306,
         "arith_exec": 102,
         "logic_exec": 34,
         "float_exec": 102,
@@ -4797,19 +5697,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 3,
         "mem_write_static": 1,
         "mem_inst_static": 3,
+        "mem_read_exec": 30618,
+        "mem_write_exec": 10206,
+        "mem_inst_exec": 30618
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 30617,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 10205,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 30618,
-        "mem_write_exec": 10206,
-        "mem_inst_exec": 30618,
         "arith_exec": 10206,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4850,19 +5760,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 0,
         "mem_inst_static": 2,
+        "mem_read_exec": 2050,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 2050
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 2049,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 2050,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 2050,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4903,19 +5823,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1026,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1026
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 1025,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 1026,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1026,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -4956,19 +5886,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 1,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -5009,19 +5949,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 0,
         "mem_inst_static": 0,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -5062,19 +6012,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -5115,19 +6075,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 2,
+        "mem_read_exec": 1,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 0,
-        "mem_read_exec": 1,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -5168,19 +6138,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 2,
         "mem_write_static": 0,
         "mem_inst_static": 2,
+        "mem_read_exec": 2,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 2
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 1,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 1,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 0,
-        "mem_read_exec": 2,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 2,
         "arith_exec": 0,
         "logic_exec": 1,
         "float_exec": 0,
@@ -5221,19 +6201,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -5274,19 +6264,29 @@
         "terminator_type": "ret",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 3,
         "mem_write_static": 0,
         "mem_inst_static": 3,
+        "mem_read_exec": 3,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 3
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 2,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 2,
         "pure_compute_static": 1,
-        "mem_read_exec": 3,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 3,
         "arith_exec": 1,
         "logic_exec": 0,
         "float_exec": 0,
@@ -5327,19 +6327,29 @@
         "terminator_type": "call",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 7,
         "mem_inst_static": 7,
+        "mem_read_exec": 0,
+        "mem_write_exec": 7,
+        "mem_inst_exec": 7
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 6,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 2,
         "logic_static": 1,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 11,
         "pure_compute_static": 3,
-        "mem_read_exec": 0,
-        "mem_write_exec": 7,
-        "mem_inst_exec": 7,
         "arith_exec": 2,
         "logic_exec": 1,
         "float_exec": 0,
@@ -5380,19 +6390,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 0,
         "mem_inst_static": 0,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -5433,19 +6453,29 @@
         "terminator_type": "call",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 1,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 1,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 1,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 3,
         "pure_compute_static": 1,
-        "mem_read_exec": 1,
-        "mem_write_exec": 1,
-        "mem_inst_exec": 1,
         "arith_exec": 0,
         "logic_exec": 1,
         "float_exec": 0,
@@ -5486,19 +6516,29 @@
         "terminator_type": "unknown",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 0,
         "mem_inst_static": 0,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 0,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 0,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 0,
         "logic_exec": 0,
         "float_exec": 0,
@@ -5539,19 +6579,29 @@
         "terminator_type": "direct_branch",
         "has_indirect_branch": false
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 0,
         "mem_write_static": 0,
         "mem_inst_static": 0,
+        "mem_read_exec": 0,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 0
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 1,
-        "mem_read_exec": 0,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 0,
         "arith_exec": 1,
         "logic_exec": 0,
         "float_exec": 0,
@@ -5592,19 +6642,29 @@
         "terminator_type": "ret",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 7,
         "mem_write_static": 0,
         "mem_inst_static": 7,
+        "mem_read_exec": 7,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 7
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 6,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 1,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 6,
         "pure_compute_static": 1,
-        "mem_read_exec": 7,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 7,
         "arith_exec": 1,
         "logic_exec": 0,
         "float_exec": 0,
@@ -5645,19 +6705,29 @@
         "terminator_type": "ret",
         "has_indirect_branch": true
       },
-      "compute": {
+      "data_flow": {
         "mem_read_static": 1,
         "mem_write_static": 0,
         "mem_inst_static": 1,
+        "mem_read_exec": 1,
+        "mem_write_exec": 0,
+        "mem_inst_exec": 1
+      },
+      "memory_access_pattern": {
+        "seq_read_exec": 0,
+        "stride_read_exec": 0,
+        "random_read_exec": 0,
+        "seq_write_exec": 0,
+        "stride_write_exec": 0,
+        "random_write_exec": 0
+      },
+      "compute": {
         "arith_static": 2,
         "logic_static": 0,
         "float_static": 0,
         "simd_static": 0,
         "data_movement_static": 0,
         "pure_compute_static": 2,
-        "mem_read_exec": 1,
-        "mem_write_exec": 0,
-        "mem_inst_exec": 1,
         "arith_exec": 2,
         "logic_exec": 0,
         "float_exec": 0,

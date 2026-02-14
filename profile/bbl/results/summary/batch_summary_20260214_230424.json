@@ -1,0 +1,41 @@
+{
+  "timestamp": "2026-02-14T23:04:32.452726",
+  "configuration": {
+    "apps_count": 2,
+    "parallel_jobs": 1,
+    "timeout": 3600,
+    "max_retries": 2
+  },
+  "results": {
+    "total": 2,
+    "success": 1,
+    "failed": 1,
+    "timeout": 0
+  },
+  "total_time": 7.901183128356934,
+  "details": {
+    "success": [
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/bbl/results/raw_json/rodinia/amg_bbl_profile.json",
+        "file_size_mb": 5.506612777709961,
+        "num_bbls": 3815,
+        "num_edges": 2259,
+        "elapsed_time": 3.8234524726867676,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/bbl/results/logs/amg_bbl_profile_20260214_230424.log",
+        "app_name": "amg",
+        "attempts": 1
+      }
+    ],
+    "failed": [
+      {
+        "success": false,
+        "app_name": "",
+        "error": "无法获取应用  的配置: 未知的应用: ",
+        "attempts": 3,
+        "elapsed_time": 0
+      }
+    ],
+    "timeout": []
+  }
+}

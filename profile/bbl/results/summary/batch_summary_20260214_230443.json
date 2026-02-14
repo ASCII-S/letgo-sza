@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-02-14T23:04:47.508827",
+  "configuration": {
+    "apps_count": 1,
+    "parallel_jobs": 1,
+    "timeout": 3600,
+    "max_retries": 2
+  },
+  "results": {
+    "total": 1,
+    "success": 1,
+    "failed": 0,
+    "timeout": 0
+  },
+  "total_time": 3.840528964996338,
+  "details": {
+    "success": [
+      {
+        "success": true,
+        "output_file": "/home/tongshiyu/pin/source/tools/letgo/profile/bbl/results/raw_json/rodinia/amg_bbl_profile.json",
+        "file_size_mb": 5.506604194641113,
+        "num_bbls": 3815,
+        "num_edges": 2259,
+        "elapsed_time": 3.7699663639068604,
+        "log_file": "/home/tongshiyu/pin/source/tools/letgo/profile/bbl/results/logs/amg_bbl_profile_20260214_230443.log",
+        "app_name": "amg",
+        "attempts": 1
+      }
+    ],
+    "failed": [],
+    "timeout": []
+  }
+}
