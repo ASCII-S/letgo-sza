@@ -55,6 +55,7 @@ def load_per_app_csv(csv_path: Path) -> list:
                 'total_crashes': int(row['total_crashes']),
                 'overall_crash_rate': float(row['overall_crash_rate']),
                 'unique_disasm_count': int(row['unique_disasm_count']),
+                'unique_crash_pc_count': int(row['unique_crash_pc_count']),
             })
     return rows
 
@@ -73,6 +74,7 @@ def load_summary_csv(csv_path: Path) -> dict:
                 'total_crashes': int(row['total_crashes']),
                 'overall_crash_rate': float(row['overall_crash_rate']),
                 'unique_disasm_count': int(row['unique_disasm_count']),
+                'unique_crash_pc_count': int(row['unique_crash_pc_count']),
             })
     return dict(data)
 
@@ -138,6 +140,34 @@ def plot_summary_crash_rate(all_data: dict, output_path: Path):
     ax.set_xlabel('Threshold (%)', fontsize=13)
     ax.set_ylabel('Overall Crash Rate (%)', fontsize=13)
     ax.set_title('All Benchmarks - Crash Rate vs Threshold', fontsize=15, pad=12)
+    ax.set_xticks(list(range(0, 100, 10)))
+    ax.grid(True, alpha=0.3)
+    ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=8,
+              ncol=1, borderaxespad=0)
+
+    plt.tight_layout()
+    fig.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close(fig)
+
+
+def plot_summary_crash_pc(all_data: dict, output_path: Path):
+    """绘制所有应用的崩溃点地址多样性随阈值变化的汇总折线图。"""
+    fig, ax = plt.subplots(figsize=(14, 8))
+
+    names = sorted(all_data.keys())
+    cmap = plt.cm.get_cmap('tab20', len(names))
+
+    for i, name in enumerate(names):
+        rows = all_data[name]
+        thresholds = [r['threshold_pct'] for r in rows]
+        crash_pc_counts = [r['unique_crash_pc_count'] for r in rows]
+        ax.plot(thresholds, crash_pc_counts, marker='^', markersize=4,
+                linewidth=1.5, color=cmap(i), label=name)
+
+    ax.set_xlabel('Threshold (%)', fontsize=13)
+    ax.set_ylabel('Crash Point Address Diversity (Unique PC Count)', fontsize=13)
+    ax.set_title('All Benchmarks - Crash Point Address Diversity vs Threshold',
+                 fontsize=15, pad=12)
     ax.set_xticks(list(range(0, 100, 10)))
     ax.grid(True, alpha=0.3)
     ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=8,
@@ -287,9 +317,13 @@ def main():
             plot_summary_richness(all_data, p2)
             print(f"汇总图(指令丰富度)已保存: {p2}")
 
-            p3 = data_dir / 'summary_normalized.png'
-            plot_summary_normalized(all_data, p3)
-            print(f"汇总图(归一化)已保存: {p3}")
+            p3 = data_dir / 'summary_crash_pc_diversity.png'
+            plot_summary_crash_pc(all_data, p3)
+            print(f"汇总图(崩溃点地址多样性)已保存: {p3}")
+
+            p4 = data_dir / 'summary_normalized.png'
+            plot_summary_normalized(all_data, p4)
+            print(f"汇总图(归一化)已保存: {p4}")
         else:
             print("无汇总数据可绘制")
     else:
