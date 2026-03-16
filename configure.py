@@ -47,7 +47,7 @@ progname = os.environ.get("PROGNAME_OVERRIDE", waittochangebyscrips)
 
 #随机注错还是对目标类型注错
 inject_random_or_targeted = "random"
-inject_random_or_targeted = "targeted"
+# inject_random_or_targeted = "targeted"
 
 # 对目标类型注错,详细参数。请保持select_type不变，对不同progname批量进行实验!!!
 # all
