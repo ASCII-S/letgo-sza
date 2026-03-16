@@ -8,6 +8,7 @@
 - inj_pc: 注错地址
 - Sig1: 崩溃时信号
 - Sig1pc: 崩溃时指令地址
+- Sig1ins: Sig1pc对应的指令
 - result: 实验结果
 """
 
@@ -16,6 +17,7 @@ import re
 import sys
 import json
 import argparse
+import subprocess
 from typing import Dict, Optional, List, Tuple
 from pathlib import Path
 
@@ -37,11 +39,14 @@ class SimpleLogParser:
         'crash_signal': re.compile(r'Program received signal (\w+)'),
         'crash_pc': re.compile(r'崩溃点PC\s*=\s*(0x[0-9a-fA-F]+)'),  # Step 1: 崩溃点PC = 0x...
         'letgo_marker': re.compile(r'LetGo崩溃恢复框架启动|Letgo in!'),
+        'binary_path': re.compile(r'Reading symbols from ([^\s]+?)\.\.\.'),  # 从GDB输出提取二进制路径
     }
 
-    def __init__(self, log_path: str):
+    def __init__(self, log_path: str, binary_path: str = None):
         self.log_path = log_path
         self.log_index = self._extract_log_index()
+        self.binary_path = binary_path
+        self._objdump_cache = {}  # 缓存objdump结果
 
     def _extract_log_index(self) -> str:
         """提取日志编号，返回 log_N 格式"""
@@ -65,6 +70,12 @@ class SimpleLogParser:
         """解析日志，返回需要的字段"""
         content = self._read_file()
 
+        # 如果没有提供binary_path，尝试从日志中提取
+        if not self.binary_path:
+            binary_match = self.PATTERNS['binary_path'].search(content)
+            if binary_match:
+                self.binary_path = binary_match.group(1)
+
         # 提取注错PC
         inj_pc = None
         match = self.PATTERNS['target_pc'].search(content)
@@ -81,6 +92,11 @@ class SimpleLogParser:
         if pc_match:
             sig1pc = self._simplify_hex(pc_match.group(1))
 
+        # 获取Sig1pc对应的指令
+        sig1ins = None
+        if sig1pc:
+            sig1ins = self._get_instruction_at_pc(sig1pc)
+
         # 检测LetGo
         letgo_used = bool(self.PATTERNS['letgo_marker'].search(content))
 
@@ -93,6 +109,7 @@ class SimpleLogParser:
             'inj_pc': inj_pc,
             'Sig1': sig1,
             'Sig1pc': sig1pc,
+            'Sig1ins': sig1ins,
             'result': result,
         }
 
@@ -107,14 +124,61 @@ class SimpleLogParser:
     def _classify_result(self, crash_count: int, letgo_used: bool) -> str:
         """分类实验结果（基础分类，SDC由外部判断结果决定）"""
         if crash_count == 0:
-            return "Benign"  # 无崩溃，待SDC判断确定是Masked还是SDC
+            return "Masked"  # 无崩溃，待SDC判断确定是Masked还是SDC
         elif crash_count == 1:
             if letgo_used:
-                return "C-Benign"  # 崩溃后修复，待SDC判断
+                return "C-Masked"  # 崩溃后修复，待SDC判断
             else:
                 return "Crash"
         else:
             return "Recrash"
+
+    def _get_instruction_at_pc(self, pc: str) -> Optional[str]:
+        """通过objdump获取指定PC地址的指令"""
+        if not self.binary_path or not os.path.exists(self.binary_path):
+            return None
+
+        if not pc or not pc.startswith('0x'):
+            return None
+
+        # 检查缓存
+        if pc in self._objdump_cache:
+            return self._objdump_cache[pc]
+
+        try:
+            # 将十六进制地址转换为整数
+            addr = int(pc, 16)
+
+            # 使用objdump只反汇编目标地址附近的代码（前后各16字节）
+            start_addr = max(0, addr - 16)
+            stop_addr = addr + 16
+
+            cmd = [
+                'objdump', '-d',
+                f'--start-address=0x{start_addr:x}',
+                f'--stop-address=0x{stop_addr:x}',
+                self.binary_path
+            ]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
+
+            if result.returncode != 0:
+                return None
+
+            # 解析objdump输出，查找对应地址的指令
+            # 格式: "  401be0:	48 89 e5             	mov    %rsp,%rbp"
+            pc_normalized = pc.lower().lstrip('0x').lstrip('0') or '0'
+            pattern = re.compile(rf'^\s*{pc_normalized}:\s+([0-9a-f\s]+)\s+(.+)$', re.IGNORECASE)
+
+            for line in result.stdout.split('\n'):
+                match = pattern.match(line)
+                if match:
+                    instruction = match.group(2).strip()
+                    self._objdump_cache[pc] = instruction
+                    return instruction
+
+            return None
+        except Exception as e:
+            return None
 
 
 def load_sdc_results(sdc_folder: str) -> Dict[str, Dict]:
@@ -146,6 +210,21 @@ def collect_app_logs(app_folder: str, app_name: str, verbose: bool = False) -> L
             print(f"  跳过 {app_name}: 日志文件夹不存在")
         return []
 
+    # 查找二进制文件路径
+    binary_path = None
+    possible_paths = [
+        os.path.join(app_folder, app_name),
+        os.path.join(app_folder, 'bin', app_name),
+        os.path.join(app_folder, app_name + '.out'),
+    ]
+    for path in possible_paths:
+        if os.path.exists(path) and os.path.isfile(path):
+            binary_path = path
+            break
+
+    if verbose and binary_path:
+        print(f"  {app_name}: 找到二进制文件 {binary_path}")
+
     # 加载SDC判断结果
     sdc_results = {}  # {log_index: is_sdc}
     if os.path.exists(sdc_folder):
@@ -174,7 +253,7 @@ def collect_app_logs(app_folder: str, app_name: str, verbose: bool = False) -> L
     results = []
     for log_path in log_files:
         try:
-            parser = SimpleLogParser(log_path)
+            parser = SimpleLogParser(log_path, binary_path)
             data = parser.parse()
             data['app_name'] = app_name
 
@@ -183,9 +262,9 @@ def collect_app_logs(app_folder: str, app_name: str, verbose: bool = False) -> L
             if log_index in sdc_results:
                 is_sdc = sdc_results[log_index]
                 if is_sdc is not None:
-                    if data['result'] == 'Benign':
+                    if data['result'] == 'Masked':
                         data['result'] = 'SDC' if is_sdc else 'Masked'
-                    elif data['result'] == 'C-Benign':
+                    elif data['result'] == 'C-Masked':
                         data['result'] = 'C-SDC' if is_sdc else 'C-Masked'
 
             results.append(data)
@@ -223,7 +302,7 @@ def batch_collect(result_dir: str, output_csv: str, apps: List[str] = None, verb
         return
 
     # 输出CSV
-    columns = ['app_name', 'input_file', 'inj_pc', 'Sig1', 'Sig1pc', 'result']
+    columns = ['app_name', 'input_file', 'inj_pc', 'Sig1', 'Sig1pc', 'Sig1ins', 'result']
 
     if USE_PANDAS:
         df = pd.DataFrame(all_results, columns=columns)
