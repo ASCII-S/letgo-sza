@@ -497,6 +497,10 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
         'IsMemWrite',          # Whether it's a memory write operation
         # Composite metric
         'InfluenceScore',      # Comprehensive influence score (0-30)
+
+        'CrashRegName',
+        'CrashRegValue',
+        'RecoveryRegValue',
     ])
     
 
@@ -819,6 +823,51 @@ def extract_values_and_append_to_csv(log_folder, input_file, output_dir, outputn
                         print(f"Error parsing influence metrics in {input_file}: {e}")
                 continue
             # ====== End Feature Parsing ======
+
+            # ====== Parse Register Values at Crash Point ======
+            if "=== Register Values at Crash Point ===" in line:
+                try:
+                    reg_names = []
+                    reg_vals = []
+                    for _ in range(20):
+                        next_line = next(file, None)
+                        if next_line is None:
+                            break
+                        if "=== End Register Values ===" in next_line:
+                            break
+                        stripped = next_line.strip()
+                        if stripped and ':' in stripped:
+                            parts = stripped.split(':', 1)
+                            reg_names.append(parts[0].strip())
+                            reg_vals.append(parts[1].strip())
+                    if reg_names:
+                        df.loc[0, 'CrashRegName'] = '|'.join(reg_names)
+                        df.loc[0, 'CrashRegValue'] = '|'.join(reg_vals)
+                except Exception as e:
+                    if debug_mode > 3:
+                        print(f"Error parsing crash register values in {input_file}: {e}")
+                continue
+ 
+            # ====== Parse Register Values after recovery ======
+            if "=== Register Values after recovery ===" in line:
+                try:
+                    rec_vals = []
+                    for _ in range(20):
+                        next_line = next(file, None)
+                        if next_line is None:
+                            break
+                        if "=== End Register Values ===" in next_line:
+                            break
+                        stripped = next_line.strip()
+                        if stripped and ':' in stripped:
+                            parts = stripped.split(':', 1)
+                            rec_vals.append(parts[1].strip())
+                    if rec_vals:
+                        df.loc[0, 'RecoveryRegValue'] = '|'.join(rec_vals)
+                except Exception as e:
+                    if debug_mode > 3:
+                        print(f"Error parsing recovery register values in {input_file}: {e}")
+                continue
 
             if "Inj2Sig" in line.strip():
                 #print(line)

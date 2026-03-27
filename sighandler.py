@@ -879,7 +879,7 @@ class SigHandler:
             fi = faultinject.FaultInjector(self.insts)
             args = fi.getNextPC(decpc)  ## Need to pay attention to getNextPC function in faultinjecion.cpp here
             
-            if len(args) != 8:
+            if len(args) != 9:
                 print("ERROR: Instruction information returned by Pin tool is incomplete")
                 print("No nextpc!")
                 return 1
@@ -901,16 +901,69 @@ class SigHandler:
         index = args[5]     ##index register value in memory of ins, base offset
         displacement = args[6]  ##displacement amount of memory operation in instruction
         scale = args[7]     ##memory factor, used with index to achieve complex memory addressing
-        
+        regrlist = args[8]  ##list of all read registers of ins
+        ###
         print(f"  - Current PC: {hex(thispc)}")
         print(f"  - Next instruction PC: {hex(nextpc) if isinstance(nextpc, int) else nextpc}")
         print(f"  - Write register list: {regwlist}")
+        print(f"  - Read register list: {regrlist}")
         print(f"  - Stack operation identifier: {stack}")
         print(f"  - Instruction type flag: {flag} (1=stack write, 2=stack read, 3=non-stack operation)")
         print(f"  - Memory base register: {base}")
         print(f"  - Memory index register: {index}")
         print(f"  - Memory displacement: {displacement}")
         print(f"  - Memory scale factor: {scale}")
+
+        # 在gdb中打印regwlist，base，index这些寄存器
+        print("\n=== Register Values at Crash Point ===")
+        for regw in regwlist:
+            i, regwlist_val = self.gdb_send(process, "p/x $" + regw, "Get value of write register " + regw)
+            if i == 1:
+                reg_match = re.search(r'0x[0-9a-fA-F]+', regwlist_val)
+                if reg_match:
+                    print(f"  {regw}: {reg_match.group()}")
+                else:
+                    print(f"  {regw}: {regwlist_val}")
+            else:
+                print(f"  {regw}: Failed to get value")
+
+        # 打印base寄存器
+        if base and base != '' and base != 'null':
+            i, base_val = self.gdb_send(process, "p/x $" + base, "Get value of base register " + base)
+            if i == 1:
+                base_match = re.search(r'0x[0-9a-fA-F]+', base_val)
+                if base_match:
+                    print(f"  {base}: {base_match.group()}")
+                else:
+                    print(f"  {base}: {base_val}")
+            else:
+                print(f"  {base}: Failed to get value")
+
+        # 打印index寄存器
+        if index and index != '' and index != 'null':
+            i, index_val = self.gdb_send(process, "p/x $" + index, "Get value of index register " + index)
+            if i == 1:
+                index_match = re.search(r'0x[0-9a-fA-F]+', index_val)
+                if index_match:
+                    print(f"  {index}: {index_match.group()}")
+                else:
+                    print(f"  {index}: {index_val}")
+            else:
+                print(f"  {index}: Failed to get value")
+
+        # 打印regrlist寄存器
+        for regr in regrlist:
+            i, regr_val = self.gdb_send(process, "p/x $" + regr, "Get value of read register " + regr)
+            if i == 1:
+                reg_match = re.search(r'0x[0-9a-fA-F]+', regr_val)
+                if reg_match:
+                    print(f"  {regr}: {reg_match.group()}")
+                else:
+                    print(f"  {regr}: {regr_val}")
+            else:
+                print(f"  {regr}: Failed to get value")
+
+        print("=== End Register Values ===\n")
 
         # ====== Feature Collection: Register and Memory Features ======
         print("\n=== Register and Memory Features ===")
@@ -1275,6 +1328,56 @@ class SigHandler:
         print("  Step 5/6: LetGo framework recovery complete")
         print("="*60)
         print("[Info] All recovery operations completed, program ready to continue execution")
+        # 在gdb中打印regwlist，base，index这些寄存器
+        print("\n=== Register Values after recovery ===")
+        for regw in regwlist:
+            i, regwlist_val = self.gdb_send(process, "p/x $" + regw, "Get value of write register " + regw)
+            if i == 1:
+                reg_match = re.search(r'0x[0-9a-fA-F]+', regwlist_val)
+                if reg_match:
+                    print(f"  {regw}: {reg_match.group()}")
+                else:
+                    print(f"  {regw}: {regwlist_val}")
+            else:
+                print(f"  {regw}: Failed to get value")
+
+        # 打印base寄存器
+        if base and base != '' and base != 'null':
+            i, base_val = self.gdb_send(process, "p/x $" + base, "Get value of base register " + base)
+            if i == 1:
+                base_match = re.search(r'0x[0-9a-fA-F]+', base_val)
+                if base_match:
+                    print(f"  {base}: {base_match.group()}")
+                else:
+                    print(f"  {base}: {base_val}")
+            else:
+                print(f"  {base}: Failed to get value")
+
+        # 打印index寄存器
+        if index and index != '' and index != 'null':
+            i, index_val = self.gdb_send(process, "p/x $" + index, "Get value of index register " + index)
+            if i == 1:
+                index_match = re.search(r'0x[0-9a-fA-F]+', index_val)
+                if index_match:
+                    print(f"  {index}: {index_match.group()}")
+                else:
+                    print(f"  {index}: {index_val}")
+            else:
+                print(f"  {index}: Failed to get value")
+
+        # 打印regrlist寄存器
+        for regr in regrlist:
+            i, regr_val = self.gdb_send(process, "p/x $" + regr, "Get value of read register " + regr)
+            if i == 1:
+                reg_match = re.search(r'0x[0-9a-fA-F]+', regr_val)
+                if reg_match:
+                    print(f"  {regr}: {reg_match.group()}")
+                else:
+                    print(f"  {regr}: {regr_val}")
+            else:
+                print(f"  {regr}: Failed to get value")
+
+        print("=== End Register Values ===\n")
         print(f"[Summary] Number of registers fixed: {len(regwlist) if regwlist else 0}")
         print(f"[Summary] Instruction type fixed: {'Stack read' if flag == 2 else 'Stack write' if flag == 1 else 'Non-stack operation'}")
         print(f"[Summary] Program will continue execution from address {next_pc_hex}")
@@ -1320,6 +1423,7 @@ class SigHandler:
                 rcv_sig =1
             else:
                 print("[Success] LetGo framework recovery complete")
+                
 
             ##After letgo_frame execution, start error propagation detection
             print("Step 3: Detecting error propagation after recovery")

@@ -285,6 +285,7 @@ class FaultInjector:
             return []
         nextpc = ""
         regw = []
+        regr = []
         stack = ""
         flag = 0 # stackw: 1, stackr: 2 , nostack: 3
         displacement = 0
@@ -299,6 +300,8 @@ class FaultInjector:
                     nextpc = line.split(":")[1]
                 if "regw" in line:
                     regw.append(line.split(":")[1])
+                if "regr" in line:
+                    regr.append(line.split(":")[1])
                 if "stackw:" in line:
                     stack = line.split(":")[1]
                     flag = 1
@@ -315,4 +318,4 @@ class FaultInjector:
                     displacement = line.split(":")[1]
                 if "scale:" in line:
                     scale = line.split(":")[1]
-        return [nextpc,regw,stack,flag,base,index,displacement,scale]
+        return [nextpc,regw,stack,flag,base,index,displacement,scale,regr]
