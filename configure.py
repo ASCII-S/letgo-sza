@@ -1,6 +1,5 @@
 import os
-pin_home = "/home/tongshiyu/pin"
-pin_binary = os.path.join(pin_home, "pin")  # Pin 可执行文件路径
+pin_home = "/home/tongshiyu/pin/pin"
 letgo_base_home = "/home/tongshiyu/pin/source/tools/letgo"
 toolbase = "/home/tongshiyu/pin/source/tools/pinfi"
 filib = toolbase + "/obj-intel64/faultinjection.so"
@@ -41,7 +40,7 @@ special = ""
 ##############################config parameters###############################
 
 #应用名取自prognames_supply
-waittochangebyscrips = "HPCCG"
+waittochangebyscrips = "syr2k"
 # 支持环境变量覆盖（用于并行实验）
 progname = os.environ.get("PROGNAME_OVERRIDE", waittochangebyscrips)
 
@@ -54,7 +53,7 @@ inject_random_or_targeted = "random"
 # | stack   |   mov |   integer |   float   |   call_ret    |   cmp
 # | div     |
 # data_transfer,logical,control_flow, other
-select_type = "adaptive"     # adaptive用来指定适应性注错
+select_type = "mov"     # adaptive用来指定适应性注错
 only_memory = 1
 dynamic_analyze =  1 #置1则生成包含指令占比的信息,而非单纯catalog,谨慎!!!
 high_bit_fault = 0 #在寄存器高位进行注错
