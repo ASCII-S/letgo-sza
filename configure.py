@@ -40,13 +40,13 @@ special = ""
 ##############################config parameters###############################
 
 #应用名取自prognames_supply
-waittochangebyscrips = "syr2k"
+waittochangebyscrips = "fdtd-2d"
 # 支持环境变量覆盖（用于并行实验）
 progname = os.environ.get("PROGNAME_OVERRIDE", waittochangebyscrips)
 
 #随机注错还是对目标类型注错
 inject_random_or_targeted = "random"
-# inject_random_or_targeted = "targeted"
+inject_random_or_targeted = "targeted"
 
 # 对目标类型注错,详细参数。请保持select_type不变，对不同progname批量进行实验!!!
 # all
@@ -92,6 +92,36 @@ exclude_dead_defs = True
 # 影响力 catalog 和 pool 文件名
 influence_catalog_name = "influence_catalog.csv"
 influence_pool_name = "influence_pool.csv"
+
+# ====== 手动指令注错配置 ======
+# 是否启用手动指令注错模式（仅在 targeted 模式下生效）
+use_manual_instructions = True
+
+# 手动指令列表
+# 格式：[regmem, reg, pc_hex, max_iteration(可选), repeat_count(可选)]
+# - regmem: 内存操作数寄存器（如 "rbp"），如果没有则填 ""
+# - reg: 目标寄存器（如 "rax"），如果没有则填 ""
+# - pc_hex: 指令地址，支持十六进制格式（如 "0x4026b1" 或 "4026b1"）
+# - max_iteration: 该指令在程序中的最大执行次数，默认 1023
+#   * 可以从 catalog 文件的最后一列获取准确值
+#   * iteration 不会超过这个值
+# - repeat_count: 对该位置重复注错的次数，默认 1
+#   * iteration 会自动按顺序分配：0, 1, 2, ..., min(max_iteration, repeat_count-1)
+#
+# 示例：
+# manual_instructions = [
+#     ["rbp", "", "0x4026b1", 12474, 100],  # 注错 100 次，max_iteration=12474
+#     ["rbp", "", "0x402605", 12096, 50],   # 注错 50 次，max_iteration=12096
+#     ["rdx", "", "0x402678"],              # 注错 1 次，使用默认 max_iteration=1023
+#     ["rax", "", "0x401234", 5000],        # 注错 1 次，max_iteration=5000
+# ]
+manual_instructions = [
+    # 在这里添加你的手动注错配置
+    ["rdx","","0x467c2b",1023,100],  # max_iteration=1023, repeat_count=100
+]
+
+# 手动 pool 文件名
+manual_pool_name = "manual_pool.csv"
 
 ##############################config parameters###############################
 

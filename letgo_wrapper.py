@@ -168,20 +168,45 @@ if __name__ == "__main__":
         print(f"An error occurred: {e}")
 
 
-  
+
     if configure.inject_random_or_targeted == "targeted":
-        if not os.path.exists(configure.mnemonic_count_file):
-            print("Generating mnemonic_count...")
-            mnemonic_count_file = InstPoolMaker.generate_mnemonic_count_file(mnemonic_count_file = configure.mnemonic_count_file)
-        if not os.path.exists(configure.catalog_csv_file):
-            print("Generating catalog...")
-            catalog_path = InstPoolMaker.generate_catalog(catalog_csv_file = configure.catalog_csv_file)
-        if not os.path.exists(configure.pool_csv_file) or os.path.getsize(configure.pool_csv_file)==0:
-            print("Generating pool...")
-            pool_path = InstPoolMaker.generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=configure.numFI)
-            print(f"Pool generated at: {pool_path}")
+        # ====== 手动指令注错模式 ======
+        if hasattr(configure, 'use_manual_instructions') and configure.use_manual_instructions:
+            print("\n=== Manual Instructions Mode Enabled ===")
+
+            # 备份旧的 pool 文件（如果存在）
+            if os.path.exists(configure.pool_csv_file) and os.path.getsize(configure.pool_csv_file) > 0:
+                backup_pool = configure.pool_csv_file + ".backup"
+                import shutil
+                shutil.copy(configure.pool_csv_file, backup_pool)
+                print(f"Backed up existing pool to: {backup_pool}")
+
+            # 生成手动 pool 并直接覆盖到 pool_csv_file
+            print("Generating manual pool from configure.manual_instructions...")
+            pool_path = InstPoolMaker.generate_manual_pool(pool_csv_file=configure.pool_csv_file)
+
+            if pool_path:
+                print(f"Manual pool generated at: {configure.pool_csv_file}")
+                print("=== Manual Instructions Setup Complete ===\n")
+            else:
+                print("Error: Failed to generate manual pool!")
+                sys.exit(1)
+
+        # ====== 自动目标注错模式 ======
         else:
-            print("Pool already exists, skip generating pool from catalog...")
+            if not os.path.exists(configure.mnemonic_count_file):
+                print("Generating mnemonic_count...")
+                mnemonic_count_file = InstPoolMaker.generate_mnemonic_count_file(mnemonic_count_file = configure.mnemonic_count_file)
+            if not os.path.exists(configure.catalog_csv_file):
+                print("Generating catalog...")
+                catalog_path = InstPoolMaker.generate_catalog(catalog_csv_file = configure.catalog_csv_file)
+            if not os.path.exists(configure.pool_csv_file) or os.path.getsize(configure.pool_csv_file)==0:
+                print("Generating pool...")
+                pool_path = InstPoolMaker.generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool_csv_file = configure.pool_csv_file, num_samples=configure.numFI)
+                print(f"Pool generated at: {pool_path}")
+            else:
+                print("Pool already exists, skip generating pool from catalog...")
+
 
     # ====== 影响力分析集成 ======
     if hasattr(configure, 'use_influence_analysis') and configure.use_influence_analysis:

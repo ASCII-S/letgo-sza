@@ -515,6 +515,64 @@ def generate_Pool_from_catalog(catalog_csv_file=configure.catalog_csv_file, pool
     print(f"已通过catalog创建{len(lines) * minnum} 条注错位置，保存到 {pool_csv_file}")
     return pool_csv_file
 
+
+def generate_manual_pool(pool_csv_file=None):
+    """
+    根据 configure.manual_instructions 生成手动注错 pool 文件
+
+    格式：[regmem, reg, pc_hex, max_iteration(可选), repeat_count(可选)]
+    - max_iteration: 该指令在程序中的最大执行次数，默认为 1023
+    - repeat_count: 对该位置重复注错的次数，默认为 1
+    - iteration 自动按顺序分配：0, 1, 2, ..., min(max_iteration, repeat_count-1)
+
+    Args:
+        pool_csv_file: 输出的 pool 文件路径，默认使用 configure.pool_csv_file
+
+    Returns:
+        生成的 pool 文件路径
+    """
+    if pool_csv_file is None:
+        pool_csv_file = configure.pool_csv_file
+
+    # 检查 manual_instructions 是否为空
+    if not hasattr(configure, 'manual_instructions') or not configure.manual_instructions:
+        print("Warning: manual_instructions is empty!")
+        return None
+
+    total_injections = 0
+
+    # 打开 pool_csv_file 进行写入
+    with open(pool_csv_file, 'w') as outfile:
+        for instruction in configure.manual_instructions:
+            # 解析指令配置
+            if len(instruction) < 3:
+                print(f"Warning: Invalid instruction format (need at least 3 params): {instruction}")
+                continue
+
+            regmem = instruction[0]
+            reg = instruction[1]
+            pc_hex = instruction[2]
+            max_iteration = instruction[3] if len(instruction) > 3 else 1023  # 默认最大 iteration
+            repeat_count = instruction[4] if len(instruction) > 4 else 1      # 默认注错 1 次
+
+            # 处理 PC 地址：移除 0x 前缀，转换为十进制
+            if isinstance(pc_hex, str):
+                pc_hex = pc_hex.lower().replace('0x', '')
+                pc_decimal = str(int(pc_hex, 16))
+            else:
+                pc_decimal = str(pc_hex)
+
+            # 生成多条注错配置，iteration 从 0 开始递增，但不超过 max_iteration
+            for i in range(repeat_count):
+                iteration = min(i, max_iteration)
+                new_line = [regmem, reg, pc_decimal, str(iteration)]
+                outfile.write(','.join(new_line) + '\n')
+                total_injections += 1
+
+    print(f"已通过手动配置创建 {total_injections} 条注错位置，保存到 {pool_csv_file}")
+    return pool_csv_file
+
+
 def readArgsFromPool(filepath = os.path.join(configure.instpool_folder, poolname)):
     
     # 用于存储最后一行数据
